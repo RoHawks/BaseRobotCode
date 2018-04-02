@@ -19,8 +19,8 @@ public class SwerveDrive {
 	 * Initializes a swerve drive calculator
 	 * 
 	 * @param wheels
-	 *            wheels to initialize with; used to compute distances relative
-	 *            to robot center
+	 *            wheels to initialize with; used to compute distances relative to
+	 *            robot center
 	 */
 	public SwerveDrive(final Wheel[] wheels) {
 		mOffsets = new Vector[4];
@@ -43,8 +43,8 @@ public class SwerveDrive {
 	 * Calculates wheel vectors to give some linear & angular velocity
 	 * 
 	 * @param pAngularVelocity
-	 *            value between -1 and 1; clockwise is negative,
-	 *            counter-clockwise is positive
+	 *            value between -1 and 1; clockwise is negative, counter-clockwise
+	 *            is positive
 	 * @param pRobotVelocity
 	 *            Vector corresponding to robot velocity: x-axis points forward,
 	 *            y-axis points to the right
@@ -53,17 +53,20 @@ public class SwerveDrive {
 		Vector[] velocities = new Vector[4];
 		double maximumLength = 0;
 		for (int i = 0; i < 4; i++) {
-			double angularComponent_angle = mOffsets[i].getAngle() + 90; // angle from center to wheel, +90 for perpendicular
+			double angularComponent_angle = mOffsets[i].getAngle() + 90;
+			// angle from center to wheel, +90 for perpendicular
 			double angularComponent_speed = mOffsets[i].getMagnitude() * pAngularVelocity;
 
-			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed); 
+			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed);
 			// if we only used these vectors, would only turn
-			Vector velocityComponent = new Vector(pRobotVelocity); // if we only used these vectors, would drive linearly
+			Vector velocityComponent = new Vector(pRobotVelocity);
+			// if we only used these vectors, would drive linearly
 
 			// add two components together
 			velocities[i] = Vector.add(angularComponent, velocityComponent);
-			if (velocities[i].getMagnitude() > maximumLength)
+			if (velocities[i].getMagnitude() > maximumLength) {
 				maximumLength = velocities[i].getMagnitude();
+			}
 		}
 
 		// if our maximum empirical length is too big, scale it all down
@@ -82,12 +85,12 @@ public class SwerveDrive {
 	}
 
 	/**
-	 * Calculates wheel vectors to give some linear & angular velocity while
-	 * holding wheel direction towards robot velocity
+	 * Calculates wheel vectors to give some linear & angular velocity while holding
+	 * wheel direction towards robot velocity
 	 * 
 	 * @param pAngularVelocity
-	 *            value between -1 and 1; clockwise is negative,
-	 *            counter-clockwise is positive
+	 *            value between -1 and 1; clockwise is negative, counter-clockwise
+	 *            is positive
 	 * @param pRobotVelocity
 	 *            Vector corresponding to robot velocity: x-axis points forward,
 	 *            y-axis points to the right
@@ -99,12 +102,12 @@ public class SwerveDrive {
 		Vector[] velocities = new Vector[4];
 		double maximumLength = 0;
 		for (int i = 0; i < 4; i++) {
-			double angularComponent_angle = mOffsets[i].getAngle() + 90; 
+			double angularComponent_angle = mOffsets[i].getAngle() + 90;
 			// angle from center to wheel, +90 for perpendicular
 			double angularComponent_speed = mOffsets[i].getMagnitude() * pAngularVelocity;
 
-			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed); 
-			//if we only used these vectors, would only turn
+			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed);
+			// if we only used these vectors, would only turn
 
 			// add two components together
 			fakeVelocities[i] = Vector.add(angularComponent, pRobotVelocity);

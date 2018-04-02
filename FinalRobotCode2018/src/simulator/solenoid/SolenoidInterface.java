@@ -6,8 +6,8 @@ public interface SolenoidInterface {
 	void set(Value pDirection);
 
 	Value get();
-	
+
 	void setOpposite();
-	
+
 	void simulate(long pDeltaMillis);
 }

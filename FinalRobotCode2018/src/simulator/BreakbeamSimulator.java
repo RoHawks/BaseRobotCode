@@ -2,17 +2,17 @@ package simulator;
 
 import edu.wpi.first.wpilibj.Joystick;
 
-public class BreakbeamSimulator implements DigitalInputInterface{
+public class BreakbeamSimulator implements DigitalInputInterface {
 	private Joystick mJoystick;
 	private boolean mTriggered;
-	
+
 	public BreakbeamSimulator(Joystick pJoystick) {
 		mJoystick = pJoystick;
 	}
-	
+
 	@Override
 	public void set() {
-		if(mJoystick.getRawButtonReleased(9)) {
+		if (mJoystick.getRawButtonReleased(9)) {
 			mTriggered = !mTriggered;
 		}
 	}

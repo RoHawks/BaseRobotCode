@@ -12,7 +12,6 @@ public class StopCommand extends BaseAutonomousCommand {
 		mDriveTrain = pDriveTrain;
 	}
 
-
 	@Override
 	public boolean RunCommand() {
 		mDriveTrain.enactMovement(mDriveTrain.getRobotAngle(), mDriveTrain.getDesiredRobotVel().getAngle(), LinearVelocity.NONE, RotationalVelocity.NONE, 0.0);

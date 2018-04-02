@@ -12,5 +12,5 @@ public enum States {
 	Defense,
 	Manual_Elevator_Control,
 	Initial_If_Holding_Box
-	
+
 }

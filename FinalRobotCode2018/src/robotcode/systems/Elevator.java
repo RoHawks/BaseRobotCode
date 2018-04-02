@@ -1,6 +1,7 @@
 package robotcode.systems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import constants.ElevatorConstants;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,11 +35,20 @@ public class Elevator {
 	}
 
 	public enum ElevatorState {
-		GROUND, JOYSTICK, SCALE_HIGH, SCALE_MID, SCALE_LOW, SWITCH, BOX_HEIGHT;
+		GROUND,
+		JOYSTICK,
+		SCALE_HIGH,
+		SCALE_MID,
+		SCALE_LOW,
+		SWITCH,
+		BOX_HEIGHT,
+		TOP;
 	}
 
 	public enum ElevatorDirection {
-		UP, DOWN, NONE;
+		UP,
+		DOWN,
+		NONE;
 	}
 
 	public void setPIDConstants() {
@@ -84,14 +94,14 @@ public class Elevator {
 
 	public void setGround() {
 		mElevatorState = ElevatorState.GROUND;
-//		if (mIsEnabled) {
-//			mMotor.set(ControlMode.PercentOutput, -0.6);
-//		} else {
-//			mMotor.set(ControlMode.PercentOutput, 0);
-//		}
-		moveElevator(ElevatorConstants.Heights.GROUND); //TZ should work with pid...
+		// if (mIsEnabled) {
+		// mMotor.set(ControlMode.PercentOutput, -0.6);
+		// } else {
+		// mMotor.set(ControlMode.PercentOutput, 0);
+		// }
+		moveElevator(ElevatorConstants.Heights.GROUND); // TZ should work with pid...
 	}
-	
+
 	public void setSwitch() {
 		mElevatorState = ElevatorState.SWITCH;
 		moveElevator(ElevatorConstants.Heights.SWITCH_HEIGHT);
@@ -116,6 +126,11 @@ public class Elevator {
 		mElevatorState = ElevatorState.BOX_HEIGHT;
 		moveElevator(ElevatorConstants.Heights.BOX_HEIGHT);
 	}
+	
+	public void setTop() {
+		mElevatorState = ElevatorState.TOP;
+		moveElevator(ElevatorConstants.Heights.TOP);
+	}
 
 	public void setJoystickBasic() {
 		mElevatorState = ElevatorState.JOYSTICK;
@@ -126,14 +141,14 @@ public class Elevator {
 			mMotor.set(0);
 		}
 	}
-	
+
 	public void setJoystickAdvanced() {
 		mElevatorState = ElevatorState.JOYSTICK;
 		setElevatorDirection();
 		ElevatorDirection dir = getElevatorDirection();
-		if(Math.abs(mJoystick.getY()) > 0.25 && mIsEnabled) {
+		if (Math.abs(mJoystick.getY()) > 0.25 && mIsEnabled) {
 			double speed = -mJoystick.getY() * mJoystick.getY() * Math.signum(mJoystick.getY());
-			if(dir == ElevatorDirection.UP && isCloseToTarget(ElevatorConstants.Heights.TOP, 15)) {
+			if (dir == ElevatorDirection.UP && isCloseToTarget(ElevatorConstants.Heights.TOP, 15)) {
 				speed *= 0.5;
 			}
 			else if (dir == ElevatorDirection.UP && isCloseToTarget(ElevatorConstants.Heights.TOP, 5)) {
@@ -149,7 +164,7 @@ public class Elevator {
 		}
 		else {
 			mMotor.set(0);
-		}//TZ check
+		} // TZ check
 	}
 
 	/**
@@ -169,7 +184,8 @@ public class Elevator {
 			SmartDashboard.putNumber("Talon error value", mMotor.getClosedLoopError(0));
 			SmartDashboard.putNumber("Elevator motor output", mMotor.getMotorOutputVoltage());
 			SmartDashboard.putNumber("Elevator Talon Current", mMotor.getOutputCurrent());
-		} else {
+		} 
+		else {
 			mMotor.set(ControlMode.PercentOutput, 0);
 		}
 	}
@@ -180,9 +196,11 @@ public class Elevator {
 	private void setElevatorDirection() {
 		if (mEncoder.getHeightInInchesFromElevatorBottom() > getHeightGoal(mElevatorState)) {
 			mElevatorDir = ElevatorDirection.DOWN;
-		} else if (mEncoder.getHeightInInchesFromElevatorBottom() < getHeightGoal(mElevatorState)) {
+		} 
+		else if (mEncoder.getHeightInInchesFromElevatorBottom() < getHeightGoal(mElevatorState)) {
 			mElevatorDir = ElevatorDirection.UP;
-		} else {
+		} 
+		else {
 			mElevatorDir = ElevatorDirection.NONE;
 		}
 	}
@@ -210,6 +228,8 @@ public class Elevator {
 			return ElevatorConstants.Heights.SWITCH_HEIGHT;
 		case BOX_HEIGHT:
 			return ElevatorConstants.Heights.BOX_HEIGHT;
+		case TOP:
+			return ElevatorConstants.Heights.TOP;
 		default:
 			return mEncoder.getHeightInInchesFromElevatorBottom();
 		}
@@ -250,10 +270,10 @@ public class Elevator {
 	public boolean isCloseToTarget() {
 		SmartDashboard.putNumber("Height Goal -- close to target", this.getHeightGoal(mElevatorState));
 		SmartDashboard.putNumber("Height Inches -- close to target", getHeightInches());
-		return isCloseToTarget(getHeightGoal(mElevatorState), 0.5);//TZ tolerance
+		return isCloseToTarget(getHeightGoal(mElevatorState), 0.5);// TZ tolerance
 	}
-	
-	public boolean isCloseToTarget(double pHeight, double pTolerance) { //Everything in inches
+
+	public boolean isCloseToTarget(double pHeight, double pTolerance) { // Everything in inches
 		return Math.abs(pHeight - getHeightInches()) < pTolerance;
 	}
 }

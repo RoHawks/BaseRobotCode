@@ -43,7 +43,8 @@ public class StraightLineDriveCommand extends BaseAutonomousCommand {
 		// it in reverse, for example
 		double boundedSpeed = isThisCommandDone ? mFinalVelocity : speed;
 
-		mDriveTrain.enactMovement(mDriveTrain.getRobotAngle(), mAngle, LinearVelocity.NORMAL, RotationalVelocity.NONE, boundedSpeed);
+		mDriveTrain.enactMovement(mDriveTrain.getRobotAngle(), mAngle, LinearVelocity.NORMAL, RotationalVelocity.NONE,
+				boundedSpeed);
 
 		return isThisCommandDone;
 

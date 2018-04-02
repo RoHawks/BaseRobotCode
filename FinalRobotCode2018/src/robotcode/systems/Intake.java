@@ -1,12 +1,12 @@
 package robotcode.systems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import constants.IntakeConstants;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import robotcode.systems.Intake.IntakeState;
-import simulator.*;
+import simulator.DigitalInputInterface;
 import simulator.talon.TalonInterface;
 
 public class Intake {
@@ -17,7 +17,7 @@ public class Intake {
 	private IntakeState mIntakeState;
 	private Joystick mJoystick;
 	
-	private long msWhenEnteredFlip;
+	private long mTimeWhenEnteredFlip;
 
 	private double mWheelSpeed;
 
@@ -35,16 +35,15 @@ public class Intake {
 	
 	public void flap()
 	{
-		if(mIntakeState != IntakeState.FLAP)
-		{
-			msWhenEnteredFlip = System.currentTimeMillis();			
-		
+		if (mIntakeState != IntakeState.FLAP) {
+			mTimeWhenEnteredFlip = System.currentTimeMillis();
 		}
 		mIntakeState = IntakeState.FLAP;
 		
-		boolean flipSide = (System.currentTimeMillis() - msWhenEnteredFlip) % IntakeConstants.FLIP_TIME_MS > IntakeConstants.FLIP_TIME_MS / 2;
+		boolean flipSide = (System.currentTimeMillis() - mTimeWhenEnteredFlip) % IntakeConstants.FLIP_TIME_MS > IntakeConstants.FLIP_TIME_MS / 2;
 		mRightPiston.set(flipSide ? Value.kForward : Value.kReverse);
 		mLeftPiston.set((flipSide ? Value.kForward : Value.kReverse));
+		//TZ test for all the different possibilities
 		
 		mLeftWheel.set(ControlMode.PercentOutput, IntakeConstants.INTAKE_WHEEL_SPEED);
 		mRightWheel.set(ControlMode.PercentOutput, IntakeConstants.INTAKE_WHEEL_SPEED);
@@ -52,26 +51,9 @@ public class Intake {
 	
 	boolean button_pressed = false;
 	//ATS wheels run every 5 seconds for 1 second to push cube back in
-	public void hold()//on way to exchange
-	{
+	public void hold() {
 		mIntakeState = IntakeState.CLOSED;
-		
 		closeMovePistons();
-		
-//		if(mJoystick.getRawButtonReleased(8)/*mLimitSwitch.get()*/)
-//		{
-//			button_pressed = !button_pressed;
-//		}
-//		if(button_pressed) {
-//			mLeftWheel.set(0);
-//			mRightWheel.set(0);
-//		}
-//		else
-//		{
-//			mLeftWheel.set(ControlMode.PercentOutput, IntakeConstants.INTAKE_WHEEL_SPEED);
-//			mRightWheel.set(ControlMode.PercentOutput, IntakeConstants.INTAKE_WHEEL_SPEED);
-//		}
-		
 	}
 	
 	public void hunt() {
@@ -112,9 +94,7 @@ public class Intake {
 	public void setWheelSpeedJoystick() {
 		double yPos = mJoystick.getY();
 		mWheelSpeed = (Math.abs(yPos) > 0.25) ? (-1 * Math.signum(yPos) * yPos * yPos) : 0;
-//		if(mIntakeState == IntakeState.FLAP) {
-//			mWheelSpeed = IntakeConstants.INTAKE_WHEEL_SPEED;
-//		}
+		
 		SmartDashboard.putNumber("Secondary Joystick Y", yPos);
 		SmartDashboard.putNumber("Intake Wheel Speed", mWheelSpeed);
 		mLeftWheel.set(mWheelSpeed);

@@ -3,42 +3,35 @@ package autonomous.commands;
 import constants.GrabberConstants;
 import robotcode.systems.Grabber;
 
-public class ScoreCommand extends BaseAutonomousCommand
-{
+public class ScoreCommand extends BaseAutonomousCommand {
 	private Grabber mGrabber;
-	
-	public ScoreCommand(Grabber pGrabber)
-	{
+
+	public ScoreCommand(Grabber pGrabber) {
 		mGrabber = pGrabber;
 	}
-	
+
 	@Override
-	public boolean RunCommand() 
-	{
+	public boolean RunCommand() {
 		long scoringSequenceElapsedMilliseconds = this.GetMillisecondsSinceStart();
 		
-		if(scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME)
-		{
+		if (scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME) {
 			mGrabber.out();
 			mGrabber.grab();
-			return false;
 		}
-		else if(scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME + GrabberConstants.GRAB_PISTON_OUT_TIME)
-		{
+		else if (scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME
+				+ GrabberConstants.GRAB_PISTON_OUT_TIME) {
 			mGrabber.out();
 			mGrabber.release();
-			return false;
 		}
-		else if(scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME + GrabberConstants.GRAB_PISTON_OUT_TIME + GrabberConstants.EXTEND_PISTON_IN_TIME)
-		{
+		else if (scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME
+				+ GrabberConstants.GRAB_PISTON_OUT_TIME + GrabberConstants.EXTEND_PISTON_IN_TIME) {
 			mGrabber.in();
 			mGrabber.release();
-			return false;
 		}
-		else
-		{
+		else {
 			return true;
 		}
-
+		
+		return false;
 	}
 }

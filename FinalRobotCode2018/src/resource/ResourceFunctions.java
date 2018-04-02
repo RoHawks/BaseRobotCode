@@ -1,27 +1,27 @@
 package resource;
 
 public class ResourceFunctions {
-	
+
 	public static double tickToAngle(int tick) {
 		return (double) tick * 360.0 / 4096.0;
 	}
 
 	public static int angleToTick(double angle) {
-		return (int) Math.round(angle * 4096.0/360.0);
+		return (int) Math.round(angle * 4096.0 / 360.0);
 	}
-	
+
 	public static double TickToCenti(double tick) {
 		return tick * 12 / 4096;
 	}
-	
+
 	public static double CentiToTick(double centi) {
 		return centi * 4096 / 12;
 	}
-	
-	public static double speedToPercent(double speed){
+
+	public static double speedToPercent(double speed) {
 		return speed / 1023;
 	}
-	
+
 	/**
 	 * gets angle between 0 and 360
 	 * 
@@ -43,7 +43,7 @@ public class ResourceFunctions {
 	 *            second angle
 	 * @return difference
 	 */
-	public static double continuousAngleDif(double angle1, double angle2) { //target - current?
+	public static double continuousAngleDif(double angle1, double angle2) { // target - current?
 		double dif = putAngleInRange(angle1) - putAngleInRange(angle2);
 		dif = putAngleInRange(dif);
 		if (dif > 180)
@@ -84,13 +84,5 @@ public class ResourceFunctions {
 		} else {
 			return val;
 		}
-	}
-	
-	public static double InchToTick(double inch) {
-		return CentiToTick(2.54 * inch);
-	}
-	
-	public static double TickToInch(double tick) {
-		return TickToCenti(tick) / 2.54;
 	}
 }

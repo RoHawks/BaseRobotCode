@@ -6,7 +6,6 @@ import autonomous.AutonomousRoutine;
 import autonomous.commands.AutonomousCommand;
 import autonomous.commands.StopCommand;
 import autonomous.commands.StraightLineDriveCommand;
-import autonomous.commands.TurnWheelsToAngle;
 import robotcode.driving.DriveTrain;
 import robotcode.systems.Elevator;
 
@@ -16,7 +15,6 @@ public class DriveForwardRoutine implements AutonomousRoutine {
 	private Elevator mElevator;
 
 	private final double WHEEL_ANGLE = 0;
-	private final double WHEEL_TOLERANCE = 10;
 	private final double ACCELERATE_TO_SPEED = 0.3;
 	private final long ACCELERATION_TIME = 1000;
 	private final long DRIVE_FULL_SPEED_TIME = 1000;

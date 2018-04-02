@@ -1,7 +1,5 @@
 package autonomous;
 
-public interface AutonomousSequence 
-{
+public interface AutonomousSequence {
 	boolean run();
-
 }

@@ -138,7 +138,7 @@ public abstract class BaseTalonSimulator implements TalonInterface {
 	public void configPeakOutputForward(double pOutput, int j) {
 		mMaxForwardOutput = pOutput;
 	}
-	
+
 	@Override
 	public void configPeakOutputReverse(double pOutput, int j) {
 		mMaxReverseOutput = pOutput;
@@ -147,25 +147,30 @@ public abstract class BaseTalonSimulator implements TalonInterface {
 	public void configPeakCurrentDuration(int milliseconds, int timeoutMs) {
 		mPeakMaxDuration = milliseconds;
 	}
+
 	public void configPeakCurrentLimit(int amps, int timeoutMs) {
 		mPeakMaxCurrent = amps;
 	}
+
 	public void configContinuousCurrentLimit(int amps, int timeoutMs) {
 		mContinuousMaxCurrent = amps;
 	}
+
 	public void enableCurrentLimit(boolean enable) {
 		mCurrentControl = enable;
 	}
+
 	public abstract void simulate(long pMillisecondsSinceLastUpdate);
-	
+
 	protected void pidCalc() {
 		mCurrentPercentOutput = mP * (mPIDTarget - mCurrentTicks);
 		mCurrentPercentOutput = ResourceFunctions.PutNumInAbsoluteRange(mCurrentPercentOutput, -1, 1);
 	}
+
 	public boolean getSensorCollection_isFwdLimitSwitchClosed() {
 		return false;
 	}
-	
+
 	public WPI_TalonSRX getTalon() {
 		return null;
 	}

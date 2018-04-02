@@ -9,10 +9,11 @@ public class IntakeHingePiston {
 	public IntakeHingePiston(simulator.solenoid.SolenoidInterface pPiston) {
 		mPiston = pPiston;
 	}
-	
+
 	public void Up() {
-		mPiston.set(HingeConstants.Piston.UP);		
+		mPiston.set(HingeConstants.Piston.UP);
 	}
+
 	public void Down() {
 		mPiston.set(HingeConstants.Piston.DOWN);
 	}

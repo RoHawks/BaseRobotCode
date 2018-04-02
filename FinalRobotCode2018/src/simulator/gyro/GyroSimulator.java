@@ -1,6 +1,6 @@
 package simulator.gyro;
 
-public class GyroSimulator implements GyroInterface{
+public class GyroSimulator implements GyroInterface {
 
 	@Override
 	public double getAngle() {

@@ -1,15 +1,5 @@
 package org.usfirst.frc.team3419.robot;
 
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.SerialPort;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -26,29 +16,38 @@ import constants.ElevatorConstants;
 import constants.GrabberConstants;
 import constants.HingeConstants;
 import constants.IntakeConstants;
+import constants.JoystickConstants;
 import constants.Ports;
 import constants.RunConstants;
 import constants.States;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.SampleRobot;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
+import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
 import robotcode.systems.Elevator;
 import robotcode.systems.Grabber;
 import robotcode.systems.Intake;
 import robotcode.systems.IntakeHingeMotor;
 import robotcode.systems.SingleSolenoidReal;
-import robotcode.driving.DriveTrain;
-import robotcode.driving.DriveTrain.LinearVelocity;
-import robotcode.driving.DriveTrain.RotationalVelocity;
 import sensors.ElevatorEncoder;
 import sensors.RobotAngle;
 import sensors.TalonAbsoluteEncoder;
-
-import simulator.*;
+import simulator.BreakbeamSimulator;
+import simulator.DigitalInputActualImplementation;
+import simulator.DigitalInputInterface;
+import simulator.LimitSwitchSimulator;
 import simulator.gyro.GyroActualImplementation;
 import simulator.gyro.GyroInterface;
 import simulator.gyro.GyroSimulator;
@@ -56,7 +55,6 @@ import simulator.solenoid.SingleSolenoidActualImplementation;
 import simulator.solenoid.SingleSolenoidSimulator;
 import simulator.talon.TalonActualImplementation;
 import simulator.talon.TalonInterface;
-import constants.JoystickConstants;
 
 @SuppressWarnings("deprecation")
 public class Robot extends SampleRobot {
@@ -103,18 +101,19 @@ public class Robot extends SampleRobot {
 	private AutonomousSequence mAutonomousSequence;
 
 	public Robot() {
+		
 	}
 
 	@Override
 	public void robotInit() {
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(240,180);
+		camera.setResolution(240, 180);
 		camera.setFPS(30);
-		
+
 		mNavX = GetGyroObject(Ports.NAVX);
 		mCompressor = new Compressor(Ports.COMPRESSOR);
 		mPDP = new PowerDistributionPanel();
-		
+
 		if (RunConstants.RUNNING_DRIVE) {
 			DriveInit();
 		}
@@ -129,11 +128,6 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	
-	private void autodrive(double angle) {
-		mDriveTrain.enactMovement(0, angle, LinearVelocity.NORMAL, RotationalVelocity.NONE, 0.3);//TZ
-	}
-	
 	@Override
 	public void autonomous() {
 		/*
@@ -147,22 +141,23 @@ public class Robot extends SampleRobot {
 		 * int currentStep = 0; int previousStep = -1;
 		 */
 
-		//mAutonomousRoutine = AutonomousRoutines.DRIVE_FORWARD;
-		
+		// mAutonomousRoutine = AutonomousRoutines.DRIVE_FORWARD;
+
 		startGame();
 		chooseAutoSequence();
 		long autoTimeStart = System.currentTimeMillis();
-		
-		//Do not do anything until data from FMS arrives:
-		while ((isAutonomous() && isEnabled()) && (System.currentTimeMillis() - autoTimeStart > AutoConstants.SwitchMiddle.INITIAL_PAUSE)
+
+		// Do not do anything until data from FMS arrives:
+		while ((isAutonomous() && isEnabled())
+				&& (System.currentTimeMillis() - autoTimeStart > AutoConstants.SwitchMiddle.INITIAL_PAUSE)
 				|| (autonomous.PlateAssignmentReader.GetNearSwitchSide() == 'U')) {
 			Timer.delay(0.005);
 		}
-		
+
 		boolean isComplete = false;
-		
+
 		while (isAutonomous() && isEnabled() && !isComplete) {
-			
+
 			isComplete = mAutonomousSequence.run();
 
 			/*
@@ -180,7 +175,7 @@ public class Robot extends SampleRobot {
 	}
 
 	private void chooseAutoSequence() {
-		switch(mAutonomousRoutine) {
+		switch (mAutonomousRoutine) {
 			case DO_NOTHING:
 				mAutonomousSequence = new DoNothingSequence();
 				SetNewState(States.Hunting);
@@ -194,12 +189,11 @@ public class Robot extends SampleRobot {
 			case SCALE_SCORE_START_ON_RIGHT:
 				break;
 			case SWITCH_SCORE:
-				mAutonomousSequence = new SwitchSequence(mDriveTrain, mElevator, mGrabber, mHinge, mWheel);
+				mAutonomousSequence = new SwitchSequence(mDriveTrain, mElevator, mGrabber, mHinge);
 				SetNewState(States.Hunting);
 				break;
 			default:
-				break;
-			
+				break;	
 		}
 	}
 
@@ -330,7 +324,6 @@ public class Robot extends SampleRobot {
 				mHasBegunScoringSequence = false;
 				SetNewState(States.Hunting);
 			}
-
 		} 
 		else {
 			mHasBegunScoringSequence = true;
@@ -338,13 +331,12 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	long mPickingUpBoxStartedGrabTime;
-	boolean mPickingUpBoxHasStartedGrab = false;
-	boolean mOnWayToScoreStartedGoingUp = false;
-
+	private long mPickingUpBoxStartedGrabTime;
+	private boolean mPickingUpBoxHasStartedGrab = false;
+	
 	private void On_Way_To_Score_Switch() {
 		mIntake.disable();
-		
+
 		if (mElevator.IsAtBottom()) {
 			SmartDashboard.putNumber("Grab time", System.currentTimeMillis());
 			mGrabber.grab();
@@ -357,8 +349,9 @@ public class Robot extends SampleRobot {
 			mElevator.setSpeed(-0.3);
 		}
 
-		if (mPickingUpBoxHasStartedGrab && System.currentTimeMillis() - mPickingUpBoxStartedGrabTime > GrabberConstants.GRAB_PISTON_IN_TIME) {  //TZ change time constant
-			mOnWayToScoreStartedGoingUp = true;
+		if (mPickingUpBoxHasStartedGrab && System.currentTimeMillis() - mPickingUpBoxStartedGrabTime 
+				> GrabberConstants.GRAB_PISTON_IN_TIME) {
+			// TZ change time constant
 			SmartDashboard.putNumber("Change height time", System.currentTimeMillis());
 			mElevator.setSwitch();
 			if (mElevator.getHeightInches() > ElevatorConstants.Heights.HINGE_HEIGHT) {// TZ check elevator encoder
@@ -368,20 +361,16 @@ public class Robot extends SampleRobot {
 			if (mJoystick.getRawButton(JoystickConstants.SCORE)) {
 				SetNewState(States.Score);
 				mPickingUpBoxHasStartedGrab = false;
-				mOnWayToScoreStartedGoingUp = false;
 			}
 		}
 		if (mJoystick.getRawButton(JoystickConstants.MANUAL_ELEVATOR_CONTROL)) {
 			SetNewState(States.Manual_Elevator_Control);
 			mPickingUpBoxHasStartedGrab = false;
-			mOnWayToScoreStartedGoingUp = false;
 		} 
 		else if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
 			SetNewState(States.Hunting);
 			mPickingUpBoxHasStartedGrab = false;
-			mOnWayToScoreStartedGoingUp = false;
 		}
-
 	}
 
 	private void InitialIfHoldingBox() {
@@ -399,9 +388,7 @@ public class Robot extends SampleRobot {
 		else if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
 			SetNewState(States.Hunting);
 		}
-
 	}
-
 
 	private void Manual_Elevator_Control() {
 		mIntake.disable();
@@ -425,14 +412,12 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	boolean mHasSeenGroundInOnWayToExchange = false;
-	boolean mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed = false;
-	boolean mDriveHasHitOnWayToExchange_OnWayToScoreSwitchButtonPressed = false;
-	boolean mDriveHasHitOnWayToExchange_HuntingButtonPressed = false;
-	long mTimeAtWayToExchangeStart;
+	private boolean mHasSeenGroundInOnWayToExchange = false;
+	private boolean mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed = false;
+	private boolean mDriveHasHitOnWayToExchange_OnWayToScoreSwitchButtonPressed = false;
+	private boolean mDriveHasHitOnWayToExchange_HuntingButtonPressed = false;
 	
 	private void On_Way_To_Exchange() {
-		mTimeAtWayToExchangeStart = mTimeAtStateStart;
 		if (GetMillisIntoState() < 500) {
 			mIntake.openMovePistons();
 		} 
@@ -451,18 +436,16 @@ public class Robot extends SampleRobot {
 		mGrabber.release();
 		mHinge.down();
 
-		mIntake.setWheelSpeed(0.2); //TZ Was in if statement for time
+		mIntake.setWheelSpeed(0.2); // TZ Was in if statement for time
 
 		if (mJoystick.getRawButton(JoystickConstants.SCORE)) {
 			mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed = true;
-		} 
+		}
 		else if (mJoystick.getRawButton(JoystickConstants.PREPARE_TO_SCORE_ON_SWITCH)) {
 			mDriveHasHitOnWayToExchange_OnWayToScoreSwitchButtonPressed = true;
-
 		} 
 		else if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
 			mDriveHasHitOnWayToExchange_HuntingButtonPressed = true;
-
 		}
 
 		if (mHasSeenGroundInOnWayToExchange) {
@@ -476,7 +459,6 @@ public class Robot extends SampleRobot {
 				SetNewState(States.Hunting);
 			}
 		}
-
 	}
 
 	private void Breakbeam_Tripped() {
@@ -494,7 +476,6 @@ public class Robot extends SampleRobot {
 		else if (mBreakbeam.get()) {
 			SetNewState(States.Hunting);
 		}
-
 	}
 
 	private long mTimeAtStateStart;
@@ -503,16 +484,15 @@ public class Robot extends SampleRobot {
 	private void SetNewState(States pState) {
 		mCurrentState = pState;
 		mTimeAtStateStart = System.currentTimeMillis();
-		
+
 		mHasSeenGroundInOnWayToExchange = false;
 		mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed = false;
 		mDriveHasHitOnWayToExchange_OnWayToScoreSwitchButtonPressed = false;
 		mDriveHasHitOnWayToExchange_HuntingButtonPressed = false;
 		mHasBegunScoringSequence = false;
-		
+
 		mStateLog = mStateLog + ", " + (mTimeAtStateStart - mGameStartMillis) + ": " + mCurrentState.toString();
 		SmartDashboard.putString("StateLog", mStateLog);
-
 	}
 
 	private long GetMillisIntoState() {
@@ -531,7 +511,7 @@ public class Robot extends SampleRobot {
 
 		if (mJoystick.getRawButton(JoystickConstants.ACQUIRED_BOX)) {
 			SetNewState(States.On_Way_To_Exchange);
-		} 
+		}
 		else if (!mBreakbeam.get() && GetMillisIntoState() > 3000) {
 			SetNewState(States.Breakbeam_Tripped);
 		}
@@ -557,11 +537,11 @@ public class Robot extends SampleRobot {
 
 			if (RunConstants.RUNNING_PNEUMATICS) {
 				mCompressor.start();
-			} 
+			}
 			else {
 				mCompressor.stop();
 			}
-			
+
 			if (RunConstants.RUNNING_ELEVATOR) {
 				mGrabber.grab();
 				while (!mElevatorTalon.getSensorCollection_isRevLimitSwitchClosed()) {
@@ -599,7 +579,7 @@ public class Robot extends SampleRobot {
 					mAutonomousRoutine = AutonomousRoutines.SWITCH_SCORE;
 				}
 			}
-			//SmartDashboard.putString("!AUTONOMOUS_ROUTINE!", mAutonomousRoutine.toString());
+			// SmartDashboard.putString("!AUTONOMOUS_ROUTINE!", mAutonomousRoutine.toString());
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
@@ -661,15 +641,13 @@ public class Robot extends SampleRobot {
 			mDrive[i].configContinuousCurrentLimit(80, 10);
 			mDrive[i].enableCurrentLimit(true);
 
-			// mDrive[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute,
-			// 0, 10);
+			// mDrive[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			// mDrive[i].setSensorPhase(DriveConstants.DRIVE_ENCODER_INVERTED[i]);
 
-			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i],
-					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
+			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i]);
 		}
-		
+
 		mRobotAngle = new RobotAngle(mNavX, false, 0);
 		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle);
 	}
@@ -726,19 +704,18 @@ public class Robot extends SampleRobot {
 		mElevatorTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		mElevatorTalon.setSensorPhase(ElevatorConstants.ENCODER_REVERSED);
 		mElevatorTalon.setNeutralMode(NeutralMode.Brake);
-		
+
 		mElevatorTalon.config_kP(0, ElevatorConstants.PID.ELEVATOR_UP_P, 10);
 		mElevatorTalon.config_kI(0, ElevatorConstants.PID.ELEVATOR_UP_I, 10);
 		mElevatorTalon.config_kD(0, ElevatorConstants.PID.ELEVATOR_UP_D, 10);
 		mElevatorTalon.configAllowableClosedloopError(0, ElevatorConstants.PID.ELEVATOR_TOLERANCE, 10);
 		mElevatorTalon.config_IntegralZone(0, ElevatorConstants.PID.IZONE, 10);
-		
-//		mElevatorTalonFollower = new WPI_TalonSRX(Ports.Elevator.FOLLOWER);
-//		mElevatorTalonFollower.follow(mElevatorTalon.getTalon());
-//		mElevatorTalonFollower.set(ControlMode.Follower, 2);
+
+		// mElevatorTalonFollower = new WPI_TalonSRX(Ports.Elevator.FOLLOWER);
+		// mElevatorTalonFollower.follow(mElevatorTalon.getTalon());
+		// mElevatorTalonFollower.set(ControlMode.Follower, 2);
 		mElevEncoder = new ElevatorEncoder(mElevatorTalon);
 		mElevator = new Elevator(mElevatorTalon, mElevEncoder, mJoystick);
-
 	}
 
 	public void GrabberInit() {
@@ -752,13 +729,16 @@ public class Robot extends SampleRobot {
 		if (RunConstants.SIMULATOR) {
 			if (pPortNumber == Ports.Elevator.ELEVATOR_LEAD) {
 				return new simulator.talon.ElevatorTalonSimulator();
-			} else if (pPortNumber == Ports.Intake.LEFT_INTAKE_WHEEL
+			} 
+			else if (pPortNumber == Ports.Intake.LEFT_INTAKE_WHEEL
 					|| pPortNumber == Ports.Intake.RIGHT_INTAKE_WHEEL) {
 				return new simulator.talon.IntakeWheelSimulator();
-			} else {
+			} 
+			else {
 				throw new RuntimeException("Simulator class for port " + pPortNumber + " not created yet");
 			}
-		} else {
+		} 
+		else {
 			return new TalonActualImplementation(new WPI_TalonSRX(pPortNumber));
 		}
 	}

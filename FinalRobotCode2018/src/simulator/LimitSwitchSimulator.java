@@ -2,17 +2,17 @@ package simulator;
 
 import edu.wpi.first.wpilibj.Joystick;
 
-public class LimitSwitchSimulator implements DigitalInputInterface{
+public class LimitSwitchSimulator implements DigitalInputInterface {
 	private Joystick mJoystick;
 	private boolean mTriggered;
-	
+
 	public LimitSwitchSimulator(Joystick pJoystick) {
 		mJoystick = pJoystick;
 	}
-	
+
 	@Override
 	public void set() {
-		if(mJoystick.getRawButtonReleased(10)) {
+		if (mJoystick.getRawButtonReleased(10)) {
 			mTriggered = !mTriggered;
 		}
 	}
@@ -21,7 +21,7 @@ public class LimitSwitchSimulator implements DigitalInputInterface{
 	public boolean get() {
 		return mTriggered;
 	}
-	
+
 	public void simulate() {
 		set();
 	}

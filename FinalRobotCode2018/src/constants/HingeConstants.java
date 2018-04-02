@@ -3,7 +3,8 @@ package constants;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class HingeConstants {
-	public static class Motor{
+	
+	public static class Motor {
 		public static final boolean 
 			LEFT_REVERSED = true,
 			RIGHT_REVERSED = false,
@@ -14,7 +15,6 @@ public class HingeConstants {
 			LEFT_OFFSET = 0,
 			RIGHT_OFFSET = 80;
 		
-		
 		public static final double //ticks, up is negative
 			LEFT_UP = 220,//-22950,
 			LEFT_DOWN = 108,//-21860,
@@ -22,8 +22,7 @@ public class HingeConstants {
 			RIGHT_DOWN = 345,//3500;
 			MOVE_TOLERANCE = 3;
 		
-		public static final double 
-			MAX_CURRENT = 5;
+		public static final double MAX_CURRENT = 5;
 		
 		public static final double
 			HINGE_P_DOWN = 0.1,
@@ -44,15 +43,9 @@ public class HingeConstants {
 			RIGHT_HINGE_IZONE_UP = 100;
 	}
 	
-	public static class Piston{
-		public static final Value
-		UP = Value.kForward,
-		DOWN = Value.kReverse;
-		/*
-			LEFT_UP = Value.kForward,
-			LEFT_DOWN = Value.kReverse,
-			RIGHT_UP = Value.kForward,
-			RIGHT_DOWN = Value.kReverse;
-			*/
+	public static class Piston {
+		public static final Value 
+			UP = Value.kForward, 
+			DOWN = Value.kReverse;
 	}
 }

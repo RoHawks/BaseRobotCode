@@ -1,17 +1,19 @@
 package robotcode.driving;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import constants.DriveConstants;
 import resource.ResourceFunctions;
 import resource.Vector;
 import sensors.TalonAbsoluteEncoder;
 import simulator.talon.TalonInterface;
+
 public class Wheel {
 
 	private TalonInterface mTurn;
 	private TalonInterface mDrive;
 	private TalonAbsoluteEncoder mEncoder;
-	
+
 	public Wheel(TalonInterface pTurn, TalonInterface pDrive, TalonAbsoluteEncoder pEncoder) {
 		mTurn = pTurn;
 		mDrive = pDrive;
@@ -42,19 +44,18 @@ public class Wheel {
 	}
 
 	public void setLinearVelocity(double pSpeed) {
-		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), 
-				DriveConstants.MAX_LINEAR_VEL);
+		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), DriveConstants.MAX_LINEAR_VEL);
 		mDrive.set(ControlMode.PercentOutput, speed);
 	}
 
 	public void setAngle(double pAngle) {
 		TalonPID(pAngle);
 	}
-	
+
 	private void TalonPID(double pTarget) {
 		double current = ResourceFunctions.tickToAngle(mTurn.getSelectedSensorPosition(0));
 		double realCurrent = mEncoder.getAngleDegrees();
-		
+
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 
 		if (Math.abs(error) > 90) {
@@ -69,17 +70,16 @@ public class Wheel {
 		mTurn.set(ControlMode.PercentOutput, pSpeed);
 	}
 
-	public void setDriveInverted(boolean pInverted) {
-		mDrive.setInverted(pInverted);
-	}
-	
-	public boolean getDriveInverted(){
-		return mDrive.getInverted();
-	}
-
 	public double getAngle(){
 		return mEncoder.getAngleDegrees();
 	}
+	
+	public boolean IsInRange(double pTarget) {
+		double realCurrent = mEncoder.getAngleDegrees();
+		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
+		return Math.abs(error) < DriveConstants.PID_Constants.ROTATION_TOLERANCE[0];
+	}
+	
 	/*
 	 * Methods to run a self written PID (just proportional) on the roborio
 	 * instead of the Talons Requires some constants to be changed
@@ -106,15 +106,4 @@ public class Wheel {
 	 * 		return speed; 
 	 * }
 	 */
-
-	public boolean IsInRange(double pTarget)
-	{
-		double realCurrent = mEncoder.getAngleDegrees();
-		
-		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
-		
-		return Math.abs(error) < DriveConstants.PID_Constants.ROTATION_TOLERANCE[0];
-
-	}
-
 }

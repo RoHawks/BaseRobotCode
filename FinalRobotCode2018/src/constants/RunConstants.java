@@ -8,6 +8,6 @@ public class RunConstants {
 			RUNNING_ELEVATOR = true,
 			RUNNING_GRABBER = true,
 			SIMULATOR = false;
-//			USING_CUSTOM_JOYSTICK = false,
-//			RUN_COMPRESSOR_ALWAYS = false,
+	// USING_CUSTOM_JOYSTICK = false,
+	// RUN_COMPRESSOR_ALWAYS = false,
 }

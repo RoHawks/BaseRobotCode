@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 public class SingleSolenoidSimulator implements SolenoidInterface {
 
 	private Value mValue = Value.kReverse;
-	
+
 	@Override
 	public void set(Value pDirection) {
 		mValue = pDirection;
@@ -22,7 +22,7 @@ public class SingleSolenoidSimulator implements SolenoidInterface {
 
 	@Override
 	public void simulate(long pDeltaMillis) {
-		//vroom
+		// vroom
 	}
 
 }

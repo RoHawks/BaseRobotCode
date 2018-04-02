@@ -2,16 +2,16 @@ package simulator;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
-public class DigitalInputActualImplementation implements DigitalInputInterface{
+public class DigitalInputActualImplementation implements DigitalInputInterface {
 	private DigitalInput mInput;
-	
-	public DigitalInputActualImplementation (DigitalInput pInput) {
+
+	public DigitalInputActualImplementation(DigitalInput pInput) {
 		mInput = pInput;
 	}
-	
+
 	@Override
 	public void set() {
-		//nothing
+		// nothing
 	}
 
 	@Override
