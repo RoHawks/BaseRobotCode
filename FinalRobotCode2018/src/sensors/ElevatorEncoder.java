@@ -6,36 +6,24 @@ public class ElevatorEncoder {
 	TalonInterface mTalon;
 	double mOffset;
 	
-	
-	double mSensorReadingAtElevatorBottom;
-	
-	public void TriggerAtElevatorBottom()
-	{
-		mSensorReadingAtElevatorBottom = getRawTicks();		
-	}
-	
-	public double getTicksFromElevatorBottom()
-	{
-		return getRawTicks() - mSensorReadingAtElevatorBottom;
-	}
-	
-	public double getHeightInInchesFromElevatorBottom()
-	{
-		return (getTicksFromElevatorBottom() / 4096.0) * 2.40 * 5.0 / 2.54;
-	}
-	
-	public ElevatorEncoder (TalonInterface pTalon, double pOffset) {
-
+	public ElevatorEncoder (TalonInterface pTalon) {
 		mTalon = pTalon;
-		mOffset = pOffset;
+	}
+	
+	public void TriggerAtElevatorBottom() {
+		mOffset = getRawTicks();
+	}
+	
+	public double getTicksFromElevatorBottom() {
+		return getRawTicks() - mOffset;
+	}
+
+	public double getHeightInInchesFromElevatorBottom() {
+		return TickToInch(getTicksFromElevatorBottom());
 	}
 	
 	public double getRawTicks() {
 		return mTalon.getSelectedSensorPosition(0);
-	}
-	
-	public double getTicks() {
-		return getRawTicks() - getOffset();
 	}
 	
 	public double getRawHeightCenti() {
@@ -43,13 +31,12 @@ public class ElevatorEncoder {
 	}
 	
 	public double getHeightCenti() {
-		return TickToCenti(getRawTicks() - this.getOffset());
+		return TickToCenti(getTicksFromElevatorBottom());
 	}
 	
 	public double getOffset() {
 		return mOffset;
 	}
-	
 	
 	public static double TickToCenti(double tick) {
 		return tick * 12 / 4096;

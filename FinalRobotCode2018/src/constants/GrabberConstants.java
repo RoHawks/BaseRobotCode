@@ -9,10 +9,10 @@ public class GrabberConstants {
 			RELEASE = Value.kForward,
 			GRAB = Value.kReverse;
 	
-	public static final long EXTEND_PISTON_OUT_TIME = 1000;
-	public static final long GRAB_PISTON_OUT_TIME = 500;
-	public static final long GRAB_PISTON_IN_TIME = 500;
-	public static final long EXTEND_PISTON_IN_TIME = 1500;
+	public static final long EXTEND_PISTON_OUT_TIME = 400;
+	public static final long GRAB_PISTON_OUT_TIME = 400;
+	public static final long GRAB_PISTON_IN_TIME = 400;
+	public static final long EXTEND_PISTON_IN_TIME = 700;
 	
 	
 }

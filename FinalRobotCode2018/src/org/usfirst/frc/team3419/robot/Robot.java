@@ -16,6 +16,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import autonomous.AutonomousRoutines;
+import autonomous.AutonomousSequence;
+import autonomous.sequence.DoNothingSequence;
+import autonomous.sequence.DriveForwardSequence;
+import autonomous.sequence.SwitchSequence;
 import constants.AutoConstants;
 import constants.DriveConstants;
 import constants.ElevatorConstants;
@@ -38,6 +42,8 @@ import robotcode.systems.Intake;
 import robotcode.systems.IntakeHingeMotor;
 import robotcode.systems.SingleSolenoidReal;
 import robotcode.driving.DriveTrain;
+import robotcode.driving.DriveTrain.LinearVelocity;
+import robotcode.driving.DriveTrain.RotationalVelocity;
 import sensors.ElevatorEncoder;
 import sensors.RobotAngle;
 import sensors.TalonAbsoluteEncoder;
@@ -90,9 +96,11 @@ public class Robot extends SampleRobot {
 
 	private boolean mInGame = false;
 
-	private long mTimeStart;
+	private long mGameStartMillis;
+	States mCurrentState = States.Hunting;
 
 	private AutonomousRoutines mAutonomousRoutine = AutonomousRoutines.SWITCH_SCORE;
+	private AutonomousSequence mAutonomousSequence;
 
 	public Robot() {
 	}
@@ -102,9 +110,11 @@ public class Robot extends SampleRobot {
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(240,180);
 		camera.setFPS(30);
+		
 		mNavX = GetGyroObject(Ports.NAVX);
 		mCompressor = new Compressor(Ports.COMPRESSOR);
 		mPDP = new PowerDistributionPanel();
+		
 		if (RunConstants.RUNNING_DRIVE) {
 			DriveInit();
 		}
@@ -120,19 +130,12 @@ public class Robot extends SampleRobot {
 	}
 
 	
-	private void autodrive(double angle)
-	{
-		////mDriveTrain.enactMovement(0, angle, LinearVelocity.NORMAL, RotationalVelocity.NONE, 0.3);
-		
-		for (int i = 3; i >= 0; i--) {
-			mWheel[i].set(angle, 0.3);
-		}
-
+	private void autodrive(double angle) {
+		mDriveTrain.enactMovement(0, angle, LinearVelocity.NORMAL, RotationalVelocity.NONE, 0.3);//TZ
 	}
+	
 	@Override
 	public void autonomous() {
-		startGame();
-		long timeStart = System.currentTimeMillis();
 		/*
 		 * ArrayList<AutonomousCommand> autonomousCommands;
 		 * 
@@ -145,116 +148,22 @@ public class Robot extends SampleRobot {
 		 */
 
 		//mAutonomousRoutine = AutonomousRoutines.DRIVE_FORWARD;
-		long scoringSequenceStartingTime = 0;
-		boolean enteredScoringRoutine = false;
-
-		long INITIAL_PAUSE = 500;
-		long WHEEL_POINT_TIME = 1000;
-		long FORWARD_DRIVE_TIME = 4000; //middle
-		long FORWARD_DRIVE_TIME_LEFT = 4261;
-		long FORWARD_DRIVE_TIME_RIGHT = 3917;
-		long DRIVE_BACKWARDS_TIME = 1000;
-		long PISTON_WORK_TIME = GrabberConstants.EXTEND_PISTON_OUT_TIME + GrabberConstants.GRAB_PISTON_OUT_TIME
-				+ GrabberConstants.EXTEND_PISTON_IN_TIME + 1000;
 		
-		double angle = 28; // in middle
-		double leftAngle = -33.23;
-		double rightAngle = 26.0;
+		startGame();
+		chooseAutoSequence();
+		long autoTimeStart = System.currentTimeMillis();
 		
-		while ((isAutonomous() && isEnabled()) && (System.currentTimeMillis() - timeStart > INITIAL_PAUSE)
+		//Do not do anything until data from FMS arrives:
+		while ((isAutonomous() && isEnabled()) && (System.currentTimeMillis() - autoTimeStart > AutoConstants.SwitchMiddle.INITIAL_PAUSE)
 				|| (autonomous.PlateAssignmentReader.GetNearSwitchSide() == 'U')) {
 			Timer.delay(0.005);
 		}
 		
-		timeStart = System.currentTimeMillis();
+		boolean isComplete = false;
 		
-		double actualAngle;
-		long actualDriveTime;
-		while (isAutonomous() && isEnabled()) {
-			if (mAutonomousRoutine == AutonomousRoutines.SWITCH_SCORE) {
-				mElevator.setSwitch();
-
-				
-				if (autonomous.PlateAssignmentReader.GetNearSwitchSide() == 'L') {
-					actualAngle = leftAngle;
-					actualDriveTime = FORWARD_DRIVE_TIME_LEFT;
-				}
-				else {
-					actualAngle = rightAngle;
-					actualDriveTime = FORWARD_DRIVE_TIME_RIGHT;
-				}
-				
-				if (System.currentTimeMillis() - timeStart < WHEEL_POINT_TIME) {
-					mHinge.up();
-					mGrabber.grab();
-					for (int i = 0; i < 4; i++) {
-						mWheel[i].set(actualAngle, 0);
-					}
-	
-
-				} 
-				else if (System.currentTimeMillis() - timeStart < WHEEL_POINT_TIME + actualDriveTime) {
-						autodrive(actualAngle);
-				} 
-				else if (System.currentTimeMillis() - timeStart < WHEEL_POINT_TIME + actualDriveTime
-						+ PISTON_WORK_TIME) {
-					for (int i = 0; i < 4; i++) {
-						mWheel[i].set(0, 0);
-					}
-
-					if (enteredScoringRoutine == false) {
-						enteredScoringRoutine = true;
-						scoringSequenceStartingTime = System.currentTimeMillis();
-					}
-
-					long scoringSequenceElapsedMilliseconds = System.currentTimeMillis() - scoringSequenceStartingTime;
-					// ATS play around with these times to make it faster
-
-					if (scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME) {
-						mGrabber.out();
-						mGrabber.grab();
-					}
-					else if (scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME
-							+ GrabberConstants.GRAB_PISTON_OUT_TIME) {
-						mGrabber.out();
-						mGrabber.release();
-					} else if (scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME
-							+ GrabberConstants.GRAB_PISTON_OUT_TIME + GrabberConstants.EXTEND_PISTON_IN_TIME) {
-						mGrabber.in();
-						mGrabber.release();
-					}
-				} 
-				else if (System.currentTimeMillis() - timeStart < WHEEL_POINT_TIME + actualDriveTime
-						+ PISTON_WORK_TIME + DRIVE_BACKWARDS_TIME) {
-					for (int i = 0; i < 4; i++) {
-						mWheel[i].set(180, 0.3);
-					}
-
-				}
-				else {
-					for (int i = 0; i < 4; i++) {
-						mWheel[i].set(0, 0);
-					}
-				}
-
-				SetNewState(States.Hunting);
-			}
+		while (isAutonomous() && isEnabled() && !isComplete) {
 			
-			else// Drive straight forwards mode
-			{
-				mElevator.setSwitch();
-				if (System.currentTimeMillis() - timeStart < AutoConstants.Mobility.DRIVE_TIME) {
-					for (int i = 0; i < 4; i++) {
-						mWheel[i].set(0, AutoConstants.Mobility.DRIVE_SPEED);
-					}
-				} 
-				else {
-					for (int i = 0; i < 4; i++) {
-						mWheel[i].set(0, 0);
-					}
-				}
-				SetNewState(States.InitialIfHoldingBox);
-			}
+			isComplete = mAutonomousSequence.run();
 
 			/*
 			 * } } SmartDashboard.putNumber("Autonomos step", currentStep); if(currentStep <
@@ -270,32 +179,41 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	States mCurrentState = States.Hunting;
+	private void chooseAutoSequence() {
+		switch(mAutonomousRoutine) {
+			case DO_NOTHING:
+				mAutonomousSequence = new DoNothingSequence();
+				SetNewState(States.Hunting);
+				break;
+			case DRIVE_FORWARD:
+				mAutonomousSequence = new DriveForwardSequence(mDriveTrain, mElevator);
+				SetNewState(States.Initial_If_Holding_Box);
+				break;
+			case SCALE_SCORE_START_ON_LEFT:
+				break;
+			case SCALE_SCORE_START_ON_RIGHT:
+				break;
+			case SWITCH_SCORE:
+				mAutonomousSequence = new SwitchSequence(mDriveTrain, mElevator, mGrabber, mHinge, mWheel);
+				SetNewState(States.Hunting);
+				break;
+			default:
+				break;
+			
+		}
+	}
 
 	public void operatorControl() {
 		startGame();
-//		SetNewState(States.InitialIfHoldingBox);
 		while (isOperatorControl() && isEnabled()) {
 			SwerveDrive();
-			// simulate();
 			SmartDashboard.putBoolean("test limit", mLimitSwitch.get());
 			SmartDashboard.putBoolean("breakbeam", mBreakbeam.get());
 			monitorElevatorCurrent();
-			if (mJoystick.getRawButton(JoystickConstants.ENABLE_ELEVATOR)) {
+			if (mJoystick.getRawButton(JoystickConstants.ENABLE_ELEVATOR) && !mElevator.IsEnabled()) {
+				SetNewState(States.Manual_Elevator_Control);
 				mElevator.enable(true);
 			}
-			/*
-			 * if (mPDP.getVoltage() < DriveConstants.EMERGENCY_VOLTAGE) { for (int i = 0; i
-			 * < 4; i++) {
-			 * mTurn[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-			 * mTurn[i].configPeakOutputReverse(-DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-			 * 
-			 * mDrive[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-			 * mDrive[i].configPeakOutputReverse(-DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-			 * } } for(int i = 0; i<4; i++) { SmartDashboard.putNumber("Drive Current " + i,
-			 * mDrive[i].getOutputCurrent()); SmartDashboard.putNumber("Turn Current " + i,
-			 * mTurn[i].getOutputCurrent()); }
-			 */
 
 			chooseModeMethod();
 			SmartDashboard.putString("Current State", mCurrentState.toString());
@@ -361,29 +279,23 @@ public class Robot extends SampleRobot {
 			case On_Way_To_Score_Switch:
 				On_Way_To_Score_Switch();
 				break;
-			case On_Way_To_Score_Scale:
-				On_Way_To_Score_Scale();
-				break;
 			case Score:
 				Score();
-				break;
-			case Picking_Up_Box:
-				Picking_Up_Box();
 				break;
 			case Defense:
 				Defense();
 				break;
-			case GetUp:
-				GetUp();
+			case Manual_Elevator_Control:
+				Manual_Elevator_Control();
 				break;
-			case InitialIfHoldingBox:
+			case Initial_If_Holding_Box:
 				InitialIfHoldingBox();
 				break;
 			default:
 				throw new RuntimeException("Unknown state");
 		}
 
-		SmartDashboard.putString("CurrentState", mCurrentState.name());
+		SmartDashboard.putString("Current State", mCurrentState.name());
 	}
 
 	private boolean mHasBegunScoringSequence = false;
@@ -395,17 +307,10 @@ public class Robot extends SampleRobot {
 		SmartDashboard.putBoolean("Close to Target -- scores", mElevator.isCloseToTarget());
 		SmartDashboard.putBoolean("Has begun scoring-- scores", mHasBegunScoringSequence);
 
-		// if(mElevator.isCloseToTarget() ||
-		// mElevatorTalon.getSensorCollection_isFwdLimitSwitchClosed()
-		// || mElevator.isAboveTarget())
-		// if(true)
-		// {
-
 		long scoringSequenceElapsedMilliseconds = System.currentTimeMillis() - mScoringSequenceStartingTime;
 		SmartDashboard.putBoolean("mHasBegunScoringSequence", mHasBegunScoringSequence);
 		SmartDashboard.putNumber("scoringSequenceElapsedMilliseconds", scoringSequenceElapsedMilliseconds);
 		if (mHasBegunScoringSequence) {
-			// ATS play around with these times to make it faster
 
 			if (scoringSequenceElapsedMilliseconds < GrabberConstants.EXTEND_PISTON_OUT_TIME) {
 				mGrabber.out();
@@ -431,30 +336,6 @@ public class Robot extends SampleRobot {
 			mHasBegunScoringSequence = true;
 			mScoringSequenceStartingTime = System.currentTimeMillis();
 		}
-		// }
-		// else
-		// {
-		// mHasBegunScoringSequence = false;
-		// mScoringSequenceStartingTime = 0;
-		// }
-	}
-
-	private void On_Way_To_Score_(boolean isSwitch) {
-		mGrabber.grab();
-		if (mElevator.getHeightInches() > ElevatorConstants.Heights.HINGE_HEIGHT) {// ATS check encoder
-			mHinge.up();
-		}
-		mIntake.disable();
-		if (mJoystick.getRawButton(JoystickConstants.SCORE)) {
-			SetNewState(States.Score);
-			mPickingUpBoxHasStartedGrab = false;
-			mOnWayToScoreStartedGoingUp = false;
-		} else if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
-			SetNewState(States.Hunting);
-			mPickingUpBoxHasStartedGrab = false;
-			mOnWayToScoreStartedGoingUp = false;
-		}
-
 	}
 
 	long mPickingUpBoxStartedGrabTime;
@@ -475,20 +356,12 @@ public class Robot extends SampleRobot {
 		else if (!mPickingUpBoxHasStartedGrab) {
 			mElevator.setSpeed(-0.3);
 		}
-		/*
-		 * else if (!mOnWayToScoreStartedGoingUp)//ATS changed {
-		 * SmartDashboard.putNumber("Not at Bottom time", System.currentTimeMillis());
-		 * mPickingUpBoxHasStartedGrab = false;
-		 * 
-		 * }
-		 */
 
-		if (mPickingUpBoxHasStartedGrab && System.currentTimeMillis() - mPickingUpBoxStartedGrabTime > 1000) {
-			mOnWayToScoreStartedGoingUp = true;// ATS
+		if (mPickingUpBoxHasStartedGrab && System.currentTimeMillis() - mPickingUpBoxStartedGrabTime > GrabberConstants.GRAB_PISTON_IN_TIME) {  //TZ change time constant
+			mOnWayToScoreStartedGoingUp = true;
 			SmartDashboard.putNumber("Change height time", System.currentTimeMillis());
 			mElevator.setSwitch();
-			mGrabber.grab();
-			if (mElevator.getHeightInches() > ElevatorConstants.Heights.HINGE_HEIGHT) {// ATS check encoder
+			if (mElevator.getHeightInches() > ElevatorConstants.Heights.HINGE_HEIGHT) {// TZ check elevator encoder
 				mHinge.up();
 			}
 			mIntake.disable();
@@ -497,10 +370,9 @@ public class Robot extends SampleRobot {
 				mPickingUpBoxHasStartedGrab = false;
 				mOnWayToScoreStartedGoingUp = false;
 			}
-
 		}
-		if (mJoystick.getRawButton(JoystickConstants.GET_UP)) {
-			SetNewState(States.GetUp);
+		if (mJoystick.getRawButton(JoystickConstants.MANUAL_ELEVATOR_CONTROL)) {
+			SetNewState(States.Manual_Elevator_Control);
 			mPickingUpBoxHasStartedGrab = false;
 			mOnWayToScoreStartedGoingUp = false;
 		} 
@@ -521,8 +393,8 @@ public class Robot extends SampleRobot {
 		if (mJoystick.getRawButton(JoystickConstants.SCORE)) {
 			SetNewState(States.Score);
 		} 
-		else if (mJoystick.getRawButton(JoystickConstants.GET_UP)) {
-			SetNewState(States.GetUp);
+		else if (mJoystick.getRawButton(JoystickConstants.MANUAL_ELEVATOR_CONTROL)) {
+			SetNewState(States.Manual_Elevator_Control);
 		} 
 		else if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
 			SetNewState(States.Hunting);
@@ -530,62 +402,25 @@ public class Robot extends SampleRobot {
 
 	}
 
-	private void On_Way_To_Score_Scale() {
-		/*
-		 * mIntake.disable(); if (mElevator.IsAtBottom()) { mGrabber.grab(); if
-		 * (!mPickingUpBoxHasStartedGrab) { mPickingUpBoxStartedGrabTime =
-		 * System.currentTimeMillis(); } mPickingUpBoxHasStartedGrab = true; } else if
-		 * (!mOnWayToScoreStartedGoingUp)//ATS changed { mPickingUpBoxHasStartedGrab =
-		 * false; }
-		 * 
-		 * if (mPickingUpBoxHasStartedGrab && System.currentTimeMillis() -
-		 * mPickingUpBoxStartedGrabTime > 1000) { mOnWayToScoreStartedGoingUp = true;
-		 * mElevator.setMidHigh();
-		 * 
-		 * mGrabber.grab(); if(mElevator.getHeightInches() >
-		 * ElevatorConstants.Heights.HINGE_HEIGHT) {//ATS check encoder mHinge.up(); }
-		 * mIntake.disable(); if(mJoystick.getRawButton(JoystickConstants.GET_UP)) {
-		 * SetNewState(States.GetUp); mPickingUpBoxHasStartedGrab = false;
-		 * mOnWayToScoreStartedGoingUp = false; }
-		 * 
-		 * }
-		 */
 
-	}
-
-	private void GetUp() {
+	private void Manual_Elevator_Control() {
 		mIntake.disable();
-		mElevator.setScaleHigh();
-
-		mGrabber.grab();
+		mElevator.setJoystickAdvanced();
 
 		if (mJoystick.getRawButton(JoystickConstants.SCORE)) {
 			SetNewState(States.Score);
 		}
-		if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
+		else if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
 			SetNewState(States.Hunting);
 		}
 	}
 
-//	long WaitForCubeRelease;
-//	boolean HasStartedRelease = false;
-
 	private void Exchange_Score() {
-//		if (!HasStartedRelease) {
-//			WaitForCubeRelease = System.currentTimeMillis();
-//			HasStartedRelease = true;
-//		}
 		mGrabber.release();
 		mHinge.down();
 		mIntake.eject();
-//		if (HasStartedRelease) {
-//			if (System.currentTimeMillis() - WaitForCubeRelease > 1500) { // change 1000, make it a constant
-//				HasStartedRelease = false;
-//				SetNewState(States.Hunting);
-//			}
-//		}
-		if (mJoystick.getRawButton(11)) {
-//			HasStartedRelease = false;
+
+		if (mJoystick.getRawButton(JoystickConstants.HUNTING)) {
 			SetNewState(States.Hunting);
 		}
 	}
@@ -594,7 +429,8 @@ public class Robot extends SampleRobot {
 	boolean mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed = false;
 	boolean mDriveHasHitOnWayToExchange_OnWayToScoreSwitchButtonPressed = false;
 	boolean mDriveHasHitOnWayToExchange_HuntingButtonPressed = false;
-	double mTimeAtWayToExchangeStart;
+	long mTimeAtWayToExchangeStart;
+	
 	private void On_Way_To_Exchange() {
 		mTimeAtWayToExchangeStart = mTimeAtStateStart;
 		if (GetMillisIntoState() < 500) {
@@ -615,17 +451,10 @@ public class Robot extends SampleRobot {
 		mGrabber.release();
 		mHinge.down();
 
-//		if (GetMillisIntoState() < 1500) {
-			mIntake.setWheelSpeed(0.2);
-//		} 
-//		else {
-//			mIntake.setWheelSpeed(0);
-//		}
-//Changed at end of HVR
+		mIntake.setWheelSpeed(0.2); //TZ Was in if statement for time
 
 		if (mJoystick.getRawButton(JoystickConstants.SCORE)) {
 			mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed = true;
-
 		} 
 		else if (mJoystick.getRawButton(JoystickConstants.PREPARE_TO_SCORE_ON_SWITCH)) {
 			mDriveHasHitOnWayToExchange_OnWayToScoreSwitchButtonPressed = true;
@@ -635,10 +464,6 @@ public class Robot extends SampleRobot {
 			mDriveHasHitOnWayToExchange_HuntingButtonPressed = true;
 
 		}
-		// else if(mJoystick.getRawButton(JoystickConstants.PREPARE_TO_SCORE_ON_SCALE))
-		// {
-		// SetNewState(States.On_Way_To_Score_Scale);
-		// }
 
 		if (mHasSeenGroundInOnWayToExchange) {
 			if (mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed) {
@@ -664,7 +489,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if (mJoystick.getRawButton(JoystickConstants.ACQUIRED_BOX)) {
-			SetNewState(States.Picking_Up_Box);
+			SetNewState(States.On_Way_To_Exchange);
 		} 
 		else if (mBreakbeam.get()) {
 			SetNewState(States.Hunting);
@@ -678,12 +503,14 @@ public class Robot extends SampleRobot {
 	private void SetNewState(States pState) {
 		mCurrentState = pState;
 		mTimeAtStateStart = System.currentTimeMillis();
+		
 		mHasSeenGroundInOnWayToExchange = false;
 		mDriveHasHitOnWayToExchange_ExchangeScoreButtonPressed = false;
 		mDriveHasHitOnWayToExchange_OnWayToScoreSwitchButtonPressed = false;
 		mDriveHasHitOnWayToExchange_HuntingButtonPressed = false;
-		mStateLog = mStateLog + "," + (mTimeAtStateStart - mGameStartMillis) + ":" + mCurrentState.toString();
 		mHasBegunScoringSequence = false;
+		
+		mStateLog = mStateLog + ", " + (mTimeAtStateStart - mGameStartMillis) + ": " + mCurrentState.toString();
 		SmartDashboard.putString("StateLog", mStateLog);
 
 	}
@@ -703,7 +530,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if (mJoystick.getRawButton(JoystickConstants.ACQUIRED_BOX)) {
-			SetNewState(States.Picking_Up_Box);
+			SetNewState(States.On_Way_To_Exchange);
 		} 
 		else if (!mBreakbeam.get() && GetMillisIntoState() > 3000) {
 			SetNewState(States.Breakbeam_Tripped);
@@ -716,7 +543,7 @@ public class Robot extends SampleRobot {
 	private void Defense() {
 		mGrabber.grab();
 		mGrabber.in();
-		mElevator.setSwitch();//mElevator.setGround();
+		mElevator.setSwitch();
 		mIntake.disable();
 		mHinge.up();
 		if (mJoystick.getRawButtonReleased(JoystickConstants.DEFENSE)) {
@@ -724,25 +551,17 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	private void Picking_Up_Box() {
-		SetNewState(States.On_Way_To_Exchange);
-	}
-
-	long mGameStartMillis;
-
 	public void startGame() {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
 
-			if (RunConstants.RUNNING_INTAKE) {
-				// mHinge.down();
-			}
 			if (RunConstants.RUNNING_PNEUMATICS) {
 				mCompressor.start();
 			} 
 			else {
 				mCompressor.stop();
 			}
+			
 			if (RunConstants.RUNNING_ELEVATOR) {
 				mGrabber.grab();
 				while (!mElevatorTalon.getSensorCollection_isRevLimitSwitchClosed()) {
@@ -754,17 +573,11 @@ public class Robot extends SampleRobot {
 				mElevEncoder.TriggerAtElevatorBottom();
 			}
 			mInGame = true;
-			mTimeStart = System.currentTimeMillis();
 		}
 	}
 
 	public void endGame() {
-		if (mInGame) {
-			// if(mCompressor.enabled()) {
-			// mCompressor.stop();
-			// }
-			// mInGame = false;
-		}
+
 	}
 
 	@Override
@@ -818,25 +631,9 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	/*
-	 * public void PneumaticsTest() { if (mController.getAButtonReleased()) {
-	 * mLeft.set(IntakeConstants.CLOSED); mRight.set(IntakeConstants.CLOSED); } else
-	 * if (mController.getYButtonReleased()) { mLeft.set(IntakeConstants.OPEN);
-	 * mRight.set(IntakeConstants.OPEN); } else if
-	 * (mController.getXButtonReleased()) {
-	 * mLeft.set(mLeft.get().equals(IntakeConstants.CLOSED) ? IntakeConstants.OPEN :
-	 * IntakeConstants.CLOSED); } else if (mController.getBButtonReleased()) {
-	 * mRight.set(mRight.get().equals(IntakeConstants.CLOSED) ? IntakeConstants.OPEN
-	 * : IntakeConstants.CLOSED); } SmartDashboard.putString("Right",
-	 * mRight.get().toString()); SmartDashboard.putString("Left",
-	 * mLeft.get().toString()); SmartDashboard.putBoolean("Limit Switch",
-	 * mLimitSwitch.get()); SmartDashboard.putBoolean("Break Beam",
-	 * mBreakbeam.get()); }
-	 */
-
 	public void DriveInit() {
 		for (int i = 0; i < 4; i++) {
-			mTurn[i] = GetTalonObject(Ports.TURN[i]); // new WPI_TalonSRX(Ports.TURN[i]);
+			mTurn[i] = GetTalonObject(Ports.TURN[i]);
 			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			mTurn[i].setNeutralMode(NeutralMode.Brake);
 
@@ -852,7 +649,7 @@ public class Robot extends SampleRobot {
 			mTurn[i].configPeakOutputForward(1, 10);
 			mTurn[i].configPeakOutputReverse(-1, 10);
 
-			mDrive[i] = GetTalonObject(Ports.DRIVE[i]);// new WPI_TalonSRX(Ports.DRIVE[i]);
+			mDrive[i] = GetTalonObject(Ports.DRIVE[i]);
 			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
 			mDrive[i].setNeutralMode(NeutralMode.Brake);
 
@@ -872,6 +669,7 @@ public class Robot extends SampleRobot {
 					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i]);
 		}
+		
 		mRobotAngle = new RobotAngle(mNavX, false, 0);
 		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle);
 	}
@@ -881,13 +679,11 @@ public class Robot extends SampleRobot {
 		mLeftPiston = GetSolenoidObject(Ports.Intake.LEFT_INTAKE);
 		mRightPiston = GetSolenoidObject(Ports.Intake.RIGHT_INTAKE);
 
-		mRightIntakeWheel = GetTalonObject(Ports.Intake.RIGHT_INTAKE_WHEEL);// new
-																			// WPI_TalonSRX(Ports.Intake.RIGHT_INTAKE_WHEEL);
+		mRightIntakeWheel = GetTalonObject(Ports.Intake.RIGHT_INTAKE_WHEEL);
 		mRightIntakeWheel.setInverted(IntakeConstants.RIGHT_WHEEL_REVERSED);
 		mRightIntakeWheel.setNeutralMode(NeutralMode.Brake);
 
-		mLeftIntakeWheel = GetTalonObject(Ports.Intake.LEFT_INTAKE_WHEEL);// new
-																			// WPI_TalonSRX(Ports.Intake.LEFT_INTAKE_WHEEL);
+		mLeftIntakeWheel = GetTalonObject(Ports.Intake.LEFT_INTAKE_WHEEL);
 		mLeftIntakeWheel.setInverted(IntakeConstants.LEFT_WHEEL_REVERSED);
 		mLeftIntakeWheel.setNeutralMode(NeutralMode.Brake);
 
@@ -897,8 +693,7 @@ public class Robot extends SampleRobot {
 		mIntake = new Intake(mLeftIntakeWheel, mRightIntakeWheel, mLeftPiston, mRightPiston, mLimitSwitch, mBreakbeam,
 				mJoystick);
 
-		mRightIntakeHinge = GetTalonObject(Ports.Hinge.RIGHT_INTAKE_HINGE);// new
-																			// WPI_TalonSRX(Ports.Hinge.RIGHT_INTAKE_HINGE);
+		mRightIntakeHinge = GetTalonObject(Ports.Hinge.RIGHT_INTAKE_HINGE);
 		mRightIntakeHinge.setInverted(HingeConstants.Motor.RIGHT_REVERSED);
 		mRightIntakeHinge.setNeutralMode(NeutralMode.Brake);
 		mRightIntakeHinge.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
@@ -909,8 +704,7 @@ public class Robot extends SampleRobot {
 		mRightIntakeHinge.config_IntegralZone(0, HingeConstants.Motor.RIGHT_HINGE_IZONE_DOWN, 10);
 		mRightIntakeHinge.configAllowableClosedloopError(0, HingeConstants.Motor.RIGHT_HINGE_TOLERANCE_DOWN, 10);
 
-		mLeftIntakeHinge = GetTalonObject(Ports.Hinge.LEFT_INTAKE_HINGE); // new
-																			// WPI_TalonSRX(Ports.Hinge.LEFT_INTAKE_HINGE);
+		mLeftIntakeHinge = GetTalonObject(Ports.Hinge.LEFT_INTAKE_HINGE);
 		mLeftIntakeHinge.setInverted(HingeConstants.Motor.LEFT_REVERSED);
 		mLeftIntakeHinge.setNeutralMode(NeutralMode.Brake);
 		mLeftIntakeHinge.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
@@ -927,22 +721,22 @@ public class Robot extends SampleRobot {
 	}
 
 	public void ElevInit() {
-		mElevatorTalon = GetTalonObject(Ports.Elevator.ELEVATOR_LEAD);// new WPI_TalonSRX(Ports.Elevator.ELEVATOR);
+		mElevatorTalon = GetTalonObject(Ports.Elevator.ELEVATOR_LEAD);
 		mElevatorTalon.setInverted(ElevatorConstants.REVERSED);
-		// mlevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute,
-		// 0, 10);
 		mElevatorTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		mElevatorTalon.setSensorPhase(ElevatorConstants.ENCODER_REVERSED);
 		mElevatorTalon.setNeutralMode(NeutralMode.Brake);
+		
 		mElevatorTalon.config_kP(0, ElevatorConstants.PID.ELEVATOR_UP_P, 10);
 		mElevatorTalon.config_kI(0, ElevatorConstants.PID.ELEVATOR_UP_I, 10);
 		mElevatorTalon.config_kD(0, ElevatorConstants.PID.ELEVATOR_UP_D, 10);
 		mElevatorTalon.configAllowableClosedloopError(0, ElevatorConstants.PID.ELEVATOR_TOLERANCE, 10);
 		mElevatorTalon.config_IntegralZone(0, ElevatorConstants.PID.IZONE, 10);
-		mElevatorTalonFollower = new WPI_TalonSRX(Ports.Elevator.FOLLOWER);
-		mElevatorTalonFollower.follow(mElevatorTalon.getTalon());
-		mElevatorTalonFollower.set(ControlMode.Follower, 2);
-		mElevEncoder = new ElevatorEncoder(mElevatorTalon, ElevatorConstants.OFFSET);
+		
+//		mElevatorTalonFollower = new WPI_TalonSRX(Ports.Elevator.FOLLOWER);
+//		mElevatorTalonFollower.follow(mElevatorTalon.getTalon());
+//		mElevatorTalonFollower.set(ControlMode.Follower, 2);
+		mElevEncoder = new ElevatorEncoder(mElevatorTalon);
 		mElevator = new Elevator(mElevatorTalon, mElevEncoder, mJoystick);
 
 	}
@@ -1071,10 +865,10 @@ public class Robot extends SampleRobot {
 
 	public void log() {
 		long time = System.currentTimeMillis();
-		long timeElapsed = time - mTimeStart;
+		long timeElapsed = time - mGameStartMillis;
 
 		SmartDashboard.putBoolean("Game Has Started:", mInGame);
-		SmartDashboard.putNumber("Time Game Started:", mTimeStart);
+		SmartDashboard.putNumber("Time Game Started:", mGameStartMillis);
 		SmartDashboard.putNumber("Time Elapsed:", timeElapsed);
 
 		StringBuilder logString = new StringBuilder();

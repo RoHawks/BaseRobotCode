@@ -18,16 +18,14 @@ public class ElevatorConstants {
 	public static class Heights {
 		public static final double
 				GROUND = 0,
-				SCALE_HEIGHT_HIGH = 24,//75,
-				SCALE_HEIGHT_MID = 24,//60,
-				SCALE_HEIGHT_LOW = 24,//48,
+				SCALE_HEIGHT_HIGH = 75,
+				SCALE_HEIGHT_MID = 60,
+				SCALE_HEIGHT_LOW = 48,
 				SWITCH_HEIGHT = 24,
 				HINGE_HEIGHT = 20,
 				BOX_HEIGHT = 4.5,
-				MID_HEIGHT = 24;
+				TOP = 75; //TZ
 	}
-	public static final double
-			OFFSET = 0;
 	
 	public static final boolean
 			ENCODER_REVERSED = true,
