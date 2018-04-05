@@ -1,6 +1,7 @@
 package robotcode.driving;
 
 import constants.DriveConstants;
+import constants.RunConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.Vector;
 
@@ -27,7 +28,12 @@ public class SwerveDrive {
 		mOutputs = new Vector[4];
 		double sumDistFromCenter = 0;
 		for (int i = 0; i < 4; i++) {
-			mOffsets[i] = new Vector(DriveConstants.Modules.X_OFF[i], DriveConstants.Modules.Y_OFF[i]);
+			if(RunConstants.IS_PROTOTYPE) {
+				mOffsets[i] = new Vector(DriveConstants.Prototype.X_OFF[i], DriveConstants.Prototype.Y_OFF[i]);
+			}
+			else {
+				mOffsets[i] = new Vector(DriveConstants.Modules.X_OFF[i], DriveConstants.Modules.Y_OFF[i]);
+			}
 			mOutputs[i] = new Vector();
 			sumDistFromCenter += mOffsets[i].getMagnitude();
 		}

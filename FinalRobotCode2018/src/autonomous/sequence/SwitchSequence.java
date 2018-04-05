@@ -17,7 +17,6 @@ public class SwitchSequence implements AutonomousSequence {//ATS Tune
 	private Grabber mGrabber;
 	private IntakeHingeMotor mHinge;
 
-	private long autoTimeStart = System.currentTimeMillis();
 	private long scoringSequenceStartingTime = 0;
 	private boolean enteredScoringRoutine = false;
 
@@ -40,11 +39,11 @@ public class SwitchSequence implements AutonomousSequence {//ATS Tune
 
 		if (autonomous.PlateAssignmentReader.GetNearSwitchSide() == 'L') {
 			actualAngle = AutoConstants.SwitchMiddle.LEFT_ANGLE;
-			actualDriveTime = AutoConstants.SwitchMiddle.FORWARD_DRIVE_TIME_LEFT;
+			actualDriveTime = AutoConstants.SwitchMiddle.SIDEWAYS_FORWARD_FULL_SPEED_DRIVE_TIME_LEFT;
 		} 
 		else {
 			actualAngle = AutoConstants.SwitchMiddle.RIGHT_ANGLE;
-			actualDriveTime = AutoConstants.SwitchMiddle.FORWARD_DRIVE_TIME_RIGHT;
+			actualDriveTime = AutoConstants.SwitchMiddle.SIDEWAYS_FORWARD_FULL_SPEED_DRIVE_TIME_RIGHT;
 		}
 
 		while (!mDriveTrain.AllWheelsInRange(actualAngle)) {
@@ -59,6 +58,7 @@ public class SwitchSequence implements AutonomousSequence {//ATS Tune
 		}
 
 		if (System.currentTimeMillis() - wheelAlignEndingTime < actualDriveTime) {
+			//mGrabber.out(); //for faster release
 			mDriveTrain.enactMovement(0, actualAngle, LinearVelocity.NORMAL, RotationalVelocity.NONE, 0.3);
 		}
 
@@ -89,7 +89,7 @@ public class SwitchSequence implements AutonomousSequence {//ATS Tune
 			}
 		} 
 		else if (System.currentTimeMillis() - wheelAlignEndingTime < actualDriveTime
-				+ AutoConstants.SwitchMiddle.PISTON_WORK_TIME + AutoConstants.SwitchMiddle.DRIVE_BACKWARDS_TIME) {
+				+ AutoConstants.SwitchMiddle.PISTON_WORK_TIME + AutoConstants.SwitchMiddle.BACKWARDS_FULL_SPEED_DRIVE_TIME) {
 			mDriveTrain.enactMovement(0, 180, LinearVelocity.NORMAL, RotationalVelocity.NONE, 0.3);
 		} 
 		else {

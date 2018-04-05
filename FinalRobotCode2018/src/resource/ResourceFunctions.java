@@ -84,5 +84,42 @@ public class ResourceFunctions {
 		} else {
 			return val;
 		}
+		
+	}
+	
+	/**
+	 * returns derivative of the cosine function of the form a*cos(b*t) at a time t
+	 * b*t is in radians
+	 * 
+	 * @param a
+	 *            leading coefficient
+	 * @param b
+	 *            coefficient of t
+	 * @param c
+	 *            initial condition
+	 * @param t
+	 *            time
+	 * @return derivative of the function at the point t
+	 */
+	public static double cosineDerivative(double a, double b, double c, double t) {
+		return -a * b * Math.sin(b * t + c);
+	}
+
+	/**
+	 * returns derivative of the sine function of the form a*sin(b*t) at a time t
+	 * b*t is in radians
+	 * 
+	 * @param a
+	 *            leading coefficient
+	 * @param b
+	 *            coefficient of t
+	 * @param c
+	 *            initial condition
+	 * @param t
+	 *            time
+	 * @return derivative of the function at the point t
+	 */
+	public static double sineDerivative(double a, double b, double c, double t) {
+		return a * b * Math.cos(b * t + c);
 	}
 }

@@ -15,7 +15,7 @@ public class DriveConstants {
 
 	public static final double 
 			MAX_ANGULAR_VEL = 1.0,
-			MAX_LINEAR_VEL = 1.0;
+			MAX_LINEAR_VEL = 0.8;
 
 	public static class SwerveSpeeds {
 		public static final double 
@@ -28,7 +28,7 @@ public class DriveConstants {
 	public static class Modules {
 		public static final boolean[]
 			TURN_INVERTED = new boolean[] { false, false, false, false }, //old values {false, false, false, true}
-			INVERTED = new boolean[] { true, false, false, false }, // assuming this is DRIVE_REVERSED old values {false, false, false, false }
+			DRIVE_INVERTED = new boolean[] { true, false, false, false }, // assuming this is DRIVE_REVERSED old values {false, false, false, false }
 			ENCODER_REVERSED = new boolean[] { true, true, true, true }; //old values {true, true, true, false}
 		
 		public static final double[] 
@@ -51,17 +51,37 @@ public class DriveConstants {
 
 		// for turning robot to an angle
 		public static final double
-			GYRO_P = 0.0085, //8
-			GYRO_I = 0,
+			GYRO_P = 0.01, //CHANGED WITH PROTOTYPE CHANGE BACK FOR REAL TZ 0.0085
+			GYRO_I = 0.0003,//Changed was 0
 			GYRO_D = 0,
 			GYRO_TOLERANCE = 5,
-			GYRO_MAX_SPEED = 0.7;
+			GYRO_MAX_SPEED = 1;//CHANGED TZ was 0.7
 		
 		public static final double
 			DRIFT_COMP_P = 0.08,
 			DRIFT_COMP_I = 0.0008,
 			DRIFT_COMP_D = 0,
 			DRIFT_COMP_MAX = 0.3;
+	}
+	
+	public static class Prototype { //SW, SE, NE, NW
+		public static final boolean[]
+				TURN_INVERTED = new boolean[] {false, false, false, true},
+				DRIVE_INVERTED = new boolean[] { false, false, false, false },
+				ENCODER_REVERSED = new boolean[] {true, true, true, false};
+		
+		public static final double[] 
+				X_OFF = new double[] { -19.0 / 2.0, -19.0 / 2.0, 19.0 / 2.0, 19.0 / 2.0 },
+				//{-19.0 / 2.0, 19.0 / 2.0, 19.0 / 2.0, -19.0 / 2.0},//SE, NE, NW, SW
+				Y_OFF = new double[] { -22.0 / 2.0, 22.0 / 2.0, 22.0 / 2.0, -22.0 / 2.0 };
+		//{22.0 / 2.0, 22.0 / 2.0, -22.0 / 2.0, -22.0 / 2.0};
+
+		public static final int[] OFFSETS = new int[] { 3721 , 767, 3402, 2527 };
+		
+		public static final double[] 
+			ROTATION_P = new double[] { 0.7, 0.7, 0.7, 0.7 },
+			ROTATION_I = new double[] { 0.007, 0.007, 0.007, 0.007 },
+			ROTATION_D = new double[] { 0, 0, 0, 0 };
 	}
 
 }

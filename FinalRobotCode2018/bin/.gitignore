@@ -1,6 +1,7 @@
-/autonomous/
-/constants/
-/resource/
+/org/
 /robotcode/
 /sensors/
 /simulator/
+/constants/
+/resource/
+/autonomous/

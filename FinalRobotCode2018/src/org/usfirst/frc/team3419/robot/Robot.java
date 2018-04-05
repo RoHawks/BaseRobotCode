@@ -1,5 +1,7 @@
 package org.usfirst.frc.team3419.robot;
 
+import java.util.ArrayList;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -7,7 +9,13 @@ import com.kauailabs.navx.frc.AHRS;
 
 import autonomous.AutonomousRoutines;
 import autonomous.AutonomousSequence;
+import autonomous.commands.AutonomousCommand;
+import autonomous.rountines.DoNothingRoutine;
+import autonomous.rountines.DriveForwardNoElevatorRoutine;
+import autonomous.rountines.DriveForwardRoutine;
+import autonomous.rountines.SwitchRoutineNoElevator;
 import autonomous.sequence.DoNothingSequence;
+import autonomous.sequence.DriveForwardNoElevatorSequence;
 import autonomous.sequence.DriveForwardSequence;
 import autonomous.sequence.SwitchSequence;
 import constants.AutoConstants;
@@ -36,6 +44,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
+import robotcode.systems.DoubleSolenoidReal;
 import robotcode.systems.Elevator;
 import robotcode.systems.Grabber;
 import robotcode.systems.Intake;
@@ -99,7 +108,7 @@ public class Robot extends SampleRobot {
 
 	private AutonomousRoutines mAutonomousRoutine = AutonomousRoutines.SWITCH_SCORE;
 	private AutonomousSequence mAutonomousSequence;
-
+	
 	public Robot() {
 		
 	}
@@ -126,20 +135,26 @@ public class Robot extends SampleRobot {
 		if (RunConstants.RUNNING_GRABBER) {
 			GrabberInit();
 		}
+		
 	}
 
 	@Override
 	public void autonomous() {
-		/*
-		 * ArrayList<AutonomousCommand> autonomousCommands;
-		 * 
-		 * if(mAutonomousRoutine == AutonomousRoutines.DRIVE_FORWARD) {
-		 * autonomousCommands = (new DriveForwardRoutine(mDriveTrain,
-		 * mElevator)).GetAutonomousCommands(); } else { autonomousCommands = (new
-		 * DoNothingRoutine()).GetAutonomousCommands(); }
-		 * 
-		 * int currentStep = 0; int previousStep = -1;
-		 */
+		
+		ArrayList<AutonomousCommand> autonomousCommands;
+
+		if (mAutonomousRoutine == AutonomousRoutines.DRIVE_FORWARD) {
+			autonomousCommands = (new DriveForwardNoElevatorRoutine(mDriveTrain)).GetAutonomousCommands();
+		} 
+		else if (mAutonomousRoutine == AutonomousRoutines.SWITCH_SCORE) {
+			autonomousCommands = (new SwitchRoutineNoElevator(mDriveTrain)).GetAutonomousCommands();
+		}
+		else {
+			autonomousCommands = (new DoNothingRoutine()).GetAutonomousCommands();
+		}
+
+		int currentStep = 0;
+		int previousStep = -1;
 
 		// mAutonomousRoutine = AutonomousRoutines.DRIVE_FORWARD;
 
@@ -158,18 +173,22 @@ public class Robot extends SampleRobot {
 
 		while (isAutonomous() && isEnabled() && !isComplete) {
 
-			isComplete = mAutonomousSequence.run();
+			//isComplete = mAutonomousSequence.run();
 
-			/*
-			 * } } SmartDashboard.putNumber("Autonomos step", currentStep); if(currentStep <
-			 * autonomousCommands.size()) { AutonomousCommand command =
-			 * autonomousCommands.get(currentStep); if(currentStep != previousStep) {
-			 * command.Startup(); previousStep = currentStep; }
-			 * 
-			 * boolean moveToNextStep = command.RunCommand(); if(moveToNextStep) {
-			 * 
-			 * currentStep++; } } //else we're done with auto.
-			 */
+			SmartDashboard.putNumber("Autonomous step", currentStep);
+			if (currentStep < autonomousCommands.size()) {
+				AutonomousCommand command = autonomousCommands.get(currentStep);
+				if (currentStep != previousStep) {
+					command.Startup();
+					previousStep = currentStep;
+				}
+
+				boolean moveToNextStep = command.RunCommand();
+				if (moveToNextStep) {
+					currentStep++;
+				}
+			} // else we're done with auto.
+
 			Timer.delay(0.005);
 		}
 	}
@@ -181,7 +200,8 @@ public class Robot extends SampleRobot {
 				SetNewState(States.Hunting);
 				break;
 			case DRIVE_FORWARD:
-				mAutonomousSequence = new DriveForwardSequence(mDriveTrain, mElevator);
+				//mAutonomousSequence = new DriveForwardSequence(mDriveTrain, mElevator); TZ Changed
+				mAutonomousSequence = new DriveForwardNoElevatorSequence(mDriveTrain);
 				SetNewState(States.Initial_If_Holding_Box);
 				break;
 			case SCALE_SCORE_START_ON_LEFT:
@@ -200,36 +220,48 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 		startGame();
 		while (isOperatorControl() && isEnabled()) {
-			SwerveDrive();
-			SmartDashboard.putBoolean("test limit", mLimitSwitch.get());
-			SmartDashboard.putBoolean("breakbeam", mBreakbeam.get());
-			monitorElevatorCurrent();
-			if (mJoystick.getRawButton(JoystickConstants.ENABLE_ELEVATOR) && !mElevator.IsEnabled()) {
-				SetNewState(States.Manual_Elevator_Control);
-				mElevator.enable(true);
+			
+			if(RunConstants.RUNNING_DRIVE) {
+				SwerveDrive();
 			}
-
-			chooseModeMethod();
+			
+			if (RunConstants.RUNNING_EVERYTHING) {
+				chooseModeMethod();
+			}
 			SmartDashboard.putString("Current State", mCurrentState.toString());
 
-			SmartDashboard.putString("Intake State", mIntake.getIntakeState().toString());
-			SmartDashboard.putString("Left Intake Piston",
-					mLeftPiston.get().equals(Value.kReverse) ? "Open" : "Closed");
-			SmartDashboard.putString("Right Intake Piston",
-					mRightPiston.get().equals(Value.kReverse) ? "Open" : "Closed");
-			SmartDashboard.putNumber("Left Intake Wheel", mLeftIntakeWheel.getMotorOutputPercent());
-			SmartDashboard.putNumber("Right Intake Wheel", mRightIntakeWheel.getMotorOutputPercent());
-
-			SmartDashboard.putString("Grabber L-R", mGrabber.getGrab().equals(Value.kReverse) ? "Grab" : "Release");
-			SmartDashboard.putString("Grabber F-B", mGrabber.getExtend().equals(Value.kReverse) ? "In" : "Out");
-
-			SmartDashboard.putNumber("Elevator Height (good)", mElevator.getHeightInches());
-
+			if(RunConstants.RUNNING_ELEVATOR) {
+				monitorElevatorCurrent();
+				if (mJoystick.getRawButton(JoystickConstants.ENABLE_ELEVATOR) && !mElevator.IsEnabled()) {
+					SetNewState(States.Manual_Elevator_Control);
+					mElevator.enable(true);
+				}
+				SmartDashboard.putNumber("Elevator Height (good)", mElevator.getHeightInches());
+			}
+			
+			if(RunConstants.RUNNING_INTAKE) {
+				SmartDashboard.putBoolean("test limit", mLimitSwitch.get());
+				SmartDashboard.putBoolean("breakbeam", mBreakbeam.get());
+				SmartDashboard.putString("Intake State", mIntake.getIntakeState().toString());
+				SmartDashboard.putString("Left Intake Piston",
+						mLeftPiston.get().equals(Value.kReverse) ? "Open" : "Closed");
+				SmartDashboard.putString("Right Intake Piston",
+						mRightPiston.get().equals(Value.kReverse) ? "Open" : "Closed");
+				SmartDashboard.putNumber("Left Intake Wheel", mLeftIntakeWheel.getMotorOutputPercent());
+				SmartDashboard.putNumber("Right Intake Wheel", mRightIntakeWheel.getMotorOutputPercent());
+			}
+	
+			if(RunConstants.RUNNING_GRABBER) {
+				SmartDashboard.putString("Grabber L-R", mGrabber.getGrab().equals(Value.kReverse) ? "Grab" : "Release");
+				SmartDashboard.putString("Grabber F-B", mGrabber.getExtend().equals(Value.kReverse) ? "In" : "Out");
+			}
+			
 			if (RunConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
 					SmartDashboard.putNumber("motor current " + i, mDrive[i].getMotorOutputPercent());
 				}
 			}
+
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
@@ -543,7 +575,6 @@ public class Robot extends SampleRobot {
 			}
 
 			if (RunConstants.RUNNING_ELEVATOR) {
-				mGrabber.grab();
 				while (!mElevatorTalon.getSensorCollection_isRevLimitSwitchClosed()) {
 					mElevatorTalon.set(-0.7);
 				}
@@ -551,6 +582,10 @@ public class Robot extends SampleRobot {
 				mElevatorTalon.set(0);
 				mElevatorTalon.setSelectedSensorPosition(0, 0, 10);
 				mElevEncoder.TriggerAtElevatorBottom();
+			}
+			
+			if(RunConstants.RUNNING_GRABBER) {
+				mGrabber.grab();
 			}
 			mInGame = true;
 		}
@@ -612,13 +647,40 @@ public class Robot extends SampleRobot {
 	}
 
 	public void DriveInit() {
+		int turnPort, turnOffset, drivePort;
+		double D_PID;
+		double I_PID;
+		double P_PID;
+		boolean turnEncoderReversed, turnReversed, driveReversed; 
 		for (int i = 0; i < 4; i++) {
-			mTurn[i] = GetTalonObject(Ports.TURN[i]);
+			if(RunConstants.IS_PROTOTYPE) {
+				turnPort = Ports.Prototype.TURN[i];
+				turnEncoderReversed = DriveConstants.Prototype.ENCODER_REVERSED[i];
+				turnReversed = DriveConstants.Prototype.TURN_INVERTED[i];
+				turnOffset = DriveConstants.Prototype.OFFSETS[i];
+				driveReversed = DriveConstants.Prototype.DRIVE_INVERTED[i];
+				drivePort = Ports.Prototype.DRIVE[i];
+				P_PID = DriveConstants.Prototype.ROTATION_P[i];
+				I_PID = DriveConstants.Prototype.ROTATION_I[i];
+				D_PID = DriveConstants.Prototype.ROTATION_D[i];
+			}
+			else {
+				turnPort = Ports.TURN[i];
+				turnEncoderReversed = DriveConstants.Modules.ENCODER_REVERSED[i];
+				turnReversed = DriveConstants.Modules.TURN_INVERTED[i];
+				turnOffset = DriveConstants.Modules.OFFSETS[i];
+				driveReversed = DriveConstants.Modules.DRIVE_INVERTED[i];
+				drivePort = Ports.DRIVE[i];
+				P_PID = DriveConstants.PID_Constants.ROTATION_P[i];
+				I_PID = DriveConstants.PID_Constants.ROTATION_I[i];
+				D_PID = DriveConstants.PID_Constants.ROTATION_D[i];
+			}
+			mTurn[i] = GetTalonObject(turnPort);
 			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			mTurn[i].setNeutralMode(NeutralMode.Brake);
 
-			mTurn[i].setSensorPhase(DriveConstants.Modules.ENCODER_REVERSED[i]);
-			mTurn[i].setInverted(DriveConstants.Modules.TURN_INVERTED[i]);
+			mTurn[i].setSensorPhase(turnEncoderReversed);
+			mTurn[i].setInverted(turnReversed);
 
 			mTurn[i].config_kP(0, DriveConstants.PID_Constants.ROTATION_P[i], 10);
 			mTurn[i].config_kI(0, DriveConstants.PID_Constants.ROTATION_I[i], 10);
@@ -629,8 +691,8 @@ public class Robot extends SampleRobot {
 			mTurn[i].configPeakOutputForward(1, 10);
 			mTurn[i].configPeakOutputReverse(-1, 10);
 
-			mDrive[i] = GetTalonObject(Ports.DRIVE[i]);
-			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
+			mDrive[i] = GetTalonObject(drivePort);
+			mDrive[i].setInverted(driveReversed);
 			mDrive[i].setNeutralMode(NeutralMode.Brake);
 
 			mDrive[i].configPeakOutputForward(1, 10);
@@ -644,7 +706,7 @@ public class Robot extends SampleRobot {
 			// mDrive[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			// mDrive[i].setSensorPhase(DriveConstants.DRIVE_ENCODER_INVERTED[i]);
 
-			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
+			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], ResourceFunctions.tickToAngle(turnOffset));
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i]);
 		}
 

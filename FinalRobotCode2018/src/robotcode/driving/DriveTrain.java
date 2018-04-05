@@ -87,6 +87,10 @@ public class DriveTrain {
 
 		mLinearVel = pLinearVel;
 		mRotationalVel = pRotationalVel;
+		
+		SmartDashboard.putString("Linear Velocity State", mLinearVel.name());
+		SmartDashboard.putString("Previous Linear Velocity", mPrevLinearVel.name());
+		SmartDashboard.putString("Rotational Velocity State", mRotationalVel.name());
 
 		if (mController.getStartButtonReleased()) {
 			mIsFieldRelative = !mIsFieldRelative;
@@ -112,6 +116,7 @@ public class DriveTrain {
 				break;
 		}
 		mDesiredRobotVel = new Vector(linearVel);
+		SmartDashboard.putNumber("Linear Velocity after switch", mDesiredRobotVel.getMagnitude());
 
 		switch (mRotationalVel) {
 			case NORMAL:
@@ -159,12 +164,14 @@ public class DriveTrain {
 				SmartDashboard.putNumber("drift comp", mDriftCompensationOutput.getVal());
 				mSwerveDrive.calculateHoldDirection(mDriftCompensationOutput.getVal(), getDesiredRobotVel());
 				mWheels[i].set(mSwerveDrive.getOutput(i));
+				SmartDashboard.putNumber("Linear velocity in else if", mSwerveDrive.getOutput(i).getMagnitude());
 			}
 			else {
 				resetDriftCompensation();
 				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
 				mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
 				mWheels[i].set(mSwerveDrive.getOutput(i));
+				
 			}
 			SmartDashboard.putBoolean("drift comp enabled", mDriftCompensationPID.isEnabled());
 			SmartDashboard.putNumber("Error " + i, robotDirectionAngle - mWheels[i].getAngle());
@@ -351,8 +358,7 @@ public class DriveTrain {
 		if (linVel != mLinearVel) {
 			mPrevLinearVel = mLinearVel;
 		}
-		SmartDashboard.putString("Linear Velocity State", mLinearVel.name());
-		SmartDashboard.putString("Previous Linear Velocity", mPrevLinearVel.name());
+		
 		return linVel;
 	}
 
@@ -451,6 +457,10 @@ public class DriveTrain {
 		for (int i = 0; i < 4; i++) {
 			mWheels[i].set(mSwerveDrive.getOutput(i));
 		}
+	}
+	
+	public Wheel[] returnWheels() {
+		return mWheels;
 	}
 	
 }
