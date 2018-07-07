@@ -264,22 +264,22 @@ public class Robot extends SampleRobot {
 		{
 			if(RunConstants.IS_PROTOTYPE)  // determine values based on if prototype or real robot being used
 			{
-				turnPort = Ports.Prototype.TURN[i];
+				turnPort = Ports.PrototypeRobot.TURN[i];
 				turnEncoderReversed = DriveConstants.PrototypeRobot.ENCODER_REVERSED[i];
 				turnReversed = DriveConstants.PrototypeRobot.TURN_INVERTED[i];
 				turnOffset = DriveConstants.PrototypeRobot.OFFSETS[i];
 				driveReversed = DriveConstants.PrototypeRobot.DRIVE_INVERTED[i];
-				drivePort = Ports.Prototype.DRIVE[i];
+				drivePort = Ports.PrototypeRobot.DRIVE[i];
 				P_PID = DriveConstants.PrototypeRobot.ROTATION_P[i];
 				I_PID = DriveConstants.PrototypeRobot.ROTATION_I[i];
 				D_PID = DriveConstants.PrototypeRobot.ROTATION_D[i];
 			} else {
-				turnPort = Ports.TURN[i];
+				turnPort = Ports.ActualRobot.TURN[i];
 				turnEncoderReversed = DriveConstants.ActualRobot.ENCODER_REVERSED[i];
 				turnReversed = DriveConstants.ActualRobot.TURN_INVERTED[i];
 				turnOffset = DriveConstants.ActualRobot.OFFSETS[i];
 				driveReversed = DriveConstants.ActualRobot.DRIVE_INVERTED[i];
-				drivePort = Ports.DRIVE[i];
+				drivePort = Ports.ActualRobot.DRIVE[i];
 				P_PID = DriveConstants.ActualRobot.ROTATION_P[i];
 				I_PID = DriveConstants.ActualRobot.ROTATION_I[i];
 				D_PID = DriveConstants.ActualRobot.ROTATION_D[i];
