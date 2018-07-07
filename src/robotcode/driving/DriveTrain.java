@@ -368,7 +368,7 @@ public class DriveTrain {
 	 * @return bumper --> nudge; no move --> none; else --> normal
 	 */
 	private RotationalVelocity getRotationalVelocityState() {
-		if (mController.getPOV() > 0) {
+		if (mController.getPOV() >= 0) {
 			return RotationalVelocity.POV;
 		} 
 		else if (mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)) {
