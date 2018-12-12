@@ -13,7 +13,7 @@ public class Ports {
 	public static final int
 		//Controllers
 		XBOX = 0,
-		JOYSTICK = 1;
+		JOYSTICK = 1,
 	
 		COMPRESSOR = 0;
 	

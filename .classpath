@@ -7,8 +7,17 @@
 	<classpathentry kind="var" path="cscore" sourcepath="cscore.sources"/>
 	<classpathentry kind="var" path="wpiutil" sourcepath="wpiutil.sources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="/Users/shahar/Downloads/Robotics/navx-mxp-libs/roborio/java/lib/navx_frc.jar"/>
-	<classpathentry kind="lib" path="/Users/shahar/Downloads/Robotics/CTRE_Phoenix_FRCLibs_NON-WINDOWS_v5.3.1.0/java/lib/CTRE_Phoenix-sources.jar"/>
-	<classpathentry kind="lib" path="/Users/shahar/Downloads/Robotics/CTRE_Phoenix_FRCLibs_NON-WINDOWS_v5.3.1.0/java/lib/CTRE_Phoenix.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Drizzy Dubovskiy/wpilib/user/java/lib/navx_frc.jar" sourcepath="C:/Users/Drizzy Dubovskiy/navx-mxp/java/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/Drizzy%20Dubovskiy/navx-mxp/java/docs/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Drizzy Dubovskiy/wpilib/user/java/lib/CTRE_Phoenix-sources.jar" sourcepath="C:/Users/Drizzy Dubovskiy/wpilib/user/java/lib/CTRE_Phoenix-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Drizzy Dubovskiy/wpilib/user/java/lib/CTRE_Phoenix.jar" sourcepath="C:/Users/Drizzy Dubovskiy/wpilib/user/java/lib/CTRE_Phoenix-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar" sourcepath="/navx-mxp"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix_WPIAPI-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix_WPIAPI.jar" sourcepath="/CTRE_Phoenix.sources"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/navx_frc.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
