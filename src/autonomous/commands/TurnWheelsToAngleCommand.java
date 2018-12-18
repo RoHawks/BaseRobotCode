@@ -29,8 +29,8 @@ public class TurnWheelsToAngleCommand extends BaseAutonomousCommand {
 		mDriveTrain.enactMovement(mDriveTrain.getRobotAngle(), 
 								  mAngle, 
 								  LinearVelocity.ANGLE_ONLY,
-								  RotationalVelocity.NONE, 
-								  0);
+								  0, 
+								  RotationalVelocity.NONE);
 		
 		return mDriveTrain.AllWheelsInRange(mAngle);
 	}

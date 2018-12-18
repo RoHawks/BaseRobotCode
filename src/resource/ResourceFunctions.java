@@ -10,20 +10,12 @@ public class ResourceFunctions {
 		return (int) Math.round(angle * 4096.0 / 360.0);
 	}
 
-	public static double TickToCenti(double tick) {
-		return tick * 12 / 4096;
-	}
-
-	public static double CentiToTick(double centi) {
-		return centi * 4096 / 12;
-	}
-
 	public static double speedToPercent(double speed) {
 		return speed / 1023;
 	}
 
 	/**
-	 * gets angle between 0 and 360
+	 * Gets angle between 0 and 360
 	 * 
 	 * @param angle
 	 *            angle
@@ -35,7 +27,8 @@ public class ResourceFunctions {
 
 	/**
 	 * 
-	 * returns the difference between two angles between -180 and 180
+	 * Returns the difference between two angles between -180 and 180. If using for
+	 * PID for error, target angle minus current angle.
 	 * 
 	 * @param angle1
 	 *            first angle
@@ -43,7 +36,7 @@ public class ResourceFunctions {
 	 *            second angle
 	 * @return difference
 	 */
-	public static double continuousAngleDif(double angle1, double angle2) { // target - current?
+	public static double continuousAngleDif(double angle1, double angle2) { // target - current
 		double dif = putAngleInRange(angle1) - putAngleInRange(angle2);
 		dif = putAngleInRange(dif);
 		if (dif > 180)
@@ -52,7 +45,7 @@ public class ResourceFunctions {
 	}
 
 	/**
-	 * if two doubles are within 0.001
+	 * Equality of two doubles within 0.001
 	 * 
 	 * @param a
 	 *            first double
@@ -65,7 +58,7 @@ public class ResourceFunctions {
 	}
 
 	/**
-	 * ensures a number is between min and max
+	 * Ensures a number is between a min and max value
 	 * 
 	 * @param val
 	 *            number
@@ -75,18 +68,20 @@ public class ResourceFunctions {
 	 *            highest number should be
 	 * @return number between the min and max
 	 */
-	public static double PutNumInAbsoluteRange(double val, double min, double max) {
-
+	public static double putNumInAbsoluteRange(double val, double min, double max) {
+		// return Math.max(Math.min(val, max), min); ?? nifty
 		if (val > max) {
 			return max;
-		} else if (val < min) {
+		}
+		else if (val < min) {
 			return min;
-		} else {
+		}
+		else {
 			return val;
 		}
-		
+
 	}
-	
+
 	/**
 	 * returns derivative of the cosine function of the form a*cos(b*t) at a time t
 	 * b*t is in radians

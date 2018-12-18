@@ -3,9 +3,9 @@ package constants;
 
 public class DriveConstants {
 
-	//*****************//
-	//GENERAL VARIABLES//
-	//*****************//
+	//*******************//
+	// GENERAL VARIABLES //
+	//*******************//
 	public static final double  // speed mins, when lower than these don't do anything
 			MIN_LINEAR_VELOCITY = 0.02,
 			MIN_DIRECTION_MAG = 0.25, // refers to joystick magnitudes
@@ -21,7 +21,7 @@ public class DriveConstants {
 
 	
 	//*****************//
-	//  SWERVE SPEEDS  //
+	// SWERVE SPEEDS //
 	//*****************//
 	public static class SwerveSpeeds {
 		public static final double 
@@ -32,11 +32,11 @@ public class DriveConstants {
 	}
 
 	
-	//**********************//
-	//ACTUAL ROBOT VARIABLES//
-	//**********************//
+	//**************************//
+	// ACTUAL ROBOT VARIABLES //
+	//**************************//
 	public static class ActualRobot {
-		public static final boolean[]
+		public static final boolean[] 
 			TURN_INVERTED = new boolean[] { false, false, false, false },
 			DRIVE_INVERTED = new boolean[] { true, false, false, false },
 			ENCODER_REVERSED = new boolean[] { true, true, true, true };
@@ -69,9 +69,9 @@ public class DriveConstants {
 	}
 	
 	
-	//*************************//
-	//PROTOTYPE ROBOT VARIABLES//
-	//*************************//
+	//***************************//
+	// PROTOTYPE ROBOT VARIABLES //
+	//***************************//
 	public static class PrototypeRobot { //SW, SE, NE, NW
 		public static final boolean[]
 			TURN_INVERTED = new boolean[] {false, false, false, true},
@@ -87,7 +87,21 @@ public class DriveConstants {
 			ROTATION_D = new double[] { 0, 0, 0, 0 };
 
 		public static final int[] 
-			OFFSETS = new int[] { 3721 , 767, 3402, 2527 };
+			OFFSETS = new int[] { 3721 , 767, 3402, 2527 },
+			ROTATION_IZONE = new int[] { 500, 500, 500, 500 },
+			ROTATION_TOLERANCE = new int[] { 3, 3, 3, 3 };
+		
+		public static final double 
+			GYRO_P = 0.00085,
+			GYRO_I = 0.0003,
+			GYRO_D = 0,
+			GYRO_TOLERANCE = 5,
+			GYRO_MAX_SPEED = 1,
+
+			DRIFT_COMP_P = 0.08,
+			DRIFT_COMP_I = 0.0008,
+			DRIFT_COMP_D = 0,
+			DRIFT_COMP_MAX = 0.3;
 	}
 
 }

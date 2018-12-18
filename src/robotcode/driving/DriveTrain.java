@@ -12,29 +12,29 @@ import sensors.RobotAngle;
 
 public class DriveTrain {
 
-	// output
+	// Output
 	private SwerveDrive mSwerveDrive;
 	private Wheel[] mWheels;
 
-	// input
+	// Input
 	private RobotAngle mRobotAngle;
 	private XboxController mController;
 	private double mJoystickAngle;
 
-	// end products
+	// End products
 	private Vector mDesiredRobotVel;
 	private double mDesiredAngularVel;
 
 	private boolean mIsFieldRelative;
 
-	// pids
+	// PIDs
 	private PIDController mGyroPID;
 	private GenericPIDOutput mGyroOutput;
 
 	private PIDController mDriftCompensationPID;
 	private GenericPIDOutput mDriftCompensationOutput;
 
-	// velocity modes
+	// Velocity modes
 	private LinearVelocity mLinearVel;
 	private LinearVelocity mPrevLinearVel;
 	private RotationalVelocity mRotationalVel;
@@ -74,12 +74,12 @@ public class DriveTrain {
 	}
 
 	private void enactMovement() {
-		enactMovement(mController.getPOV(), getStickAngle(Hand.kLeft), getLinearVelocityState(),
-				getRotationalVelocityState(), getStickLinearVel());
+		enactMovement(mController.getPOV(), getStickAngle(Hand.kLeft), getLinearVelocityState(), getStickLinearVel(),
+				getRotationalVelocityState());
 	}
 
 	public void enactMovement(double pGyroAngle, double pRobotDirectionAngle, LinearVelocity pLinearVel,
-			RotationalVelocity pRotationalVel, double pSpecificLinearVelocity) {
+			double pSpecificLinearVelocity, RotationalVelocity pRotationalVel) {
 		SmartDashboard.putNumber("Robot Angle", mRobotAngle.getAngleDegrees());
 
 		double joystickAngle = pRobotDirectionAngle;
@@ -87,7 +87,7 @@ public class DriveTrain {
 
 		mLinearVel = pLinearVel;
 		mRotationalVel = pRotationalVel;
-		
+
 		SmartDashboard.putString("Linear Velocity State", mLinearVel.name());
 		SmartDashboard.putString("Previous Linear Velocity", mPrevLinearVel.name());
 		SmartDashboard.putString("Rotational Velocity State", mRotationalVel.name());
@@ -114,14 +114,16 @@ public class DriveTrain {
 				break;
 			case NONE:
 				break;
+			default:
+				throw new RuntimeException("Unknown drivetrain linear velocity state");
 		}
 		mDesiredRobotVel = new Vector(linearVel);
-		SmartDashboard.putNumber("Linear Velocity after switch", mDesiredRobotVel.getMagnitude());
+		SmartDashboard.putNumber("Linear velocity after switch", mDesiredRobotVel.getMagnitude());
 
 		switch (mRotationalVel) {
 			case NORMAL:
 				mGyroPID.disable();
-				mDesiredAngularVel = angularVelStick();
+				mDesiredAngularVel = getStickAngularVel();
 				break;
 			case NUDGE:
 				mGyroPID.disable();
@@ -133,49 +135,61 @@ public class DriveTrain {
 				break;
 			case POV:
 				mDesiredAngularVel = getAngularPIDVel(pGyroAngle); // TZ
-				SmartDashboard.putNumber("gyro pid error", mGyroPID.getError());
+				SmartDashboard.putNumber("Gyro PID error", mGyroPID.getError());
 				break;
+			default:
+				throw new RuntimeException("Unknown drivetrain rotational velocity state");
 		}
 
 		SmartDashboard.putNumber("POV", mController.getPOV());
 		SmartDashboard.putString("Rotational Velocity State", mRotationalVel.toString());
-
-		for (int i = 0; i < 4; i++) {
-			if (mLinearVel == LinearVelocity.ANGLE_ONLY && mRotationalVel == RotationalVelocity.NONE) {
-				mWheels[i].set(robotDirectionAngle, 0);
-				resetDriftCompensation();
-				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
-			}
-			else if (mRotationalVel == RotationalVelocity.NONE && mLinearVel == LinearVelocity.NONE) {
-				if (mPrevLinearVel == LinearVelocity.NUDGE) {
-					mWheels[i].set(mSwerveDrive.getOutput(i).getAngle(), 0);
-				} 
-				else {
-					mWheels[i].setLinearVelocity(0);
-					mWheels[i].setTurnSpeed(0);
+		if (mRotationalVel == RotationalVelocity.NONE) {
+			if (mLinearVel == LinearVelocity.ANGLE_ONLY) {
+				for (int i = 0; i < 4; i++) {
+					mWheels[i].set(robotDirectionAngle, 0);
 				}
 				resetDriftCompensation();
 				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
 			}
-			else if (mRotationalVel == RotationalVelocity.NONE
-					&& (mLinearVel == LinearVelocity.NORMAL || mLinearVel == LinearVelocity.NUDGE)) {
-				mDriftCompensationPID.enable();
-				SmartDashboard.putNumber("drift comp error", mDriftCompensationPID.getError());
-				SmartDashboard.putNumber("drift comp", mDriftCompensationOutput.getVal());
-				mSwerveDrive.calculateHoldDirection(mDriftCompensationOutput.getVal(), getDesiredRobotVel());
-				mWheels[i].set(mSwerveDrive.getOutput(i));
-				SmartDashboard.putNumber("Linear velocity in else if", mSwerveDrive.getOutput(i).getMagnitude());
-			}
-			else {
+			else if (mLinearVel == LinearVelocity.NONE) {
+				if (mPrevLinearVel == LinearVelocity.NUDGE) {
+					for (int i = 0; i < 4; i++) {
+						mWheels[i].set(mSwerveDrive.getOutput(i).getAngle(), 0);
+					}
+				}
+				else {
+					for (int i = 0; i < 4; i++) {
+						mWheels[i].setLinearVelocity(0);
+						mWheels[i].setTurnSpeed(0);
+					}
+				}
 				resetDriftCompensation();
 				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
-				mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
-				mWheels[i].set(mSwerveDrive.getOutput(i));
-				
 			}
-			SmartDashboard.putBoolean("drift comp enabled", mDriftCompensationPID.isEnabled());
-			SmartDashboard.putNumber("Error " + i, robotDirectionAngle - mWheels[i].getAngle());
-			SmartDashboard.putNumber("Angle " + i, mWheels[i].getAngle());
+			else if (mLinearVel == LinearVelocity.NORMAL || mLinearVel == LinearVelocity.NUDGE) {
+				mDriftCompensationPID.enable();
+				SmartDashboard.putNumber("Drift comp error", mDriftCompensationPID.getError());
+				SmartDashboard.putNumber("Drift comp value", mDriftCompensationOutput.getVal());
+				mSwerveDrive.calculateHoldDirection(mDriftCompensationOutput.getVal(), getDesiredRobotVel());
+				for (int i = 0; i < 4; i++) {
+					mWheels[i].set(mSwerveDrive.getOutput(i));
+				}
+			}
+		}
+		else {
+			resetDriftCompensation();
+			mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
+			mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
+			for (int i = 0; i < 4; i++) {
+				mWheels[i].set(mSwerveDrive.getOutput(i));
+			}
+		}
+
+		SmartDashboard.putBoolean("Drift comp enabled", mDriftCompensationPID.isEnabled());
+
+		for (int i = 0; i < 4; i++) {
+			SmartDashboard.putNumber("Error " + i + ":", robotDirectionAngle - mWheels[i].getAngle());
+			SmartDashboard.putNumber("Angle " + i + ":", mWheels[i].getAngle());
 		}
 	}
 
@@ -213,7 +227,7 @@ public class DriveTrain {
 		double joystickAngle = getStickAngle(Hand.kLeft);
 		for (int i = 0; i < 4; i++) {
 			mWheels[i].set(joystickAngle, linearVelocity);
-			SmartDashboard.putNumber("Angle " + i, mWheels[i].getAngle());
+			SmartDashboard.putNumber("Angle " + i + ":", mWheels[i].getAngle());
 		}
 	}
 
@@ -228,14 +242,13 @@ public class DriveTrain {
 	public double getStickAngle(Hand h) {
 		double x = mController.getX(h);
 		double y = -mController.getY(h);
-		SmartDashboard.putNumber("X-Value: " + h.toString(), x);
-		SmartDashboard.putNumber("Y-Yalue: " + h.toString(), y);
+		SmartDashboard.putNumber("X-Value " + h.toString() + ":", x);
+		SmartDashboard.putNumber("Y-Yalue " + h.toString() + ":", y);
 		if (Math.abs(y) >= DriveConstants.MIN_DIRECTION_MAG || Math.abs(x) >= DriveConstants.MIN_DIRECTION_MAG) {
 			mJoystickAngle = -Math.toDegrees(Math.atan2(y, x)) + 90;
-			mJoystickAngle = ResourceFunctions.putAngleInRange(mJoystickAngle);
-			// puts angle between zero and 360
+			mJoystickAngle = ResourceFunctions.putAngleInRange(mJoystickAngle); // puts angle between zero and 360
 		}
-		SmartDashboard.putNumber(h.toString() + " Joystick Angle", mJoystickAngle);
+		SmartDashboard.putNumber(h.toString() + " Joystick Angle: ", mJoystickAngle);
 		return mJoystickAngle;
 	}
 
@@ -247,8 +260,7 @@ public class DriveTrain {
 	 * @return Magnitude of the depression; 0 is not used, 1 is fully depressed
 	 */
 	public double getStickMag(Hand h) {
-		Vector v = new Vector(mController.getX(h), mController.getY(h));
-		return v.getMagnitude();
+		return Math.hypot(mController.getX(h), mController.getY(h));
 	}
 
 	/**
@@ -259,7 +271,8 @@ public class DriveTrain {
 	private double nudgeTurn() {
 		if (mController.getBumper(Hand.kLeft)) {
 			return -DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
-		} else if (mController.getBumper(Hand.kRight)) {
+		}
+		else if (mController.getBumper(Hand.kRight)) {
 			return DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
 		}
 
@@ -275,17 +288,16 @@ public class DriveTrain {
 		double newAngle = 0;
 		double robotAngle = mRobotAngle.getAngleDegrees();
 
-		if (mController.getYButton()) {
-			newAngle = 0;
-		}
-		else if (mController.getXButton()) {
-			newAngle = 270;
+		// Don't need to check Y button, which is 0 degrees, since newAngle set to 0 by default
+
+		if (mController.getBButton()) {
+			newAngle = 90;
 		}
 		else if (mController.getAButton()) {
 			newAngle = 180;
 		}
-		else if (mController.getBButton()) {
-			newAngle = 90;
+		else if (mController.getXButton()) {
+			newAngle = 270;
 		}
 
 		if (mIsFieldRelative) {
@@ -313,7 +325,7 @@ public class DriveTrain {
 	 * 
 	 * @return angular velocity for swerve drive
 	 */
-	private double angularVelStick() {
+	private double getStickAngularVel() {
 		double joystickValue = mController.getX(Hand.kRight);
 		SmartDashboard.putNumber("Right Joystick X", joystickValue);
 
@@ -322,13 +334,12 @@ public class DriveTrain {
 		}
 		double angularVel = joystickValue * Math.abs(joystickValue);
 		angularVel *= DriveConstants.SwerveSpeeds.ANGULAR_SPEED_MULT;
-		// angularVel = -angularVel; // correct the sign for clockwise/counter-clockwise
 		SmartDashboard.putNumber("Angular Velocity", angularVel);
 		return angularVel; // quadratic control for finer movements
 	}
 
 	/**
-	 * disables and resets previous stuff
+	 * Disables and resets drift compensation
 	 */
 	private void resetDriftCompensation() {
 		if (mDriftCompensationPID.isEnabled()) {
@@ -338,7 +349,7 @@ public class DriveTrain {
 	}
 
 	/**
-	 * gets linear velocity state
+	 * Gets linear velocity state
 	 * 
 	 * @return bumper --> nudge; no move --> angle only; else --> normal
 	 */
@@ -363,7 +374,7 @@ public class DriveTrain {
 	}
 
 	/**
-	 * gets rotational velocity state
+	 * Gets rotational velocity state
 	 * 
 	 * @return bumper --> nudge; no move --> none; else --> normal
 	 */
@@ -374,7 +385,7 @@ public class DriveTrain {
 		else if (mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)) {
 			return RotationalVelocity.NUDGE;
 		} 
-		else if (angularVelStick() != 0) {
+		else if (getStickAngularVel() != 0) {
 			return RotationalVelocity.NORMAL;
 		}
 		return RotationalVelocity.NONE;
@@ -419,8 +430,7 @@ public class DriveTrain {
 		mGyroPID = new PIDController(DriveConstants.ActualRobot.GYRO_P, DriveConstants.ActualRobot.GYRO_I,
 				DriveConstants.ActualRobot.GYRO_D, mRobotAngle, mGyroOutput);
 		mGyroPID.setInputRange(0, 360.0);
-		mGyroPID.setOutputRange(-DriveConstants.ActualRobot.GYRO_MAX_SPEED,
-				DriveConstants.ActualRobot.GYRO_MAX_SPEED);
+		mGyroPID.setOutputRange(-DriveConstants.ActualRobot.GYRO_MAX_SPEED, DriveConstants.ActualRobot.GYRO_MAX_SPEED);
 		mGyroPID.setAbsoluteTolerance(DriveConstants.ActualRobot.GYRO_TOLERANCE);
 		mGyroPID.setContinuous(true);
 
@@ -446,17 +456,9 @@ public class DriveTrain {
 	public boolean gyroInRange() {
 		return mGyroPID.onTarget();
 	}
-	
+
 	public double getRobotAngle() {
 		return mRobotAngle.getAngleDegrees();
-	}
-
-	public void gyroOnly(double pAngle) {
-		double angularVel = getAngularPIDVel(pAngle);
-		mSwerveDrive.calculate(angularVel, new Vector());
-		for (int i = 0; i < 4; i++) {
-			mWheels[i].set(mSwerveDrive.getOutput(i));
-		}
 	}
 	
 	public Wheel[] returnWheels() {
@@ -464,30 +466,3 @@ public class DriveTrain {
 	}
 	
 }
-
-/*
-LOGS
-robotangle
-fieldrelative
-gyropiderror
-pov
-drift compensation error
-drift compensatoin output
-drift compensatoin enabled
-wheel angle error
-wheel angle
-tank left
-tank right
-crab angle
-joystick x value
-joystick y value
-joystick angle
-right trigger
-right joystick x
-angular velocity
-lin vel state
-lin vel state prev
-gyro pid setpoint
-gyro pid output
-rotational vel state
-*/

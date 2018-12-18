@@ -58,8 +58,8 @@ public class ParameterizedPathDriveCommand extends BaseAutonomousCommand {
 		mDriveTrain.enactMovement(0, 
 								  -linearV.getAngle() + 90, 
 								  LinearVelocity.NORMAL, 
-								  RotationalVelocity.NONE, 
-								  linearV.getMagnitude()*100);
+								  linearV.getMagnitude()*100, 
+								  RotationalVelocity.NONE);
 		
 		return currentTime > mTotalTime;
 	}

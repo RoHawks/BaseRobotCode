@@ -91,7 +91,7 @@ public class Vector {
 	 * @return magnitude of vector
 	 */
 	public double getMagnitude() {
-		return Math.sqrt(Math.pow(xVal, 2) + Math.pow(yVal, 2));
+		return Math.hypot(xVal, yVal);
 	}
 
 	/**

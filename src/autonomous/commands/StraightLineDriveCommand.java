@@ -55,8 +55,8 @@ public class StraightLineDriveCommand extends BaseAutonomousCommand {
 		mDriveTrain.enactMovement(mDriveTrain.getRobotAngle(), 
 								  mAngle, 
 								  LinearVelocity.NORMAL, 
-								  RotationalVelocity.NONE,
-								  finalSpeed);
+								  finalSpeed,
+								  RotationalVelocity.NONE);
 
 		return isThisCommandDone;
 

@@ -27,8 +27,8 @@ public class StopCommand extends BaseAutonomousCommand {
 		mDriveTrain.enactMovement(mDriveTrain.getRobotAngle(), 
 								  mDriveTrain.getDesiredRobotVel().getAngle(), 
 								  LinearVelocity.NONE, 
-								  RotationalVelocity.NONE, 
-								  0.0);
+								  0.0, 
+								  RotationalVelocity.NONE);
 		
 		return true;
 	}
