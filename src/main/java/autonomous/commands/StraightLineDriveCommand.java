@@ -44,7 +44,6 @@ public class StraightLineDriveCommand extends BaseAutonomousCommand {
 		double intialCalculatedspeed = mInitialVelocity + portionIntoSpeedRange;
 
 		// check if we should finish this command:
-		// TODO this is set to a default time, but can be if some action has past instead...
 		boolean isThisCommandDone = getMillisecondsSinceStart() > mTotalMilliseconds;
 		
 		// if command is going to wrap up after this run, set speed to final velocity:

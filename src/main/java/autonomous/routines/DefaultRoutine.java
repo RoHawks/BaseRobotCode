@@ -49,7 +49,7 @@ public class DefaultRoutine implements AutonomousRoutine {
 				AutoConstants.DefaultRoutine.DECELERATION_TIME));
 
 		returnValue.add(new StopCommand(mRobot));
-		returnValue.add(new TurnRobotToAngleCommand(mRobot, -90)); // TODO this is a default angle setting
+		returnValue.add(new TurnRobotToAngleCommand(mRobot, -90));
 		returnValue.add(new ParameterizedPathDriveCommand(mRobot, 4, Math.PI/10000, 0, 4, Math.PI/10000, 0, 5000));
 		returnValue.add(new StopCommand(mRobot));
 		
