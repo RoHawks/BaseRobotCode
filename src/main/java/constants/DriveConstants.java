@@ -11,6 +11,9 @@ public class DriveConstants {
 			MIN_DIRECTION_MAG = 0.25, // refers to joystick magnitudes
 			MAX_INDIVIDUAL_VELOCITY = 1.0;
 	
+	public static final double[]
+		INDIVIDUAL_SCALE_FACTORS = { 1.0 , 1.0 , 1.0 , 1.0 };
+	
 	public static final double
 			EMERGENCY_VOLTAGE = 10000,
 			MAX_EMERGENCY_VOLTAGE = 0.5;
