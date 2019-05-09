@@ -78,6 +78,9 @@ public class Robot extends SampleRobot {
 	}
 
 	public void endGame() {
+		if(RunConstants.LOGGING){
+			SmartDashboard.putString("DashboardCommand", "EndRecording");
+		}
 	}
 
 	@Override
@@ -86,6 +89,7 @@ public class Robot extends SampleRobot {
 		mController = new XboxController(Ports.XBOX);
 		mNavX = new AHRS(Ports.NAVX);
 		mPDP = new PowerDistributionPanel();
+		mCompressor = new Compressor(Ports.COMPRESSOR);
 
 		if (RunConstants.RUNNING_DRIVE) {
 			driveInit();
@@ -100,10 +104,7 @@ public class Robot extends SampleRobot {
 			camera.setResolution(240, 180);
 			camera.setFPS(30);
 		}
-		
-		if (RunConstants.RUNNING_PNEUMATICS) {
-			mCompressor = new Compressor(Ports.COMPRESSOR);
-		}
+
 	}
 
 	@Override
@@ -190,6 +191,11 @@ public class Robot extends SampleRobot {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
 
+			if(RunConstants.LOGGING){
+				createHeaderString();
+				SmartDashboard.putString("DashboardCommand", "StartRecording");
+			}
+			
 			if (RunConstants.RUNNING_PNEUMATICS) {
 				mCompressor.start();
 			}
@@ -203,9 +209,20 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void disabled() {
-		endGame();
+		
+		long timeDisabledStarted = System.currentTimeMillis();
+		boolean ended = false;
 
 		while (this.isDisabled()) {
+			
+			long timeElapsed = System.currentTimeMillis() - timeDisabledStarted;
+
+			if (timeElapsed > 3000 && !ended) {
+				endGame();
+				ended = true;
+				//SmartDashboard.putString("CURRENT ROBOT MODE: ", "DISABLED");
+			}
+			
 			if (mJoystick.getTriggerPressed()) {
 				// rotate autonomous routines to select which one to start with:
 				if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
@@ -366,35 +383,12 @@ public class Robot extends SampleRobot {
 		long timeElapsed = time - mGameStartMillis;
 
 		SmartDashboard.putBoolean("Game Has Started:", mInGame);
-		SmartDashboard.putNumber("Time Game Started:", mGameStartMillis);
 		SmartDashboard.putNumber("Time Elapsed:", timeElapsed);
 
 		StringBuilder logString = new StringBuilder();
 
 		// for now it is one frame per line
 		addLogValueInt(logString, (int) timeElapsed);
-
-		addLogValueBoolean(logString, mController.getYButton());
-		addLogValueBoolean(logString, mController.getBButton());
-		addLogValueBoolean(logString, mController.getAButton());
-		addLogValueBoolean(logString, mController.getXButton());
-		addLogValueBoolean(logString, mController.getBumper(Hand.kLeft));
-		addLogValueBoolean(logString, mController.getBumper(Hand.kRight));
-		addLogValueDouble(logString, mController.getTriggerAxis(Hand.kLeft));
-		addLogValueDouble(logString, mController.getTriggerAxis(Hand.kRight));
-		addLogValueInt(logString, mController.getPOV());
-		addLogValueBoolean(logString, mController.getStartButton());
-		addLogValueBoolean(logString, mController.getBackButton());
-		addLogValueDouble(logString, mController.getX(Hand.kLeft));
-		addLogValueDouble(logString, mController.getY(Hand.kLeft));
-		addLogValueDouble(logString, mController.getX(Hand.kRight));
-		addLogValueDouble(logString, mController.getY(Hand.kRight));
-
-		if (RunConstants.SECONDARY_JOYSTICK) {
-			for (int i = 1; i < 12; i++) {
-				addLogValueBoolean(logString, mJoystick.getRawButton(i));
-			}
-		}
 
 		if (RunConstants.RUNNING_DRIVE) {
 			for (int i = 0; i < 4; i++) {
@@ -406,10 +400,6 @@ public class Robot extends SampleRobot {
 
 				addLogValueDouble(logString, mEncoder[i].getAngleDegrees());
 			}
-
-			addLogValueDouble(logString, mDriveTrain.getDesiredRobotVel().getMagnitude());
-			addLogValueDouble(logString, mDriveTrain.getDesiredRobotVel().getAngle());
-			addLogValueDouble(logString, mDriveTrain.getDesiredAngularVel());
 		}
 
 		if (RunConstants.RUNNING_PNEUMATICS) {
@@ -423,5 +413,17 @@ public class Robot extends SampleRobot {
 		addLogValueEndDouble(logString, mRobotAngle.getAngleDegrees());
 
 		SmartDashboard.putString("LogString", logString.toString());
+	}
+	
+	public void createHeaderString() {
+		StringBuilder headerString = new StringBuilder();
+		String[] headers = { "Time left", "Robot State", "etc" };
+
+		for(int i = 0; i < headers.length - 1; i++){
+			addLogValueString(headerString, headers[i]);
+		}
+		
+		addLogValueEndString(headerString, headers[headers.length - 1]);
+		SmartDashboard.putString("HeaderString", headerString.toString());
 	}
 }
