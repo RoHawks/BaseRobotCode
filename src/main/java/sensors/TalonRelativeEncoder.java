@@ -8,8 +8,7 @@ public class TalonRelativeEncoder extends RelativeEncoder {
 	private WPI_TalonSRX mTalon;
 	private boolean mReversed;
 
-	public TalonRelativeEncoder(WPI_TalonSRX pTalon, boolean pReversed, double pTicksToRPM) 
-	{
+	public TalonRelativeEncoder(WPI_TalonSRX pTalon, boolean pReversed, double pTicksToRPM) {
 		super(pTicksToRPM);
 		mTalon = pTalon;
 		mReversed = pReversed;
@@ -18,8 +17,7 @@ public class TalonRelativeEncoder extends RelativeEncoder {
 		mTalon.setInverted(mReversed);
 	}
 
-	public double getRawTicksPerSecond() 
-	{
+	public double getRawTicksPerSecond() {
 		return mTalon.getSelectedSensorVelocity(0);
 	}
 }
