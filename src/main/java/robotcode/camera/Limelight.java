@@ -13,28 +13,30 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Limelight {
 
-    private static final double FOV = 59.6; // degrees
+    private String mTableName;
 
     public Limelight() {
-
+        mTableName = "limelight";
     }
 
+    public Limelight(String pTableName){
+        mTableName = pTableName;
+    }
 
-    // ******** //
+    //**********//
     // RESOURCE //
-    // ******** //
-    public double getDoubleFromNetworkTable(String key) {
-        return NetworkTableInstance.getDefault().getTable("limelight").getEntry(key).getDouble(0);
-    }
-
+    //**********//
     public NetworkTableEntry getEntryFromNetworkTable(String key) {
-        return NetworkTableInstance.getDefault().getTable("limelight").getEntry(key);
+        return NetworkTableInstance.getDefault().getTable(mTableName).getEntry(key);
     }
 
+    public double getDoubleFromNetworkTable(String key) {
+        return getEntryFromNetworkTable(key).getDouble(Double.NaN);
+    }
 
-    // **** //
+    //******//
     // DATA //
-    // **** //
+    //******//
     public double xAngleToDistance() {
         return (CameraConstants.HEIGHT * Math.tan(Math.toRadians(getDoubleFromNetworkTable("tx"))));
     }
@@ -51,11 +53,11 @@ public class Limelight {
         return getDoubleFromNetworkTable("ta");
     }
 
-    public double getTargetSkew() { //-90 to 0 degrees
+    public double getTargetSkew() { // -90 to 0 degrees
         return getDoubleFromNetworkTable("ts");
     }
 
-    public double getTargetWidth() { //in pixels
+    public double getTargetWidth() { // in pixels
         return getDoubleFromNetworkTable("thor");
     }
 
@@ -63,47 +65,44 @@ public class Limelight {
         return getDoubleFromNetworkTable("tvert");
     }
 
-
-    // ************ //
+    //**************//
     // LED SETTINGS //
-    // ************ //
-    public void setLedFromPipeline(){
+    //**************//
+    public void setLedFromPipeline() {
         getEntryFromNetworkTable("ledMode").setNumber(0);
     }
 
-    public void setLedOff(){
+    public void setLedOff() {
         getEntryFromNetworkTable("ledMode").setNumber(1);
     }
 
-    public void setLedBlink(){
+    public void setLedBlink() {
         getEntryFromNetworkTable("ledMode").setNumber(2);
     }
 
-    public void setLedOn(){
+    public void setLedOn() {
         getEntryFromNetworkTable("ledMode").setNumber(3);
     }
 
-
-    // *********** //
+    //************//
     // CAMERA MODE //
-    // *********** //
-    public void setVisionProcessor(){
+    //*************//
+    public void setVisionProcessor() {
         getEntryFromNetworkTable("camMode").setNumber(0);
     }
 
-    public void setDriverCamera(){
+    public void setDriverCamera() {
         getEntryFromNetworkTable("camMode").setNumber(1);
     }
 
-
-    // ******** //
+    //**********//
     // PIPELINE //
-    // ******** //
-    public void setPipeline(int pPipeline){
+    //**********//
+    public void setPipeline(int pPipeline) {
         getEntryFromNetworkTable("pipeline").setNumber(pPipeline);
     }
 
-    public double getPipeline(){
+    public double getPipeline() {
         return getDoubleFromNetworkTable("getpipe");
     }
 
@@ -111,31 +110,29 @@ public class Limelight {
         return getDoubleFromNetworkTable("tl");
     }
 
-
-    // ****** //
+    //********//
     // STREAM //
-    // ****** //
-    public void setStreamStandard(){
+    //********//
+    public void setStreamStandard() {
         getEntryFromNetworkTable("stream").setNumber(0);
     }
-    
-    public void setStreamMain(){
+
+    public void setStreamMain() {
         getEntryFromNetworkTable("stream").setNumber(1);
     }
-    
-    public void setStreamSecondary(){
+
+    public void setStreamSecondary() {
         getEntryFromNetworkTable("stream").setNumber(2);
     }
 
-
-    // ******** //
+    //**********//
     // SNAPSHOT //
-    // ******** //
-    public void stopSnapshot(){
+    //**********//
+    public void stopSnapshot() {
         getEntryFromNetworkTable("snapshot").setNumber(0);
     }
 
-    public void startSnapshot(){
+    public void startSnapshot() {
         getEntryFromNetworkTable("snapshot").setNumber(1);
     }
 

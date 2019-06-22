@@ -24,7 +24,7 @@
         public static final long TIME_THRESHOLD = 500; //temporary
         public static final double DISTANCE_THRESHOLD = 4000; //temporary, check specs for voltage/distance graph
 
-        public UltrasonicSensor(int pPort) {
+        public InfraredSensor(int pPort) {
             super(pPort);
             mActualValue = getRaw();
             mReturnedValue = getRaw();

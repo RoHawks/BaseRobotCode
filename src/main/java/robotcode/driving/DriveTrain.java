@@ -444,9 +444,9 @@ public class DriveTrain {
 		mDriftCompensationPID.disable();
 	}
 
-	public boolean AllWheelsInRange(double pAngle) {
+	public boolean allWheelsInRange(double pAngle) {
 		for (int i = 0; i < 4; i++) {
-			if (!mWheels[i].IsInRange(pAngle)) {
+			if (!mWheels[i].isInRange(pAngle)) {
 				return false;
 			}
 		}

@@ -2,7 +2,6 @@ package robotcode.driving;
 
 import constants.DriveConstants;
 import constants.RunConstants;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.Vector;
 
 /**
@@ -84,7 +83,13 @@ public class SwerveDrive {
 		}
 
 		for (int i = 0; i < 4; i++){
-			velocities[i].scaleTotal(DriveConstants.INDIVIDUAL_SCALE_FACTORS[i]);
+			if(RunConstants.IS_PROTOTYPE){
+				velocities[i].scaleTotal(DriveConstants.PrototypeRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+			}
+			else {
+				velocities[i].scaleTotal(DriveConstants.ActualRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+
+			}
 		}
 		
 		for (int i = 0; i < 4; i++) {
@@ -135,6 +140,16 @@ public class SwerveDrive {
 			double velScale = DriveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
 			for (int i = 0; i < 4; i++) {
 				velocities[i].scaleTotal(velScale);
+			}
+		}
+
+		for (int i = 0; i < 4; i++){
+			if(RunConstants.IS_PROTOTYPE){
+				velocities[i].scaleTotal(DriveConstants.PrototypeRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+			}
+			else {
+				velocities[i].scaleTotal(DriveConstants.ActualRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+
 			}
 		}
 

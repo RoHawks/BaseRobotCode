@@ -1,6 +1,5 @@
 package frc.robot;
 
-import java.awt.SecondaryLoop;
 import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -19,7 +18,6 @@ import constants.RobotState;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SampleRobot;
