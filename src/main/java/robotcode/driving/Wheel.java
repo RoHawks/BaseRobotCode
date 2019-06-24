@@ -58,7 +58,7 @@ public class Wheel {
 	}
 
 	/**
-	 * Sets the angle of the turn motor using the Talon PID
+	 * Sets the angle of the turn motor using the Talon Position PID ControlMode.
 	 * 
 	 * @param pAngle target angle in degrees
 	 */
@@ -69,8 +69,9 @@ public class Wheel {
 	/**
 	 * Sets the angle of the turn motor using a specified {@code ControlMode}.
 	 * 
-	 * @param pAngle target angle in degrees
-	 * @param pControlMode {@code ControlMode} to be used. Either {@code Position} or {@code MotionMagic}.
+	 * @param pAngle       target angle in degrees
+	 * @param pControlMode {@code ControlMode} to be used. Either {@code Position}
+	 *                     or {@code MotionMagic}.
 	 */
 	public void setAngle(double pAngle, ControlMode pControlMode) {
 		if (pControlMode == ControlMode.Position) {
@@ -83,24 +84,27 @@ public class Wheel {
 	}
 
 	/**
-	 * Helper method that calculates the value to pass to the Talon for its PID and MotionMagic processes.
+	 * Helper method that calculates the value to pass to the Talon for its PID and
+	 * MotionMagic processes.
 	 * 
 	 * @param pTarget target angle in degrees
-	 * @return the target tick value of the Talon
+	 * @return the target value of the Talon in ticks
 	 */
-	private double calculateTalonTargetPosition(double pTarget) {
-		double current = ResourceFunctions.tickToAngle(mTurn.getSelectedSensorPosition(0));
-		double realCurrent = mEncoder.getAngleDegrees();
+	private int calculateTalonTargetPosition(double pTarget) {
+		int rawCurrentPosition = mTurn.getSelectedSensorPosition(0);
+		double cookedCurrentPosition = mEncoder.getAngleDegrees();
 
-		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
+		double error = ResourceFunctions.continuousAngleDif(pTarget, cookedCurrentPosition);
 
 		if (Math.abs(error) > 90) {
 			mEncoder.setAdd180(!mEncoder.getAdd180());
 			mDrive.setInverted(!mDrive.getInverted());
-			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
+
+			cookedCurrentPosition = mEncoder.getAngleDegrees();
+			error = ResourceFunctions.continuousAngleDif(pTarget, cookedCurrentPosition);
 		}
 
-		return ResourceFunctions.angleToTick(current + error);
+		return rawCurrentPosition + ResourceFunctions.angleToTick(error);
 	}
 
 	/**
@@ -122,16 +126,16 @@ public class Wheel {
 	}
 
 	/**
-	 * Checks whether the wheel is within some epsilon of its target angle
+	 * Checks whether the wheel is within some epsilon of its target angle.
 	 * 
 	 * @param pTarget target angle in degrees
 	 * @return if the wheel is in range
 	 */
 	public boolean isInRange(double pTarget) {
-		double realCurrent = mEncoder.getAngleDegrees();
-		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
+		double currentPosition = mEncoder.getAngleDegrees();
+		double error = ResourceFunctions.continuousAngleDif(pTarget, currentPosition);
 		return Math.abs(error) < DriveConstants.ActualRobot.ROTATION_TOLERANCE[0];
-		//TODO change tolerance value
+		// TODO change tolerance value. Same value is used for ticks and angles for some reason...
 	}
 
 }

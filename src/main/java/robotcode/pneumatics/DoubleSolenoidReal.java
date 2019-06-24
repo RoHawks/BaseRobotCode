@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class DoubleSolenoidReal implements SolenoidInterface {
+
 	private DoubleSolenoid mDoubleSolenoid;
 	private Value mCurrent;
 
@@ -12,24 +13,24 @@ public class DoubleSolenoidReal implements SolenoidInterface {
 		mCurrent = this.getActual();
 	}
 
-	public DoubleSolenoidReal(int pInPort, int pOutPort, int pModuleNumber){
+	public DoubleSolenoidReal(int pInPort, int pOutPort, int pModuleNumber) {
 		mDoubleSolenoid = new DoubleSolenoid(pModuleNumber, pInPort, pOutPort);
 		mCurrent = this.getActual();
 	}
 
-	public void set(Value pDirection) {
-		if(pDirection != mCurrent){
-			mDoubleSolenoid.set(pDirection);
-			mCurrent = pDirection;
-		}
-	}
-
-	public Value get(){
+	public Value get() {
 		return mCurrent;
 	}
 
 	public Value getActual() {
 		return mDoubleSolenoid.get();
+	}
+
+	public void set(Value pDirection) {
+		if (pDirection != mCurrent) {
+			mDoubleSolenoid.set(pDirection);
+			mCurrent = pDirection;
+		}
 	}
 
 	public void setOpposite() {

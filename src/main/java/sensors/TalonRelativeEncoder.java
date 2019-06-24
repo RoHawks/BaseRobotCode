@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class TalonRelativeEncoder extends RelativeEncoder {
-	
+
 	private WPI_TalonSRX mTalon;
 	private boolean mReversed;
 

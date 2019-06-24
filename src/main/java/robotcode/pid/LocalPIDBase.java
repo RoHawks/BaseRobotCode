@@ -16,10 +16,8 @@ import edu.wpi.first.wpilibj.PIDInterface;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
 
@@ -34,8 +32,12 @@ import static java.util.Objects.requireNonNull;
  * This feedback controller runs in discrete time, so time deltas are not used
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
+ * 
+ * <p>
+ * Modified by Tal Zussman in February 2019. Added capability to set the integral zone, deadband, negate, and access
+ * the integral term. Additionally, removed the SendableBase functionality for simplicity.
  */
-public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutput {
+public class LocalPIDBase implements PIDInterface, PIDOutput {
     public static final double kDefaultPeriod = 0.05;
     private static int instances;
 
@@ -84,7 +86,6 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
     private double m_setpoint;
     private double m_prevSetpoint;
 
-    private double m_error;
     private double m_result;
 
     private PIDSource m_origSource;
@@ -168,7 +169,6 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
      * @param output The PIDOutput object that is set to the output percentage
      */
     public LocalPIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource source, PIDOutput output) {
-        super(false);
         requireNonNull(source, "Null PIDSource was given");
         requireNonNull(output, "Null PIDOutput was given");
 
@@ -195,7 +195,6 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         instances++;
         HAL.report(tResourceType.kResourceType_PIDController, instances);
         m_tolerance = new NullTolerance();
-        setName("PIDController", instances);
     }
 
     /**
@@ -226,7 +225,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             enabled = m_enabled;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
 
@@ -277,7 +277,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
 
                 iTerm = m_ITerm;
 
-            } finally {
+            }
+            finally {
                 m_thisMutex.unlock();
             }
 
@@ -290,14 +291,15 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
                 }
 
                 result = P * totalError + D * error + feedForward;
-            } 
+            }
             else {
                 if (I != 0) {
                     // New code, added izone
                     if (iZone < Double.POSITIVE_INFINITY) {
                         if (Math.abs(error) < iZone) {
                             totalError += error;
-                        } else {
+                        }
+                        else {
                             totalError = 0;
                         }
                     }
@@ -306,13 +308,13 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
                         totalError = clamp(totalError + error, minimumOutput / I, maximumOutput / I);
                     }
                 }
-                
+
                 // new code, added deadband, iTerm
                 iTerm = I * totalError;
-                
+
                 if (Math.abs(error) < deadband) {
                     result = 0;
-                } 
+                }
                 else {
                     result = P * error + I * totalError + D * (error - prevError) + feedForward;
                 }
@@ -321,8 +323,9 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
 
             result = clamp(result, minimumOutput, maximumOutput);
 
-            //New code, added negate
-            if (negate) result = -result;
+            // New code, added negate
+            if (negate)
+                result = -result;
 
             // Ensures m_enabled check and pidWrite() call occur atomically
             m_pidWriteMutex.lock();
@@ -335,25 +338,27 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
 
                         m_pidOutput.pidWrite(result);
                     }
-                } finally {
+                }
+                finally {
                     if (m_thisMutex.isHeldByCurrentThread()) {
                         m_thisMutex.unlock();
                     }
                 }
-            } finally {
+            }
+            finally {
                 m_pidWriteMutex.unlock();
             }
 
             m_thisMutex.lock();
             try {
                 m_prevError = error;
-                m_error = error;
                 m_totalError = totalError;
                 m_result = result;
 
-                //New code, iTerm set
+                // New code, iTerm set
                 m_ITerm = iTerm;
-            } finally {
+            }
+            finally {
                 m_thisMutex.unlock();
             }
         }
@@ -379,7 +384,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
     protected double calculateFeedForward() {
         if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
             return m_F * getSetpoint();
-        } else {
+        }
+        else {
             double temp = m_F * getDeltaSetpoint();
             m_prevSetpoint = m_setpoint;
             m_setpointTimer.reset();
@@ -402,7 +408,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
             m_P = p;
             m_I = i;
             m_D = d;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -423,7 +430,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
             m_I = i;
             m_D = d;
             m_F = f;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -437,7 +445,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_P = p;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -451,7 +460,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_I = i;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -465,7 +475,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_D = d;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -479,7 +490,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_F = f;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -494,7 +506,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return m_P;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -509,7 +522,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return m_I;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -524,7 +538,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return m_D;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -538,7 +553,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return m_F;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -553,7 +569,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return m_result;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -572,7 +589,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_continuous = continuous;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -601,7 +619,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
             m_minimumInput = minimumInput;
             m_maximumInput = maximumInput;
             m_inputRange = maximumInput - minimumInput;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
 
@@ -622,7 +641,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
             }
             m_minimumOutput = minimumOutput;
             m_maximumOutput = maximumOutput;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -637,22 +657,17 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             if (m_maximumInput > m_minimumInput) {
-                if (setpoint > m_maximumInput) {
-                    m_setpoint = m_maximumInput;
-                } else if (setpoint < m_minimumInput) {
-                    m_setpoint = m_minimumInput;
-                } else {
-                    m_setpoint = setpoint;
-                }
-            } else {
+                //New code - changed to clamp instead of if statement. For original check WPI version of this class
+                m_setpoint = clamp(setpoint, m_minimumInput, m_maximumOutput);
+            }
+            else {
                 m_setpoint = setpoint;
             }
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
-
-    //New code - can't the above just be clamp(setpoint, m_minimumInput, m_maximumInput);?
 
     /**
      * Returns the current setpoint of the PIDController.
@@ -664,7 +679,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return m_setpoint;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -678,7 +694,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return (m_setpoint - m_prevSetpoint) / m_setpointTimer.get();
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -693,7 +710,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return getContinuousError(getSetpoint() - m_pidInput.pidGet());
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -711,7 +729,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return getError();
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -760,7 +779,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_tolerance = new AbsoluteTolerance(absvalue);
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -775,7 +795,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_tolerance = new PercentageTolerance(percentage);
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -797,7 +818,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         try {
             m_filter = LinearDigitalFilter.movingAverage(m_origSource, bufLength);
             m_pidInput = m_filter;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -813,7 +835,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             return m_tolerance.onTarget();
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -829,7 +852,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
             m_totalError = 0;
             m_result = 0;
             m_ITerm = 0;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -851,17 +875,6 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         setSetpoint(output);
     }
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("PIDController");
-        builder.setSafeState(this::reset);
-        builder.addDoubleProperty("p", this::getP, this::setP);
-        builder.addDoubleProperty("i", this::getI, this::setI);
-        builder.addDoubleProperty("d", this::getD, this::setD);
-        builder.addDoubleProperty("f", this::getF, this::setF);
-        builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-    }
-
     /**
      * Wraps error around for continuous inputs. The original error is returned if
      * continuous mode is disabled. This is an unsynchronized function.
@@ -875,7 +888,8 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
             if (Math.abs(error) > m_inputRange / 2) {
                 if (error > 0) {
                     return error - m_inputRange;
-                } else {
+                }
+                else {
                     return error + m_inputRange;
                 }
             }
@@ -888,13 +902,13 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         return Math.max(low, Math.min(value, high));
     }
 
-
     // New code, NEW METHODS
     public void setIZone(double pIZone) {
         m_thisMutex.lock();
         try {
             m_iZone = pIZone;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
@@ -903,34 +917,38 @@ public class LocalPIDBase extends SendableBase implements PIDInterface, PIDOutpu
         m_thisMutex.lock();
         try {
             m_deadband = pDeadband;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
 
-    public void setNegated(boolean pNegate){
+    public void setNegated(boolean pNegate) {
         m_thisMutex.lock();
         try {
             m_negate = pNegate;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
 
-    public double getITerm(){
+    public double getITerm() {
         m_thisMutex.lock();
         try {
             return m_ITerm;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }
 
-    public void resetIGain(){
+    public void resetIGain() {
         m_thisMutex.lock();
         try {
             m_ITerm = 0;
-        } finally {
+        }
+        finally {
             m_thisMutex.unlock();
         }
     }

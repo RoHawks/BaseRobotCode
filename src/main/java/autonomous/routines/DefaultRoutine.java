@@ -6,11 +6,7 @@ import frc.robot.Robot;
 
 import autonomous.AutonomousRoutine;
 import autonomous.commands.AutonomousCommand;
-import autonomous.commands.ParameterizedPathDriveCommand;
 import autonomous.commands.StopCommand;
-import autonomous.commands.StraightLineDriveCommand;
-import autonomous.commands.TurnRobotToAngleCommand;
-import constants.AutoConstants;
 
 public class DefaultRoutine implements AutonomousRoutine {
 

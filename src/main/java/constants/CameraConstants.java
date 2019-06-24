@@ -23,13 +23,26 @@ public class CameraConstants {
     public static final double HEIGHT = 10.00;
 
     /**
-     * Horizontal field of view of the Limelight in degrees.
+     * Horizontal field of view of the Limelight 2 in degrees.
      */
-    public static final double FOV = 59.6;
+    public static final double HORIZONTAL_FOV = 59.6;
+
+    /**
+     * Vertical field of view of the Limelight 2 in degrees.
+     */
+    public static final double VERTICAL_FOV = 49.7;
+
+    public static final double IMAGE_CAPTURE_LATENCY = 11;
+
+    public static final int MAX_PIPELINE = 9;
+
+    public static final int MIN_PIPELINE = 0;
+
+    public static final long MAX_UPDATE_TIME = 200000; //TODO check units
 
     /**
      * Default pipeline used for the Limelight.
      */
-    public static final int PIPELINE = 0;
+    public static final int DEFAULT_PIPELINE = 0;
 
 }

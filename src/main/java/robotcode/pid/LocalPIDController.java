@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.Controller;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Class implements a PID Control Loop.
@@ -92,9 +91,7 @@ public class LocalPIDController extends LocalPIDBase implements Controller {
         this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
     }
 
-    @Override
     public void close() {
-        super.close();
         m_controlLoop.close();
         m_thisMutex.lock();
         try {
@@ -173,9 +170,4 @@ public class LocalPIDController extends LocalPIDBase implements Controller {
         super.reset();
     }
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        super.initSendable(builder);
-        builder.addBooleanProperty("enabled", this::isEnabled, this::setEnabled);
-    }
 }

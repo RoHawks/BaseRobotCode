@@ -9,12 +9,29 @@ package robotcode.pneumatics;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
+/**
+ * Base interface for Solenoids to allow for wrapping the WPI Solenoid classes
+ * 
+ * @author Tal Zussman
+ * @author Alex Cohen
+ */
 public interface SolenoidInterface {
 
-    public void set (Value pDirection);
-
+    /**
+     * @return the Solenoid's current state.
+     */
     public Value get();
 
+    /**
+     * Sets the Solenoid's state.
+     * 
+     * @param pDirection direction to set the solenoid.
+     */
+    public void set(Value pDirection);
+
+    /**
+     * Flips the solenoid's direction.
+     */
     public void setOpposite();
-    
+
 }
