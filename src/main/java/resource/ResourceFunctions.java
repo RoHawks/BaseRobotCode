@@ -76,9 +76,9 @@ public class ResourceFunctions {
 		return ((angle % 360) + 360) % 360;
 
 		/*
-		 * TODO delete this comment if above implementation works 
-		 * Previous implementation: (angle + 36000) % 360;
-		 * Drawbacks of previous implementation: if angle is less than -36000, value is still neg
+		 * TODO delete this comment if above implementation works. Previous
+		 * implementation: (angle + 36000) % 360; Drawbacks of previous implementation:
+		 * if angle is less than -36000, value is still neg
 		 */
 	}
 
@@ -127,7 +127,9 @@ public class ResourceFunctions {
 	/**
 	 * returns derivative of the cosine function of the form a*cos(b*t + c) at a
 	 * time t
-	 * <p> b*t is in radians
+	 * 
+	 * <p>
+	 * b*t is in radians
 	 * 
 	 * @param a leading coefficient
 	 * @param b coefficient of t
@@ -140,8 +142,11 @@ public class ResourceFunctions {
 	}
 
 	/**
-	 * returns derivative of the sine function of the form a*sin(b*t + c) at a time t
-	 * <p> b*t is in radians
+	 * returns derivative of the sine function of the form a*sin(b*t + c) at a time
+	 * t
+	 * 
+	 * <p>
+	 * b*t is in radians
 	 * 
 	 * @param a leading coefficient
 	 * @param b coefficient of t

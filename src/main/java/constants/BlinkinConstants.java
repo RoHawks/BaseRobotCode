@@ -8,19 +8,19 @@
 package constants;
 
 /**
- * Constants for the Rev Robotics Blinkin LED Driver patterns. 
+ * Constants for the Rev Robotics Blinkin LED Driver patterns.
  * 
  * <p>
- * The Blinkin is controlled through the PWM signal, and is represented as a motor controller of type Spark in the code.
- * This is not to be confused with the Spark Motor Controller class in the Rev Robotics API.
+ * The Blinkin is controlled through the PWM signal, and is represented as a
+ * motor controller of type Spark in the code. This is not to be confused with
+ * the Spark Motor Controller class in the Rev Robotics API.
  * 
  * <p>
- * The constants in this class are PWM values which correspond to patterns that are displayed when the motor object 
- * is set to their value. The system colors, brightness, LED strip type, and default mode are selected via hardware.
- * Values can be found here: http://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
- * 
- * @author Tal Zussman
- * @author Daniel Chao
+ * The constants in this class are PWM values which correspond to patterns that
+ * are displayed when the motor object is set to their value. The system colors,
+ * brightness, LED strip type, and default mode are selected via hardware.
+ * Values can be found here:
+ * http://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
  */
 public class BlinkinConstants {
 

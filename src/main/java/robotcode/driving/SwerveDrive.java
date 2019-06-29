@@ -18,13 +18,15 @@ public class SwerveDrive {
 	/**
 	 * Initializes a swerve drive calculator
 	 * 
-	 * @param wheels wheels to initialize with; used to compute distances relative
+	 * @param pWheels wheels to initialize with; used to compute distances relative
 	 *               to robot center
 	 */
-	public SwerveDrive(final Wheel[] wheels) {
+	public SwerveDrive(final Wheel[] pWheels) {
+
 		mOffsets = new Vector[4];
 		mOutputs = new Vector[4];
 		double sumDistFromCenter = 0;
+
 		for (int i = 0; i < 4; i++) {
 			if (RunConstants.IS_PROTOTYPE) {
 				mOffsets[i] = new Vector(DriveConstants.PrototypeRobot.X_OFF[i],
@@ -42,7 +44,7 @@ public class SwerveDrive {
 			double scale = 4 * mOffsets[i].getMagnitude() / sumDistFromCenter;
 			mOffsets[i].setTotal(scale);
 		}
-	}
+	} //TODO get rid of wheeels parameter or change method
 
 	/**
 	 * Calculates wheel vectors to give some linear & angular velocity
@@ -53,8 +55,10 @@ public class SwerveDrive {
 	 *                         forward, y-axis points to the right
 	 */
 	public void calculate(double pAngularVelocity, Vector pRobotVelocity) {
+
 		Vector[] velocities = new Vector[4];
 		double maximumLength = 0;
+
 		for (int i = 0; i < 4; i++) {
 			double angularComponent_angle = mOffsets[i].getAngle() + 90;
 			// angle from center to wheel, +90 for perpendicular
@@ -80,13 +84,16 @@ public class SwerveDrive {
 			}
 		}
 
+		/*
+		 * scales down wheels by their individual factors. Use case for when one wheel
+		 * is more powerful than the others, resulting in drifting
+		 */
 		for (int i = 0; i < 4; i++) {
 			if (RunConstants.IS_PROTOTYPE) {
 				velocities[i].scaleTotal(DriveConstants.PrototypeRobot.INDIVIDUAL_SCALE_FACTORS[i]);
 			}
 			else {
 				velocities[i].scaleTotal(DriveConstants.ActualRobot.INDIVIDUAL_SCALE_FACTORS[i]);
-
 			}
 		}
 
@@ -139,13 +146,16 @@ public class SwerveDrive {
 			}
 		}
 
+		/*
+		 * scales down wheels by their individual factors. Use case for when one wheel
+		 * is more powerful than the others, resulting in drifting
+		 */
 		for (int i = 0; i < 4; i++) {
 			if (RunConstants.IS_PROTOTYPE) {
 				velocities[i].scaleTotal(DriveConstants.PrototypeRobot.INDIVIDUAL_SCALE_FACTORS[i]);
 			}
 			else {
 				velocities[i].scaleTotal(DriveConstants.ActualRobot.INDIVIDUAL_SCALE_FACTORS[i]);
-
 			}
 		}
 

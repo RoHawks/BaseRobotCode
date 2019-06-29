@@ -7,29 +7,39 @@
 
 package robotcode.camera;
 
+import java.util.HashMap;
+
 import constants.CameraConstants;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * Class that simplifies interacting with and getting data from the Limelight
- * NetworkTable. NetworkTable entry names and values can be found in the
+ * NetworkTable. See getEntryFromNetworkTable method for more information about
+ * implementation. NetworkTable entry names and values can be found in the
  * Limelight documentation:
  * http://docs.limelightvision.io/en/latest/networktables_api.html
  * 
- * @author Daniel Chao
  * @author Tal Zussman
+ * @author Daniel Chao
  */
 public class Limelight {
 
     // TODO implement PIDSource allowing Limelight to pass data to LinearFilter class directly
-    // TODO consider saving all the NetworkTableEntry's used as instance variables to avoid JNI wrapper
-    // Maybe use hash table to hold all the entries or is that really extra?
+    // TODO add camtran method and others for raw values (if necessary)
+    /*
+     * TODO consider creating instance variables for the four mode methods to avoid
+     * setting when unnecessary. Might not be necessary due to implementation of
+     * NetworkTables - would purely be JNI consideration rather than a network
+     * consideration
+     */
 
-    private String mTableName;
+    private NetworkTable mNetworkTable; // The Limelight's main NetworkTable that contains all its data
+    private HashMap<String, NetworkTableEntry> mHashTable; // HashTable containing all the used NetworkTable Entries
 
     /**
-     * Constructs a Limelight with the default NetworkTable name of "limelight".
+     * Constructs a Limelight with the default NetworkTable name "limelight".
      */
     public Limelight() {
         this("limelight");
@@ -43,21 +53,49 @@ public class Limelight {
      * @param pTableName name of the Limelight NetworkTable.
      */
     public Limelight(String pTableName) {
-        mTableName = pTableName;
+        mNetworkTable = NetworkTableInstance.getDefault().getTable(pTableName);
+        mHashTable = new HashMap<>(CameraConstants.HASH_TABLE_INITIAL_SIZE);
     }
 
-    // **********//
+    //**********//
     // UTILITY //
-    // **********//
+    //**********//
 
     /**
-     * Gets {@code NetworkTableEntry} from the Limelight's {@code NetworkTable}
+     * Gets {@code NetworkTableEntry} from the Limelight's {@code NetworkTable}.
      * 
-     * @param key the {@code NetworkTableEntry} name
-     * @return The {@code NetworkTableEntry}. If it doesn't exist, it creates it.
+     * @param key the {@code NetworkTableEntry} name.
+     * @return The appropriate {@code NetworkTableEntry}. If it doesn't exist, it
+     *         creates it.
      */
     private NetworkTableEntry getEntryFromNetworkTable(String key) {
-        return NetworkTableInstance.getDefault().getTable(mTableName).getEntry(key);
+        /*
+         * This method may seem more complicated than it needs to be. However, it has
+         * been optimized for MAXIMUM EFFICIENCY. The first iteration of this class got
+         * each entry when necessary from the NetworkTable directly, without saving them
+         * as variables. However, this leads to frequent calls that trip the JNI
+         * wrapper, leading to higher latency, which should be avoided.
+         * 
+         * A potential solution could be to save each entry as an instance variable, and
+         * access it in the relvant methods (@stuy). This gets very cumbersome quickly
+         * though, since there are many entries and maintaining each of them can be
+         * annoying.
+         * 
+         * Instead, we implement a HashTable that takes in the NetworkTableEntry name as
+         * the key and outputs the entry. If, when calling the table, no such key is
+         * found, the method below gets the entry from the NetworkTable and places it
+         * into the HashTable. This gives the benefit of fewer JNI calls, less code
+         * maintenance, and also it's pretty cool lmao.
+         */
+
+        NetworkTableEntry entry = mHashTable.get(key);
+
+        if (entry == null) {
+            entry = mNetworkTable.getEntry(key);
+            mHashTable.put(key, entry);
+        }
+
+        return entry;
     }
 
     /**
@@ -70,7 +108,7 @@ public class Limelight {
     private double getDoubleFromNetworkTable(String key) {
         /*
          * The Limelight documentation says to use 0 instead of Double.NaN as the
-         * default value However, some of these methods could return 0 as possible
+         * default value. However, some of these methods could return 0 as possible
          * values, so using Double.NaN to avoid that confusion and represent the value
          * for when the entry doesn't exist or is a different type is more robust.
          */
@@ -78,26 +116,39 @@ public class Limelight {
     }
 
     private boolean mTimingTestValue = false;
-    public boolean isConnected(){
-        mTimingTestValue = !mTimingTestValue;
-        getEntryFromNetworkTable("timing_test").forceSetBoolean(mTimingTestValue);
-        long currentTime = getEntryFromNetworkTable("timing_test").getLastChange();
 
+    /**
+     * Checks if the Limelight is connected in a roundabout way.
+     * 
+     * <p>
+     * Creds to Stuy for the one halfway decent piece of code they've ever written,
+     * and for indirectly inspiring me in its jankiness to recognize the
+     * unacknowledged and unintended potential for brilliance.
+     * 
+     * @return true if the Limelight is connected
+     */
+    public boolean isConnected() {
+        mTimingTestValue = !mTimingTestValue; // switches value to force a change in the entry
+
+        NetworkTableEntry timingEntry = getEntryFromNetworkTable("timing_test");
+        timingEntry.forceSetBoolean(mTimingTestValue);
+
+        long currentTime = timingEntry.getLastChange();
         long lastUpdate = getEntryFromNetworkTable("tl").getLastChange();
+        // TODO check the units of getLastChange and update MAX_UPDATE_TIME accordingly
 
         long timeDifference = currentTime - lastUpdate;
 
         return timeDifference < CameraConstants.MAX_UPDATE_TIME;
-        
-    } //creds to stuy for the one good piece of code they've ever written
-    //and for inspiring me in its jankiness to recognize its unacknowledged and unintended brilliance
+        // if Limelight hasn't changed the value in this threshold, it probably isn't connected
+    }
 
     //******//
     // DATA //
     //******//
 
     /**
-     * Gives the vision pipeline's latency contribution.
+     * Gives the vision pipeline's latency contribution per frame.
      * 
      * @return Latency contribution in milliseconds.
      */
@@ -106,7 +157,7 @@ public class Limelight {
     }
 
     /**
-     * Gives the total latency of the Limelight for one cycle.
+     * Gives the total latency of the Limelight for one frame cycle.
      * 
      * @return Latency of the Limelight in milliseconds.
      */
@@ -121,8 +172,10 @@ public class Limelight {
      *         {@code CameraConstants.HEIGHT}.
      */
     public double xAngleToDistance() {
-        // Limelight gives this distance in degrees, and using trig and our constants we
-        // can convert to distance
+        /*
+         * Limelight gives this distance in degrees, and using trig and our constants we
+         * can convert to distance
+         */
         // Limelight 2 values: -29.8 to 29.8 degrees
         return (CameraConstants.HEIGHT * Math.tan(Math.toRadians(getDoubleFromNetworkTable("tx"))));
     }
@@ -134,8 +187,10 @@ public class Limelight {
      *         {@code CameraConstants.HEIGHT}.
      */
     public double yAngleToDistance() {
-        // Limelight gives this distance in degrees, and using trig and our constants we
-        // can convert to distance
+        /*
+         * Limelight gives this distance in degrees, and using trig and our constants we
+         * can convert to distance
+         */
         // Limelight 2 values: -24.85 to 24.85 degrees
         return (CameraConstants.HEIGHT * Math.tan(Math.toRadians(getDoubleFromNetworkTable("ty"))));
     }
@@ -146,8 +201,7 @@ public class Limelight {
      * @return True if there is a target, false if not.
      */
     public boolean hasTarget() {
-        // The Limelight returns 0 if no target is found, and 1 if there is a target
-        // found.
+        // The Limelight returns 0 if no target, and 1 if there is a target.
         return getDoubleFromNetworkTable("tv") == 1;
     }
 
@@ -346,7 +400,9 @@ public class Limelight {
 
     /**
      * Sets the Limelight to a given pipeline.
-     * @param pPipeline Pipeline to set the Limelight to. Values from 0 to 9 are acceptable in the current software.
+     * 
+     * @param pPipeline Pipeline to set the Limelight to. Values from 0 to 9 are
+     *                  acceptable in the current software.
      */
     public void setPipeline(int pPipeline) {
         if (pPipeline <= CameraConstants.MAX_PIPELINE && pPipeline >= CameraConstants.MIN_PIPELINE) {
@@ -364,6 +420,8 @@ public class Limelight {
     //**********//
     // SNAPSHOT //
     //**********//
+
+    // Typically set to no snapshots
 
     /**
      * Stops the Limelight from taking snapshots during the match.

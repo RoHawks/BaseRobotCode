@@ -33,9 +33,9 @@ import sensors.TalonAbsoluteEncoder;
 @SuppressWarnings("deprecation")
 public class Robot extends SampleRobot {
 
-	// *************//
+	//***********//
 	// VARIABLES //
-	// *************//
+	//***********//
 
 	// controllers
 	private XboxController mController;
@@ -65,9 +65,9 @@ public class Robot extends SampleRobot {
 	private long mGameStartMillis;
 	RobotState mCurrentState = RobotState.DEFAULT;
 
-	// ****************//
+	//**************//
 	// GENERAL CODE //
-	// ****************//
+	//**************//
 	public Robot() {
 	}
 
@@ -101,7 +101,7 @@ public class Robot extends SampleRobot {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			camera.setResolution(240, 180);
 			camera.setFPS(30);
-		}
+		} //TODO add cameraInit + limelight
 
 	}
 

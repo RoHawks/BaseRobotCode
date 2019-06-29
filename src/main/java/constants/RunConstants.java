@@ -1,7 +1,11 @@
 package constants;
 
+/**
+ * Contains constants which affect code execution at runtime.
+ */
 public class RunConstants {
-	public static boolean
+
+	public static final boolean
 		RUNNING_DRIVE = true,
 		RUNNING_PNEUMATICS = true,
 		RUNNING_CAMERA = false,

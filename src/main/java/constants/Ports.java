@@ -3,6 +3,10 @@ package constants;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
+/**
+ * Contains constants for all the ports used on the robot. Subclassed into
+ * prototype and actual robot.
+ */
 public class Ports {
 
 	//*******************//

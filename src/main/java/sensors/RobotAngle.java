@@ -3,7 +3,6 @@ package sensors;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import resource.ResourceFunctions;
 
 public class RobotAngle extends RotationInputter implements PIDSource {

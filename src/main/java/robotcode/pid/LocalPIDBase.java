@@ -101,9 +101,9 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
     protected PIDOutput m_pidOutput;
     protected Timer m_setpointTimer;
 
-    // ******** //
+    //**********//
     // NEW CODE //
-    // ******** //
+    //**********//
 
     private double m_iZone = Double.POSITIVE_INFINITY;
     private double m_deadband = 0;
@@ -312,7 +312,7 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
                 // new code, added deadband, iTerm
                 iTerm = I * totalError;
 
-                if (Math.abs(error) < deadband) {
+                if (Math.abs(error) < deadband) { // TODO behaving more as a tolerance than deadband atm
                     result = 0;
                 }
                 else {
@@ -851,7 +851,7 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
             m_prevError = 0;
             m_totalError = 0;
             m_result = 0;
-            m_ITerm = 0;
+            m_ITerm = 0; // new code
         }
         finally {
             m_thisMutex.unlock();
@@ -903,6 +903,13 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
     }
 
     // New code, NEW METHODS
+
+    /**
+     * Sets the integral zone of the PID controller.
+     * 
+     * @param pIZone value below which the total error gets multiplied by the I
+     *               constant. In units of error.
+     */
     public void setIZone(double pIZone) {
         m_thisMutex.lock();
         try {
@@ -913,6 +920,12 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
         }
     }
 
+    /**
+     * Sets the deadband of the PID controller.
+     * 
+     * @param pDeadband see definition of deadband. Implementation is erroneous
+     *                  currently, and is behaving as a tolerance.
+     */
     public void setDeadband(double pDeadband) {
         m_thisMutex.lock();
         try {
@@ -923,6 +936,11 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
         }
     }
 
+    /**
+     * Sets whether or not to negate the output of the PID controller.
+     * 
+     * @param pNegate boolean that sets the negate.
+     */
     public void setNegated(boolean pNegate) {
         m_thisMutex.lock();
         try {
@@ -933,6 +951,9 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
         }
     }
 
+    /**
+     * @return the total error multiplied by the I gain constant.
+     */
     public double getITerm() {
         m_thisMutex.lock();
         try {
@@ -943,6 +964,9 @@ public class LocalPIDBase implements PIDInterface, PIDOutput {
         }
     }
 
+    /**
+     * Resets the I term value.
+     */
     public void resetIGain() {
         m_thisMutex.lock();
         try {
