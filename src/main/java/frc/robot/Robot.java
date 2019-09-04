@@ -237,12 +237,14 @@ public class Robot extends SampleRobot {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void tankDrive() {
 		if (RunConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveTank();
 		}
 	}
-
+	
+	@SuppressWarnings("unused")
 	private void crabDrive() {
 		if (RunConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveCrab();
@@ -335,17 +337,17 @@ public class Robot extends SampleRobot {
 		pLogString.append(pVal);
 		pLogString.append(",");
 	}
-
+	@SuppressWarnings("unused")
 	private void addLogValueLong(StringBuilder pLogString, long pVal) {
 		pLogString.append(pVal);
 		pLogString.append(",");
 	}
-
+	@SuppressWarnings("unused")
 	private void addLogValueBoolean(StringBuilder pLogString, boolean pVal) {
 		pLogString.append(pVal ? "1" : "0");
 		pLogString.append(",");
 	}
-
+	
 	private void addLogValueString(StringBuilder pLogString, String pVal) {
 		pLogString.append(pVal);
 		pLogString.append(",");
@@ -355,17 +357,17 @@ public class Robot extends SampleRobot {
 		pLogString.append(pVal);
 		pLogString.append("\n");
 	}
-
+	@SuppressWarnings("unused")
 	private void addLogValueEndInt(StringBuilder pLogString, int pVal) {
 		pLogString.append(pVal);
 		pLogString.append("\n");
 	}
-
+	@SuppressWarnings("unused")
 	private void addLogValueEndLong(StringBuilder pLogString, long pVal) {
 		pLogString.append(pVal);
 		pLogString.append("\n");
 	}
-
+	@SuppressWarnings("unused")
 	private void addLogValueEndBoolean(StringBuilder pLogString, boolean pVal) {
 		pLogString.append(pVal ? "1" : "0");
 		pLogString.append("\n");

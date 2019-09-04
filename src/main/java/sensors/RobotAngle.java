@@ -11,6 +11,7 @@ public class RobotAngle extends RotationInputter implements PIDSource {
 
 	public RobotAngle(AHRS pNavX, boolean pReversed, double pOffset) {
 		super(pOffset);
+		//mNavX.setAngleAdjustment(adjustment);
 		mReversed = pReversed;
 		mNavX = pNavX;
 	}
@@ -20,7 +21,7 @@ public class RobotAngle extends RotationInputter implements PIDSource {
 	}
 
 	public double getAngleDegrees(){
-		return ResourceFunctions.putAngleInRange(mNavX.getAngle());
+		return ResourceFunctions.putAngleInRange(getRawAngleDegrees());
 	}
 
 	public double getAngularVelocity() {

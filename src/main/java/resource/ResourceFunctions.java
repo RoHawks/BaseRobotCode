@@ -26,6 +26,12 @@ public class ResourceFunctions {
 	public static final int SPEED_FACTOR = 1023;
 
 	/**
+	 * {@code double} value equal to (1000 ms / 1 s) * (1 rev / 4096 ticks). Talons
+	 * give velocity in units of ticks / 100 ms.
+	 */
+	public static final double TALON_NATIVE_SPEED_TO_RPS_FACTOR = 0.244140625;
+
+	/**
 	 * {@code double} value for threshold of comparison for equality of two doubles.
 	 */
 	public static final double EPSILON = 1E-3;
@@ -142,8 +148,7 @@ public class ResourceFunctions {
 	}
 
 	/**
-	 * returns derivative of the sine function of the form a*sin(b*t + c) at a time
-	 * t
+	 * returns derivative of the sine function of the form a*sin(b*t + c) at a time t
 	 * 
 	 * <p>
 	 * b*t is in radians

@@ -17,16 +17,11 @@ public class TalonAbsoluteEncoder extends RotationInputter {
 	}
 
 	public double getRawAngleDegrees() {
-		double tempAngle = ResourceFunctions.tickToAngle(mTalon.getSelectedSensorPosition(0));
-		return ResourceFunctions.putAngleInRange(tempAngle) - this.getOffset();
+		return ResourceFunctions.tickToAngle(mTalon.getSelectedSensorPosition(0));
 	}
 
-	public double getAngleDegrees() {
-		double angle = getRawAngleDegrees();
-		angle = this.getAdd180() ? angle + 180 : angle;
-		angle = ResourceFunctions.putAngleInRange(angle);
-
-		return angle;
+	public double getVelocity(){
+		return mTalon.getSelectedSensorVelocity(0);
 	}
 
 }

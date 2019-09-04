@@ -27,7 +27,7 @@ public class MovingAverage {
     /* We use an ArrayList instead of an Array since an ArrayList allows for easy deletion and subsequent replacement
     of values, maintaining the order of addition without requiring significant shifting of indices. */
 
-    private ArrayList<Double> mNumbers = new ArrayList<Double>();
+    private ArrayList<Double> mNumbers;
     private int mSize;
 
     /**
@@ -35,6 +35,7 @@ public class MovingAverage {
      */
     public MovingAverage(int pMaxSize) {
         this.mSize = pMaxSize;
+        mNumbers = new ArrayList<Double>(pMaxSize);
     }
 
     /**
@@ -63,7 +64,7 @@ public class MovingAverage {
         }
 
         // Cheesy ignored the case where mNumbers.size() is zero
-        // We account for this by checking the size of the arraylist beforehand
+        // We account for this by checking the size of the ArrayList beforehand
         return mNumbers.size() == 0 ? 0 : total / mNumbers.size();
     }
 
