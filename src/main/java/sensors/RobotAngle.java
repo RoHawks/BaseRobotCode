@@ -3,15 +3,15 @@ package sensors;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
+import resource.ResourceFunctions;
 
 public class RobotAngle extends RotationInputter implements PIDSource {
 	AHRS mNavX;
 	boolean mReversed;
-	PIDSourceType mPIDSourceType = PIDSourceType.kDisplacement;
 
 	public RobotAngle(AHRS pNavX, boolean pReversed, double pOffset) {
 		super(pOffset);
+		//mNavX.setAngleAdjustment(adjustment);
 		mReversed = pReversed;
 		mNavX = pNavX;
 	}
@@ -20,20 +20,16 @@ public class RobotAngle extends RotationInputter implements PIDSource {
 		return mNavX.getAngle();
 	}
 
+	public double getAngleDegrees(){
+		return ResourceFunctions.putAngleInRange(getRawAngleDegrees());
+	}
+
 	public double getAngularVelocity() {
 		return Math.toDegrees((mReversed ? -1 : 1) * mNavX.getRate());
 	}
 
 	public double pidGet() {
 		return getAngleDegrees();
-	}
-
-	public PIDSourceType getPIDSourceType() {
-		return mPIDSourceType;
-	}
-
-	public void setPIDSourceType(PIDSourceType pPIDSourceType) {
-
 	}
 
 	public void reset() {

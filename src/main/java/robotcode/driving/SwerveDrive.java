@@ -2,15 +2,14 @@ package robotcode.driving;
 
 import constants.DriveConstants;
 import constants.RunConstants;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.Vector;
 
 /**
- * Performs calculations regarding the swerve drive Given a linear and angular
- * velocity, determines individual wheel velocities
+ * Performs calculations regarding the swerve drive. Given a linear and angular
+ * velocity, determines individual wheel velocities.
  * 
- * @author 3419
- *
+ * @author Alex Cohen
+ * @author Team 3419
  */
 public class SwerveDrive {
 	private Vector[] mOffsets;
@@ -19,17 +18,19 @@ public class SwerveDrive {
 	/**
 	 * Initializes a swerve drive calculator
 	 * 
-	 * @param wheels
-	 *            wheels to initialize with; used to compute distances relative to
-	 *            robot center
+	 * @param pWheels wheels to initialize with; used to compute distances relative
+	 *               to robot center
 	 */
-	public SwerveDrive(final Wheel[] wheels) {
+	public SwerveDrive(final Wheel[] pWheels) {
+
 		mOffsets = new Vector[4];
 		mOutputs = new Vector[4];
 		double sumDistFromCenter = 0;
+
 		for (int i = 0; i < 4; i++) {
-			if(RunConstants.IS_PROTOTYPE) {
-				mOffsets[i] = new Vector(DriveConstants.PrototypeRobot.X_OFF[i], DriveConstants.PrototypeRobot.Y_OFF[i]);
+			if (RunConstants.IS_PROTOTYPE) {
+				mOffsets[i] = new Vector(DriveConstants.PrototypeRobot.X_OFF[i],
+						DriveConstants.PrototypeRobot.Y_OFF[i]);
 			}
 			else {
 				mOffsets[i] = new Vector(DriveConstants.ActualRobot.X_OFF[i], DriveConstants.ActualRobot.Y_OFF[i]);
@@ -43,21 +44,21 @@ public class SwerveDrive {
 			double scale = 4 * mOffsets[i].getMagnitude() / sumDistFromCenter;
 			mOffsets[i].setTotal(scale);
 		}
-	}
+	} //TODO get rid of wheeels parameter or change method
 
 	/**
 	 * Calculates wheel vectors to give some linear & angular velocity
 	 * 
-	 * @param pAngularVelocity
-	 *            value between -1 and 1; clockwise is negative, counter-clockwise
-	 *            is positive
-	 * @param pRobotVelocity
-	 *            Vector corresponding to robot velocity: x-axis points forward,
-	 *            y-axis points to the right
+	 * @param pAngularVelocity value between -1 and 1; clockwise is negative,
+	 *                         counter-clockwise is positive
+	 * @param pRobotVelocity   Vector corresponding to robot velocity: x-axis points
+	 *                         forward, y-axis points to the right
 	 */
 	public void calculate(double pAngularVelocity, Vector pRobotVelocity) {
+
 		Vector[] velocities = new Vector[4];
 		double maximumLength = 0;
+
 		for (int i = 0; i < 4; i++) {
 			double angularComponent_angle = mOffsets[i].getAngle() + 90;
 			// angle from center to wheel, +90 for perpendicular
@@ -83,10 +84,23 @@ public class SwerveDrive {
 			}
 		}
 
+		/*
+		 * scales down wheels by their individual factors. Use case for when one wheel
+		 * is more powerful than the others, resulting in drifting
+		 */
+		for (int i = 0; i < 4; i++) {
+			if (RunConstants.IS_PROTOTYPE) {
+				velocities[i].scaleTotal(DriveConstants.PrototypeRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+			}
+			else {
+				velocities[i].scaleTotal(DriveConstants.ActualRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+			}
+		}
+
 		for (int i = 0; i < 4; i++) {
 			mOutputs[i] = new Vector(velocities[i]);
-			SmartDashboard.putNumber("Vector Angle " + i, mOutputs[i].getAngle());
-			SmartDashboard.putNumber("Vector Mag " + i, mOutputs[i].getMagnitude());
+			// SmartDashboard.putNumber("Vector Angle " + i, mOutputs[i].getAngle());
+			// SmartDashboard.putNumber("Vector Mag " + i, mOutputs[i].getMagnitude());
 		}
 	}
 
@@ -94,12 +108,10 @@ public class SwerveDrive {
 	 * Calculates wheel vectors to give some linear & angular velocity while holding
 	 * wheel direction towards robot velocity
 	 * 
-	 * @param pAngularVelocity
-	 *            value between -1 and 1; clockwise is negative, counter-clockwise
-	 *            is positive
-	 * @param pRobotVelocity
-	 *            Vector corresponding to robot velocity: x-axis points forward,
-	 *            y-axis points to the right
+	 * @param pAngularVelocity value between -1 and 1; clockwise is negative,
+	 *                         counter-clockwise is positive
+	 * @param pRobotVelocity   Vector corresponding to robot velocity: x-axis points
+	 *                         forward, y-axis points to the right
 	 */
 	public void calculateHoldDirection(double pAngularVelocity, Vector pRobotVelocity) {
 		Vector normalizedRobotVel = Vector.normalized(pRobotVelocity);
@@ -134,18 +146,30 @@ public class SwerveDrive {
 			}
 		}
 
+		/*
+		 * scales down wheels by their individual factors. Use case for when one wheel
+		 * is more powerful than the others, resulting in drifting
+		 */
+		for (int i = 0; i < 4; i++) {
+			if (RunConstants.IS_PROTOTYPE) {
+				velocities[i].scaleTotal(DriveConstants.PrototypeRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+			}
+			else {
+				velocities[i].scaleTotal(DriveConstants.ActualRobot.INDIVIDUAL_SCALE_FACTORS[i]);
+			}
+		}
+
 		for (int i = 0; i < 4; i++) {
 			mOutputs[i] = new Vector(velocities[i]);
-			SmartDashboard.putNumber("Vector Angle " + i, mOutputs[i].getAngle());
-			SmartDashboard.putNumber("Vector Mag " + i, mOutputs[i].getMagnitude());
+			// SmartDashboard.putNumber("Vector Angle " + i, mOutputs[i].getAngle());
+			// SmartDashboard.putNumber("Vector Mag " + i, mOutputs[i].getMagnitude());
 		}
 	}
 
 	/**
 	 * Gets the previously computed wheel vector
 	 * 
-	 * @param index
-	 *            Which wheel to retrieve the output
+	 * @param index Which wheel to retrieve the output
 	 * @return Output vector for that wheel
 	 */
 	public Vector getOutput(int index) {

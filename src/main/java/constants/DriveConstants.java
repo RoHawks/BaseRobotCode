@@ -6,8 +6,8 @@ public class DriveConstants {
 	//*******************//
 	// GENERAL VARIABLES //
 	//*******************//
-	public static final double  // speed mins, when lower than these don't do anything
-			MIN_LINEAR_VELOCITY = 0.02,
+	public static final double  //speed mins, when lower than these don't do anything
+			MIN_LINEAR_VELOCITY = 0.02, // minimum linear velocity that gets passed to robot
 			MIN_DIRECTION_MAG = 0.25, // refers to joystick magnitudes
 			MAX_INDIVIDUAL_VELOCITY = 1.0;
 	
@@ -21,7 +21,7 @@ public class DriveConstants {
 
 	
 	//*****************//
-	// SWERVE SPEEDS //
+	//  SWERVE SPEEDS  //
 	//*****************//
 	public static class SwerveSpeeds {
 		public static final double 
@@ -33,17 +33,20 @@ public class DriveConstants {
 
 	
 	//**************************//
-	// ACTUAL ROBOT VARIABLES //
+	//  ACTUAL ROBOT VARIABLES  //
 	//**************************//
 	public static class ActualRobot {
 		public static final boolean[] 
-			TURN_INVERTED = new boolean[] { false, false, false, false },
+			TURN_INVERTED = new boolean[] { false, false, false, false }, 
 			DRIVE_INVERTED = new boolean[] { true, false, false, false },
 			ENCODER_REVERSED = new boolean[] { true, true, true, true };
+			// Right back, right front, left front, left back
 		
 		public static final double[] 
-			X_OFF = new double[] { -27.438/2.0, 27.438/2.0 , 27.438/2.0 , -27.438/2.0 },
-			Y_OFF = new double[] { 22.563/2.0, 22.563/2.0 , -22.563/2.0 , -22.563/2.0 },
+			X_OFF = new double[] { -27.438 / 2.0, 27.438 / 2.0, 27.438 / 2.0, -27.438 / 2.0 },
+			Y_OFF = new double[] { 22.563 / 2.0, 22.563 / 2.0, -22.563 / 2.0, -22.563 / 2.0 },
+
+			INDIVIDUAL_SCALE_FACTORS = { 1.0 , 1.0 , 1.0 , 1.0 },
 			
 			ROTATION_P = new double[] { 1.0, 1.0, 1.0, 1.0 },
 			ROTATION_I = new double[] { 0.001, 0.001, 0.001, 0.001 },
@@ -81,6 +84,8 @@ public class DriveConstants {
 		public static final double[] 
 			X_OFF = new double[] { -19.0 / 2.0, -19.0 / 2.0, 19.0 / 2.0, 19.0 / 2.0 },
 			Y_OFF = new double[] { -22.0 / 2.0, 22.0 / 2.0, 22.0 / 2.0, -22.0 / 2.0 },
+
+			INDIVIDUAL_SCALE_FACTORS = { 1.0 , 1.0 , 1.0 , 1.0 },
 			
 			ROTATION_P = new double[] { 0.7, 0.7, 0.7, 0.7 },
 			ROTATION_I = new double[] { 0.007, 0.007, 0.007, 0.007 },
