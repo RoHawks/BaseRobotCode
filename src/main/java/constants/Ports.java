@@ -31,7 +31,7 @@ public class Ports {
 	//***************************//
 	public static class PrototypeRobot {
 		public static final int[] 
-			TURN = new int[] { 0, 2, 4, 6 },
-			DRIVE = new int[] { 1, 3, 5, 7 }; //SW, SE, NE, NW
+			TURN = new int[] { 3, 2, 1, 0 }, // NW, NE, SE, SW
+			DRIVE = new int[] { 7, 9, 10, 6 }; // NW, NE, SE, SW
 	}
 }

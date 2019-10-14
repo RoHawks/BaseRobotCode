@@ -17,7 +17,7 @@ public class DriveConstants {
 
 	public static final double 
 			MAX_ANGULAR_VELOCITY = 1.0,
-			MAX_LINEAR_VELOCITY = 0.8;
+			MAX_LINEAR_VELOCITY = 0.3;
 
 	
 	//*****************//
