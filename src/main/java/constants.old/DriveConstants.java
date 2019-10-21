@@ -1,5 +1,5 @@
 
-package constants;
+package constants.old;
 
 public class DriveConstants {
 
@@ -82,12 +82,12 @@ public class DriveConstants {
 			X_OFF = new double[] { -19.0 / 2.0, -19.0 / 2.0, 19.0 / 2.0, 19.0 / 2.0 },
 			Y_OFF = new double[] { -22.0 / 2.0, 22.0 / 2.0, 22.0 / 2.0, -22.0 / 2.0 },
 			
-			ROTATION_P = new double[] { 0.7, 0.7, 0.7, 0.7 },
-			ROTATION_I = new double[] { 0.007, 0.007, 0.007, 0.007 },
-			ROTATION_D = new double[] { 0, 0, 0, 0 };
+			ROTATION_P = new double[] { 0.7, 0.7, 0.7, .1 },
+			ROTATION_I = new double[] { 0.007, 0.007, 0.007, 0 },
+			ROTATION_D = new double[] { 0, 0, 0, .6 };
 
 		public static final int[] 
-			OFFSETS = new int[] { 3721 , 767, 3402, 2527 },
+			OFFSETS = new int[] { -5200 , -3267, -3658, 1900 }, //get these by looking at the getSelectedSensorPosition(0) of the turn motors
 			ROTATION_IZONE = new int[] { 500, 500, 500, 500 },
 			ROTATION_TOLERANCE = new int[] { 3, 3, 3, 3 };
 		

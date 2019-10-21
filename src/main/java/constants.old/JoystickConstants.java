@@ -1,4 +1,4 @@
-package constants;
+package constants.old;
 
 public class JoystickConstants {
 	
