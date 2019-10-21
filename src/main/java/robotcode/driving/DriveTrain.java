@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import resource.Vector;
 import robotcode.pid.GenericPIDOutput;
+import robotcode.pid.LocalPIDController;
 import sensors.RobotAngle;
 
 public class DriveTrain {
@@ -28,10 +29,10 @@ public class DriveTrain {
 	private boolean mIsFieldRelative;
 
 	// PIDs
-	private PIDController mGyroPID;
+	private LocalPIDController mGyroPID;
 	private GenericPIDOutput mGyroOutput;
 
-	private PIDController mDriftCompensationPID;
+	private LocalPIDController mDriftCompensationPID;
 	private GenericPIDOutput mDriftCompensationOutput;
 
 	// Velocity modes
@@ -427,7 +428,7 @@ public class DriveTrain {
 
 	private void pidInit() {
 		mGyroOutput = new GenericPIDOutput();
-		mGyroPID = new PIDController(DriveConstants.ActualRobot.GYRO_P, DriveConstants.ActualRobot.GYRO_I,
+		mGyroPID = new LocalPIDController(DriveConstants.ActualRobot.GYRO_P, DriveConstants.ActualRobot.GYRO_I,
 				DriveConstants.ActualRobot.GYRO_D, mRobotAngle, mGyroOutput);
 		mGyroPID.setInputRange(0, 360.0);
 		mGyroPID.setOutputRange(-DriveConstants.ActualRobot.GYRO_MAX_SPEED, DriveConstants.ActualRobot.GYRO_MAX_SPEED);
@@ -435,7 +436,7 @@ public class DriveTrain {
 		mGyroPID.setContinuous(true);
 
 		mDriftCompensationOutput = new GenericPIDOutput();
-		mDriftCompensationPID = new PIDController(DriveConstants.ActualRobot.DRIFT_COMP_P,
+		mDriftCompensationPID = new LocalPIDController(DriveConstants.ActualRobot.DRIFT_COMP_P,
 				DriveConstants.ActualRobot.DRIFT_COMP_I, DriveConstants.ActualRobot.DRIFT_COMP_D, mRobotAngle,
 				mDriftCompensationOutput);
 		mDriftCompensationPID.setInputRange(0, 360);
@@ -444,9 +445,9 @@ public class DriveTrain {
 		mDriftCompensationPID.disable();
 	}
 
-	public boolean AllWheelsInRange(double pAngle) {
+	public boolean allWheelsInRange(double pAngle) {
 		for (int i = 0; i < 4; i++) {
-			if (!mWheels[i].IsInRange(pAngle)) {
+			if (!mWheels[i].isInRange(pAngle)) {
 				return false;
 			}
 		}

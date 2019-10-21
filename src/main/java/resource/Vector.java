@@ -2,68 +2,68 @@ package resource;
 
 import java.awt.geom.Point2D;
 
+/**
+ * Represents a mathematical vector in rectangular form. Contains methods to
+ * represent polar form, and other mathematical manipulations of a vector.
+ * 
+ * @author Alex Cohen
+ */
 public class Vector {
-	private double xVal;
-	private double yVal;
+
+	private double mXComp;
+	private double mYComp;
 
 	/**
-	 * create vector with x, y component
+	 * Create vector with x and y components.
 	 * 
-	 * @param xVal
-	 *            x component of vector
-	 * @param yVal
-	 *            y component of vector
+	 * @param pXComp x-component of vector.
+	 * @param pYComp y-component of vector.
 	 */
-	public Vector(double xVal, double yVal) {
-		this.xVal = xVal;
-		this.yVal = yVal;
+	public Vector(double pXComp, double pYComp) {
+		this.mXComp = pXComp;
+		this.mYComp = pYComp;
 	}
 
 	/**
-	 * create vector equal to another vector
+	 * Create vector equal to parameter vector.
 	 * 
-	 * @param other
-	 *            vector to copy
+	 * @param pOther vector to copy.
 	 */
-	public Vector(Vector other) {
-		this(other.getX(), other.getY());
+	public Vector(Vector pOther) {
+		this(pOther.getX(), pOther.getY());
 	}
 
 	/**
-	 * creates null vector
+	 * Creates null vector.
 	 */
 	public Vector() {
 		this(0, 0);
 	}
 
 	/**
-	 * creates polar vector
+	 * Creates polar vector
 	 * 
-	 * @param angle
-	 *            angle of vector
-	 * @param total
-	 *            magnitude of vector
-	 * @return
+	 * @param pAngle angle of vector
+	 * @param pTotal magnitude of vector
+	 * @return Vector with the given characteristics.
 	 */
-	public static Vector createPolar(double angle, double total) {
+	public static Vector createPolar(double pAngle, double pTotal) {
 		Vector v = new Vector();
-		v.setPolar(angle, total);
+		v.setPolar(pAngle, pTotal);
 		return v;
 	}
 
 	/**
-	 * adds two vectors
+	 * Adds two vectors
 	 * 
-	 * @param v1
-	 *            vector
-	 * @param v2
-	 *            vector
+	 * @param pV1 vector
+	 * @param pV2 vector
 	 * @return sum vector
 	 */
-	public static Vector add(Vector v1, Vector v2) {
+	public static Vector add(Vector pV1, Vector pV2) {
 		Vector v = new Vector();
-		v.addCartesian(v1);
-		v.addCartesian(v2);
+		v.addCartesian(pV1);
+		v.addCartesian(pV2);
 		return v;
 	}
 
@@ -73,7 +73,7 @@ public class Vector {
 	 * @return x value of vector
 	 */
 	public double getX() {
-		return this.xVal;
+		return this.mXComp;
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class Vector {
 	 * @return y component of vector
 	 */
 	public double getY() {
-		return this.yVal;
+		return this.mYComp;
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class Vector {
 	 * @return magnitude of vector
 	 */
 	public double getMagnitude() {
-		return Math.hypot(xVal, yVal);
+		return Math.hypot(mXComp, mYComp);
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class Vector {
 	 * @return angle of the vector
 	 */
 	public double getAngle() {
-		return (((Math.toDegrees(Math.atan2(yVal, xVal))) + 3600) % 360);
+		return ResourceFunctions.putAngleInRange(Math.toDegrees(Math.atan2(mYComp, mXComp)));
 	}
 
 	/**
@@ -115,194 +115,172 @@ public class Vector {
 	/**
 	 * x component setter
 	 * 
-	 * @param xVal
-	 *            value to set x
+	 * @param pXComp value to set x
 	 */
-	private void setX(double xVal) {
-		this.xVal = xVal;
+	private void setX(double pXComp) {
+		this.mXComp = pXComp;
 	}
 
 	/**
 	 * y component setter
 	 * 
-	 * @param yVal
-	 *            value to set y
+	 * @param pYComp value to set y
 	 */
-	private void setY(double yVal) {
-		this.yVal = yVal;
+	private void setY(double pYComp) {
+		this.mYComp = pYComp;
 	}
 
 	/**
 	 * set x and y components
 	 * 
-	 * @param xVal
-	 *            value to set x
-	 * @param yVal
-	 *            value to set y
+	 * @param pXComp value to set x
+	 * @param pYComp value to set y
 	 */
-	public void setCartesian(double xVal, double yVal) {
-		this.setX(xVal);
-		this.setY(yVal);
+	public void setCartesian(double pXComp, double pYComp) {
+		this.setX(pXComp);
+		this.setY(pYComp);
 	}
 
 	/**
 	 * add vector to this one
 	 * 
-	 * @param xVal
-	 *            x component of vector to add
-	 * @param yVal
-	 *            y component of vector to add
+	 * @param pXComp x component of vector to add
+	 * @param pYComp y component of vector to add
 	 */
-	public void addCartesian(double xVal, double yVal) {
-		this.setCartesian(this.xVal + xVal, this.yVal + yVal);
+	public void addCartesian(double pXComp, double pYComp) {
+		this.setCartesian(this.mXComp + pXComp, this.mYComp + pYComp);
 	}
 
 	/**
 	 * add vector to this one
 	 * 
-	 * @param v
-	 *            vector to add
+	 * @param pV vector to add
 	 */
-	public void addCartesian(Vector v) {
-		this.addCartesian(v.getX(), v.getY());
+	public void addCartesian(Vector pV) {
+		this.addCartesian(pV.getX(), pV.getY());
 	}
 
 	/**
 	 * set polar coordinates
 	 * 
-	 * @param angle
-	 *            angle of vector
-	 * @param total
-	 *            magnitude of vector
+	 * @param pAngle angle of vector
+	 * @param pTotal magnitude of vector
 	 */
-	public void setPolar(double angle, double total) {
-		this.setCartesian(Math.cos(Math.toRadians(angle)) * total, Math.sin(Math.toRadians(angle)) * total);
+	public void setPolar(double pAngle, double pTotal) {
+		this.setCartesian(Math.cos(Math.toRadians(pAngle)) * pTotal, Math.sin(Math.toRadians(pAngle)) * pTotal);
 	}
 
 	/**
 	 * set angle
 	 * 
-	 * @param angle
-	 *            angle to set vector
+	 * @param pAngle angle to set vector
 	 */
-	public void setAngle(double angle) {
-		this.setPolar(angle, this.getMagnitude());
+	public void setAngle(double pAngle) {
+		this.setPolar(pAngle, this.getMagnitude());
 	}
 
 	/**
 	 * set magnitude
 	 * 
-	 * @param total
-	 *            magnitude of vector
+	 * @param pTotal magnitude of vector
 	 */
-	public void setTotal(double total) {
-		this.setPolar(this.getAngle(), total);
+	public void setTotal(double pTotal) {
+		this.setPolar(this.getAngle(), pTotal);
 	}
 
 	/**
 	 * add polar vector to this one
 	 * 
-	 * @param angle
-	 *            angle of polar vector to add
-	 * @param total
-	 *            magnitude of polar vector to add
+	 * @param pAngle angle of polar vector to add
+	 * @param pTotal magnitude of polar vector to add
 	 */
-	public void addPolar(double angle, double total) {
-		this.setPolar(this.getAngle() + angle, this.getMagnitude() + total);
+	public void addPolar(double pAngle, double pTotal) {
+		double x = this.getX() + pTotal * Math.cos(Math.toRadians(pAngle));
+		double y = this.getY() + pTotal * Math.sin(Math.toRadians(pAngle));
+		this.setCartesian(x, y);
 	}
 
 	/**
-	 * multiply by scalar
+	 * multiply vector by scalar
 	 * 
-	 * @param scaleAmount
-	 *            scalar to multiply vector
+	 * @param pScaleAmount scalar to multiply vector
 	 */
-	public void scaleTotal(double scaleAmount) {
-		this.xVal *= scaleAmount;
-		this.yVal *= scaleAmount;
-	}
-
-	/**
-	 * dot product of two vectors
-	 * 
-	 * @param v
-	 *            vector to dot this one
-	 * @return dot product
-	 */
-	public double dot(Vector v) {
-		return dot(this, v);
+	public void scaleTotal(double pScaleAmount) {
+		this.mXComp *= pScaleAmount;
+		this.mYComp *= pScaleAmount;
 	}
 
 	/**
 	 * dot product of two vectors
 	 * 
-	 * @param a
-	 *            first vector
-	 * @param b
-	 *            second vector
+	 * @param pV vector to dot this one
 	 * @return dot product
 	 */
-	public static double dot(Vector a, Vector b) {
-		return a.getX() * b.getX() + a.getY() * b.getY();
+	public double dot(Vector pV) {
+		return dot(this, pV);
+	}
+
+	/**
+	 * dot product of two vectors
+	 * 
+	 * @param pV1 first vector
+	 * @param pV2 second vector
+	 * @return dot product
+	 */
+	public static double dot(Vector pV1, Vector pV2) {
+		return pV1.getX() * pV2.getX() + pV1.getY() * pV2.getY();
 	}
 
 	/**
 	 * projection length of some Vector onto this
 	 * 
-	 * @param v
-	 *            Vector to project onto this
+	 * @param pV Vector to project onto this
 	 * @return projection length of Vector v onto this
 	 */
-	public double projectionLengthFrom(Vector v) {
-		return projectionLength(v, this);
+	public double projectionLengthFrom(Vector pV) {
+		return projectionLength(pV, this);
 	}
 
 	/**
 	 * projection length of this onto some other Vector
 	 * 
-	 * @param v
-	 *            Vector to project this onto
+	 * @param pV Vector to project this onto
 	 * @return projection length of this onto Vector v
 	 */
-	public double projectionLengthOnto(Vector v) {
-		return projectionLength(this, v);
+	public double projectionLengthOnto(Vector pV) {
+		return projectionLength(this, pV);
 	}
 
 	/**
 	 * projection length of Vector a onto Vector b
 	 * 
-	 * @param a
-	 *            Vector to project
-	 * @param b
-	 *            Vector projected onto
+	 * @param pV1 Vector to project
+	 * @param pV2 Vector projected onto
 	 * @return length of the projection
 	 */
-	public static double projectionLength(Vector a, Vector b) {
-		return dot(a, b) / b.getMagnitude();
+	public static double projectionLength(Vector pV1, Vector pV2) {
+		return dot(pV1, pV2) / pV2.getMagnitude();
 	}
 
 	/**
 	 * angle between two vectors
 	 * 
-	 * @param v
-	 *            vector to find angle between
+	 * @param pV vector to find angle between
 	 * @return angle
 	 */
-	public double angleBetween(Vector v) {
-		return angleBetween(this, v);
+	public double angleBetween(Vector pV) {
+		return angleBetween(this, pV);
 	}
 
 	/**
 	 * angle between two vectors
 	 * 
-	 * @param a
-	 *            first vector
-	 * @param b
-	 *            second vector
+	 * @param pV1 first vector
+	 * @param pV2 second vector
 	 * @return angle between them
 	 */
-	public static double angleBetween(Vector a, Vector b) {
-		double cosTheta = dot(a, b) / (a.getMagnitude() * b.getMagnitude());
+	public static double angleBetween(Vector pV1, Vector pV2) {
+		double cosTheta = dot(pV1, pV2) / (pV1.getMagnitude() * pV2.getMagnitude());
 		double angle = Math.toDegrees(Math.acos(cosTheta));
 		angle = ResourceFunctions.putAngleInRange(angle);
 
@@ -310,7 +288,7 @@ public class Vector {
 	}
 
 	/**
-	 * angle: --, total: --, x: --, y: --
+	 * Angle: --, Total: --, X: --, Y: --
 	 */
 	public String toString() {
 		return String.format("Angle: %f, Total: %f, X: %f, Y: %f", this.getAngle(), this.getMagnitude(), this.getX(),
@@ -318,14 +296,13 @@ public class Vector {
 	}
 
 	/**
-	 * finds vector of magnitude 1
+	 * Creates normalized version of the passed vector (gives it a magnitude of one)
 	 * 
-	 * @param v
-	 *            vector
-	 * @return vector w/ magnitude 1
+	 * @param pV vector
+	 * @return vector with magnitude of one
 	 */
-	public static Vector normalized(Vector v) {
-		Vector newVec = new Vector(v);
+	public static Vector normalized(Vector pV) {
+		Vector newVec = new Vector(pV);
 		newVec.setTotal(1.0);
 		return newVec;
 	}

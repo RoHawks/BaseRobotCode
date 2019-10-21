@@ -9,12 +9,11 @@ public abstract class RotationInputter implements PIDSource {
 	private double mOffsetDegrees;
 	private boolean mAdd180;
 
-	public RotationInputter(double pOffset) {
-		mOffsetDegrees = pOffset;
-	}
-
-	public void setAdd180(boolean add) {
-		mAdd180 = add;
+	/**
+	 * @param pOffsetDegrees offset of the encoder in degrees.
+	 */
+	public RotationInputter(double pOffsetDegrees) {
+		mOffsetDegrees = pOffsetDegrees;
 	}
 
 	protected abstract double getRawAngleDegrees();
@@ -35,31 +34,33 @@ public abstract class RotationInputter implements PIDSource {
 		return angle;
 	}
 
+	public void setAdd180(boolean add) {
+		mAdd180 = add;
+	}
+
 	public boolean getAdd180() {
 		return mAdd180;
 	}
 
-	public double pidGet() {
-		return getAngleDegrees();
-	}
-
-	@Override
-	public void setPIDSourceType(PIDSourceType pidSource) {
-
-	}
-
-	@Override
-	public PIDSourceType getPIDSourceType() {
-		return null;
-	}
-
-	// @Override
 	public void setOffset(double offset) {
 		mOffsetDegrees = offset;
 	}
 
 	public double getOffset() {
 		return mOffsetDegrees;
+	}
+
+	// Methods required by PIDSource interface
+	public double pidGet() {
+		return getAngleDegrees();
+	}
+
+	public void setPIDSourceType(PIDSourceType pidSource) {
+
+	}
+
+	public PIDSourceType getPIDSourceType() {
+		return null;
 	}
 
 }
