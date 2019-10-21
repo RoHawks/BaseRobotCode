@@ -22,6 +22,7 @@ import java.util.ArrayList;
  * @author Tal Zussman
  * @author Daniel Chao
  */
+
 public class MovingAverage {
 
     /* We use an ArrayList instead of an Array since an ArrayList allows for easy deletion and subsequent replacement

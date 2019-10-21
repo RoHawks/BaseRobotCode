@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.PIDSource;
 import resource.ResourceFunctions;
 
 public class RobotAngle extends RotationInputter implements PIDSource {
-	AHRS mNavX;
+	AHRS mNavX; //gyro navx
 	boolean mReversed;
 
 	public RobotAngle(AHRS pNavX, boolean pReversed, double pOffset) {

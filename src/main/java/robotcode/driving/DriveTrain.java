@@ -14,11 +14,11 @@ import sensors.RobotAngle;
 public class DriveTrain {
 
 	// Output
-	private SwerveDrive mSwerveDrive;
+	private SwerveDrive mSwerveDrive; //what are offsets
 	private Wheel[] mWheels;
 
 	// Input
-	private RobotAngle mRobotAngle;
+	private RobotAngle mRobotAngle; //what is robot angle
 	private XboxController mController;
 	private double mJoystickAngle;
 
