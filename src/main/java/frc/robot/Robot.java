@@ -239,10 +239,6 @@ public class Robot extends SampleRobot {
 		if (RunConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveSwerve();
 		}
-		SmartDashboard.putNumber("Front Left Encoder", mTurn[0].getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("Front Right Encoder", mTurn[1].getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("Rear Right Encoder", mTurn[2].getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("Rear Left Encoder", mTurn[3].getSelectedSensorPosition(0));
 	}
 
 	public void driveInit() {
