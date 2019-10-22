@@ -1,5 +1,9 @@
 package frc.robot;
 
+import config.Config;
+import config.TestChassis.*;
+import config.TestChassis;
+
 import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -11,9 +15,7 @@ import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
-import config.Config;
-import config.TestChassis.*;
-import config.TestChassis;
+
 // import constants.DriveConstants;
 // import constants.Ports;
 // import constants.RunConstants;
