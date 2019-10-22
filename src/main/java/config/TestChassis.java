@@ -20,6 +20,14 @@ public class TestChassis {
             COMPRESSOR = 0;
     }
 
+    // Constants from DriveConstants.SwerveSpeeds
+	public static class SwerveSpeeds {
+		public static final double 
+			SPEED_MULT = 1.0,
+			ANGULAR_SPEED_MULT = 1.0,
+			NUDGE_MOVE_SPEED = 0.2,
+			NUDGE_TURN_SPEED = 0.2;
+    }
 
 	public static Object ports;
 }
