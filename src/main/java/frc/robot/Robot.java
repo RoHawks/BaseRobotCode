@@ -1,6 +1,5 @@
 package frc.robot;
 
-import java.awt.SecondaryLoop;
 import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -12,16 +11,18 @@ import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
-import constants.DriveConstants;
-import constants.Ports;
-import constants.RunConstants;
-import constants.RobotState;
+import config.Config;
+// import constants.DriveConstants;
+// import constants.Ports;
+// import constants.RunConstants;
+// import constants.RobotState;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -87,22 +88,22 @@ public class Robot extends SampleRobot {
 		mNavX = new AHRS(Ports.NAVX);
 		mPDP = new PowerDistributionPanel();
 
-		if (RunConstants.RUNNING_DRIVE) {
+		if (Config.RUNNING_DRIVE) {
 			driveInit();
 		}
-		
-		if(RunConstants.SECONDARY_JOYSTICK) {
-			mJoystick = new Joystick(Ports.JOYSTICK);
+
+		if (Config.SECONDARY_JOYSTICK) {
+			mJoystick = new Joystick(Config.JOYSTICK_PORT);
 		}
-		
-		if (RunConstants.RUNNING_CAMERA) {
+
+		if (Config.RUNNING_CAMERA) {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			camera.setResolution(240, 180);
 			camera.setFPS(30);
 		}
-		
-		if (RunConstants.RUNNING_PNEUMATICS) {
-			mCompressor = new Compressor(Ports.COMPRESSOR);
+
+		if (Config.RUNNING_PNEUMATICS) {
+			mCompressor = new Compressor(Config.COMPRESSOR_PORT);
 		}
 	}
 
@@ -113,8 +114,7 @@ public class Robot extends SampleRobot {
 
 		if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
 			autonomousCommands = (new DefaultRoutine(this)).getAutonomousCommands();
-		}
-		else {
+		} else {
 			autonomousCommands = (new DoNothingRoutine()).getAutonomousCommands();
 		}
 
@@ -172,11 +172,11 @@ public class Robot extends SampleRobot {
 
 	private void doWork() {
 		switch (mCurrentState) {
-			case DEFAULT:
-				doSomeAction();
-				break;
-			default:
-				throw new RuntimeException("Unknown state");
+		case DEFAULT:
+			doSomeAction();
+			break;
+		default:
+			throw new RuntimeException("Unknown state");
 		}
 
 		SmartDashboard.putString("Current State", mCurrentState.name());
@@ -192,9 +192,8 @@ public class Robot extends SampleRobot {
 
 			if (RunConstants.RUNNING_PNEUMATICS) {
 				mCompressor.start();
-			}
-			else {
-				if(mCompressor != null)
+			} else {
+				if (mCompressor != null)
 					mCompressor.stop();
 			}
 
@@ -211,8 +210,7 @@ public class Robot extends SampleRobot {
 				// rotate autonomous routines to select which one to start with:
 				if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
 					mAutonomousRoutine = AutonomousRoutineType.DO_NOTHING;
-				}
-				else if (mAutonomousRoutine == AutonomousRoutineType.DO_NOTHING) {
+				} else if (mAutonomousRoutine == AutonomousRoutineType.DO_NOTHING) {
 					mAutonomousRoutine = AutonomousRoutineType.DEFAULT;
 				}
 			}
@@ -259,8 +257,7 @@ public class Robot extends SampleRobot {
 				D_PID = DriveConstants.PrototypeRobot.ROTATION_D[i];
 				iZone = DriveConstants.PrototypeRobot.ROTATION_IZONE[i];
 				rotTol = DriveConstants.PrototypeRobot.ROTATION_TOLERANCE[i];
-			}
-			else {
+			} else {
 				turnPort = Ports.ActualRobot.TURN[i];
 				turnEncoderReversed = DriveConstants.ActualRobot.ENCODER_REVERSED[i];
 				turnReversed = DriveConstants.ActualRobot.TURN_INVERTED[i];
