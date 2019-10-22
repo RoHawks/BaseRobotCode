@@ -1,9 +1,5 @@
 package frc.robot;
 
-import config.Config;
-import config.TestChassis.*;
-import config.TestChassis;
-
 import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -15,7 +11,10 @@ import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
-
+import config.Config;
+import config.Config.RunConstants;
+import config.TestChassis;
+import config.TestChassis.Ports;
 // import constants.DriveConstants;
 // import constants.Ports;
 // import constants.RunConstants;
@@ -92,21 +91,21 @@ public class Robot extends SampleRobot {
 		mNavX = new AHRS(TestChassis.Ports.NAVX);
 		mPDP = new PowerDistributionPanel();
 
-		if (Config.RUNNING_DRIVE) {
+		if (Config.RunConstants.RUNNING_DRIVE) {
 			driveInit();
 		}
 
-		if (Config.SECONDARY_JOYSTICK) {
+		if (Config.RunConstants.SECONDARY_JOYSTICK) {
 			mJoystick = new Joystick(TestChassis.Ports.JOYSTICK);
 		}
 
-		if (Config.RUNNING_CAMERA) {
+		if (Config.RunConstants.RUNNING_CAMERA) {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			camera.setResolution(240, 180);
 			camera.setFPS(30);
 		}
 
-		if (Config.RUNNING_PNEUMATICS) {
+		if (Config.RunConstants.RUNNING_PNEUMATICS) {
 			mCompressor = new Compressor(TestChassis.Ports.COMPRESSOR);
 		}
 	}
@@ -158,13 +157,13 @@ public class Robot extends SampleRobot {
 
 			swerveDrive();
 
-			if (Config.RUNNING_EVERYTHING) {
+			if (Config.RunConstants.RUNNING_EVERYTHING) {
 				doWork();
 			}
 
 			// put info on SmartDashboard
 			SmartDashboard.putString("Current State", mCurrentState.toString());
-			if (Config.RUNNING_DRIVE) {
+			if (Config.RunConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
 					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getMotorOutputPercent());
 				}
