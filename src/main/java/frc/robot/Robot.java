@@ -12,6 +12,8 @@ import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
 import config.Config;
+import config.TestChassis;
+import config.TestChassis.Ports;
 // import constants.DriveConstants;
 // import constants.Ports;
 // import constants.RunConstants;
@@ -84,8 +86,8 @@ public class Robot extends SampleRobot {
 	@Override
 	public void robotInit() {
 
-		mController = new XboxController(Ports.XBOX);
-		mNavX = new AHRS(Ports.NAVX);
+		mController = new XboxController(TestChassis.Ports.XBOX);
+		mNavX = new AHRS(TestChassis.Ports.NAVX);
 		mPDP = new PowerDistributionPanel();
 
 		if (Config.RUNNING_DRIVE) {
@@ -93,7 +95,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if (Config.SECONDARY_JOYSTICK) {
-			mJoystick = new Joystick(Config.JOYSTICK_PORT);
+			mJoystick = new Joystick(TestChassis.Ports.JOYSTICK);
 		}
 
 		if (Config.RUNNING_CAMERA) {
@@ -103,7 +105,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if (Config.RUNNING_PNEUMATICS) {
-			mCompressor = new Compressor(Config.COMPRESSOR_PORT);
+			mCompressor = new Compressor(TestChassis.Ports.COMPRESSOR);
 		}
 	}
 
@@ -154,13 +156,13 @@ public class Robot extends SampleRobot {
 
 			swerveDrive();
 
-			if (RunConstants.RUNNING_EVERYTHING) {
+			if (Config.RUNNING_EVERYTHING) {
 				doWork();
 			}
 
 			// put info on SmartDashboard
 			SmartDashboard.putString("Current State", mCurrentState.toString());
-			if (RunConstants.RUNNING_DRIVE) {
+			if (Config.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
 					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getMotorOutputPercent());
 				}
