@@ -49,7 +49,7 @@ public class Wheel {
 
 	public void setLinearVelocity(double pSpeed) 
 	{
-		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), DriveConstants.MAX_LINEAR_VELOCITY);
+		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), Config.DriveConstants.MAX_LINEAR_VELOCITY);
 		mDrive.set(ControlMode.PercentOutput, speed);
 	}
 
@@ -87,7 +87,7 @@ public class Wheel {
 	{
 		double realCurrent = mEncoder.getAngleDegrees();
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
-		return Math.abs(error) < DriveConstants.ActualRobot.ROTATION_TOLERANCE[0];
+		return Math.abs(error) < Config.DriveConstants.ActualRobot.ROTATION_TOLERANCE[0];
 	}
 	
 	/*
