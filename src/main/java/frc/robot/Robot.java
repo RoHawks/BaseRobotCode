@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
+import robotcode.systems.CompressorWrapper;
 import sensors.RobotAngle;
 import sensors.TalonAbsoluteEncoder;
 
@@ -193,13 +194,7 @@ public class Robot extends SampleRobot {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
 
-			if (RunConstants.RUNNING_PNEUMATICS) {
-				mCompressor.start();
-			} else {
-				if (mCompressor != null)
-					mCompressor.stop();
-			}
-
+			CompressorWrapper.action(mCompressor);
 			mInGame = true;
 		}
 	}
@@ -209,7 +204,7 @@ public class Robot extends SampleRobot {
 		endGame();
 
 		while (this.isDisabled()) {
-			if (RunConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
+			if (Config.RunConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
 				// rotate autonomous routines to select which one to start with:
 				if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
 					mAutonomousRoutine = AutonomousRoutineType.DO_NOTHING;

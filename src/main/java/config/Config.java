@@ -2,6 +2,8 @@ package config;
 
 public class Config {
 
+    // private static Config instance = new Config();
+
     public enum RobotConfig {
         Default,
         TestChassis,
@@ -42,4 +44,8 @@ public class Config {
             MAX_LINEAR_VELOCITY = 0.3;
 
     }
+
+    // public static Config getInstance() {
+    //     return instance;
+    // }
 }
