@@ -87,7 +87,7 @@ public class Wheel {
 	{
 		double realCurrent = mEncoder.getAngleDegrees();
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
-		return Math.abs(error) < Config.DriveConstants.ActualRobot.ROTATION_TOLERANCE[0];
+		return Math.abs(error) < Config.DriveConstants.ROTATION_TOLERANCE[0];
 	}
 	
 	/*
