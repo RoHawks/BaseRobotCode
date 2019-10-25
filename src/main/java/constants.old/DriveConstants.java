@@ -87,7 +87,7 @@ public class DriveConstants {
 			ROTATION_D = new double[] { 0, 0, 0, .6 };
 
 		public static final int[] 
-			OFFSETS = new int[] { -5200 , -3267, -3658, 1900 }, //get these by looking at the getSelectedSensorPosition(0) of the turn motors
+			OFFSETS = new int[] { -5200 % 4096, -3267 % 4096, -3658 % 4096, 1900 % 4096}, //get these by looking at the getSelectedSensorPosition(0) of the turn motors
 			ROTATION_IZONE = new int[] { 500, 500, 500, 500 },
 			ROTATION_TOLERANCE = new int[] { 3, 3, 3, 3 };
 		

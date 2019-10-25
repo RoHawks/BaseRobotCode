@@ -1,6 +1,5 @@
 package frc.robot;
 
-import java.awt.SecondaryLoop;
 import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -12,12 +11,21 @@ import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
+import config.Config;
+import config.Config.RunConstants;
+import config.TestChassis;
+import config.TestChassis.Ports;
+// import constants.DriveConstants;
+// import constants.Ports;
+// import constants.RunConstants;
+// import constants.RobotState;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -25,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
+import robotcode.systems.CompressorWrapper;
 import sensors.RobotAngle;
 import sensors.TalonAbsoluteEncoder;
 
@@ -78,26 +87,26 @@ public class Robot extends SampleRobot {
 	@Override
 	public void robotInit() {
 
-		mController = new XboxController(Ports.XBOX);
-		mNavX = new AHRS(Ports.NAVX);
+		mController = new XboxController(TestChassis.Ports.XBOX);
+		mNavX = new AHRS(TestChassis.Ports.NAVX);
 		mPDP = new PowerDistributionPanel();
 
-		if (RunConstants.RUNNING_DRIVE) {
+		if (Config.RunConstants.RUNNING_DRIVE) {
 			driveInit();
 		}
-		
-		if(RunConstants.SECONDARY_JOYSTICK) {
-			mJoystick = new Joystick(Ports.JOYSTICK);
+
+		if (Config.RunConstants.SECONDARY_JOYSTICK) {
+			mJoystick = new Joystick(TestChassis.Ports.JOYSTICK);
 		}
-		
-		if (RunConstants.RUNNING_CAMERA) {
+
+		if (Config.RunConstants.RUNNING_CAMERA) {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			camera.setResolution(240, 180);
 			camera.setFPS(30);
 		}
-		
-		if (RunConstants.RUNNING_PNEUMATICS) {
-			mCompressor = new Compressor(Ports.COMPRESSOR);
+
+		if (Config.RunConstants.RUNNING_PNEUMATICS) {
+			mCompressor = new Compressor(TestChassis.Ports.COMPRESSOR);
 		}
 	}
 
@@ -108,8 +117,7 @@ public class Robot extends SampleRobot {
 
 		if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
 			autonomousCommands = (new DefaultRoutine(this)).getAutonomousCommands();
-		}
-		else {
+		} else {
 			autonomousCommands = (new DoNothingRoutine()).getAutonomousCommands();
 		}
 
@@ -149,13 +157,13 @@ public class Robot extends SampleRobot {
 
 			swerveDrive();
 
-			if (RunConstants.RUNNING_EVERYTHING) {
+			if (Config.RunConstants.RUNNING_EVERYTHING) {
 				doWork();
 			}
 
 			// put info on SmartDashboard
 			SmartDashboard.putString("Current State", mCurrentState.toString());
-			if (RunConstants.RUNNING_DRIVE) {
+			if (Config.RunConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
 					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getMotorOutputPercent());
 				}
@@ -167,11 +175,11 @@ public class Robot extends SampleRobot {
 
 	private void doWork() {
 		switch (mCurrentState) {
-			case DEFAULT:
-				doSomeAction();
-				break;
-			default:
-				throw new RuntimeException("Unknown state");
+		case DEFAULT:
+			doSomeAction();
+			break;
+		default:
+			throw new RuntimeException("Unknown state");
 		}
 
 		SmartDashboard.putString("Current State", mCurrentState.name());
@@ -185,14 +193,7 @@ public class Robot extends SampleRobot {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
 
-			if (RunConstants.RUNNING_PNEUMATICS) {
-				mCompressor.start();
-			}
-			else {
-				if(mCompressor != null)
-					mCompressor.stop();
-			}
-
+			CompressorWrapper.action(mCompressor);
 			mInGame = true;
 		}
 	}
@@ -202,12 +203,11 @@ public class Robot extends SampleRobot {
 		endGame();
 
 		while (this.isDisabled()) {
-			if (RunConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
+			if (Config.RunConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
 				// rotate autonomous routines to select which one to start with:
 				if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
 					mAutonomousRoutine = AutonomousRoutineType.DO_NOTHING;
-				}
-				else if (mAutonomousRoutine == AutonomousRoutineType.DO_NOTHING) {
+				} else if (mAutonomousRoutine == AutonomousRoutineType.DO_NOTHING) {
 					mAutonomousRoutine = AutonomousRoutineType.DEFAULT;
 				}
 			}
@@ -254,8 +254,7 @@ public class Robot extends SampleRobot {
 				D_PID = DriveConstants.PrototypeRobot.ROTATION_D[i];
 				iZone = DriveConstants.PrototypeRobot.ROTATION_IZONE[i];
 				rotTol = DriveConstants.PrototypeRobot.ROTATION_TOLERANCE[i];
-			}
-			else {
+			} else {
 				turnPort = Ports.ActualRobot.TURN[i];
 				turnEncoderReversed = DriveConstants.ActualRobot.ENCODER_REVERSED[i];
 				turnReversed = DriveConstants.ActualRobot.TURN_INVERTED[i];

@@ -1,6 +1,10 @@
 package robotcode.driving;
 
-import constants.DriveConstants;
+// import constants.DriveConstants;
+import config.Config;
+import config.Config.DriveConstants;
+import config.TestChassis;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -244,7 +248,7 @@ public class DriveTrain {
 		double y = -mController.getY(h);
 		SmartDashboard.putNumber("X-Value " + h.toString() + ":", x);
 		SmartDashboard.putNumber("Y-Yalue " + h.toString() + ":", y);
-		if (Math.abs(y) >= DriveConstants.MIN_DIRECTION_MAG || Math.abs(x) >= DriveConstants.MIN_DIRECTION_MAG) {
+		if (Math.abs(y) >= Config.DriveConstants.MIN_DIRECTION_MAG || Math.abs(x) >= Config.DriveConstants.MIN_DIRECTION_MAG) {
 			mJoystickAngle = -Math.toDegrees(Math.atan2(y, x)) + 90;
 			mJoystickAngle = ResourceFunctions.putAngleInRange(mJoystickAngle); // puts angle between zero and 360
 		}
@@ -270,10 +274,10 @@ public class DriveTrain {
 	 */
 	private double nudgeTurn() {
 		if (mController.getBumper(Hand.kLeft)) {
-			return -DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
+			return -TestChassis.SwerveSpeeds.NUDGE_TURN_SPEED;
 		}
 		else if (mController.getBumper(Hand.kRight)) {
-			return DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
+			return TestChassis.SwerveSpeeds.NUDGE_TURN_SPEED;
 		}
 
 		return 0;
@@ -304,7 +308,7 @@ public class DriveTrain {
 			newAngle -= robotAngle;
 		}
 
-		return Vector.createPolar(newAngle, DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
+		return Vector.createPolar(newAngle, TestChassis.SwerveSpeeds.NUDGE_MOVE_SPEED);
 	}
 
 	/**
@@ -315,7 +319,7 @@ public class DriveTrain {
 	private double getStickLinearVel() {
 		double speed = mController.getTriggerAxis(Hand.kRight);
 		SmartDashboard.putNumber("Right Trigger Axis", speed);
-		speed = Math.pow(speed, 2) * DriveConstants.SwerveSpeeds.SPEED_MULT;
+		speed = Math.pow(speed, 2) * TestChassis.SwerveSpeeds.SPEED_MULT;
 		// quadratic control, finer control of lower speeds
 		return speed;
 	}
@@ -329,11 +333,11 @@ public class DriveTrain {
 		double joystickValue = mController.getX(Hand.kRight);
 		SmartDashboard.putNumber("Right Joystick X", joystickValue);
 
-		if (Math.abs(joystickValue) < DriveConstants.MIN_DIRECTION_MAG) {
+		if (Math.abs(joystickValue) < Config.DriveConstants.MIN_DIRECTION_MAG) {
 			return 0;
 		}
 		double angularVel = joystickValue * Math.abs(joystickValue);
-		angularVel *= DriveConstants.SwerveSpeeds.ANGULAR_SPEED_MULT;
+		angularVel *= TestChassis.SwerveSpeeds.ANGULAR_SPEED_MULT;
 		SmartDashboard.putNumber("Angular Velocity", angularVel);
 		return angularVel; // quadratic control for finer movements
 	}
@@ -358,11 +362,11 @@ public class DriveTrain {
 		if (getLetterPressed()) {
 			linVel = LinearVelocity.NUDGE;
 		} 
-		else if (getStickLinearVel() < DriveConstants.MIN_LINEAR_VELOCITY
-				&& getStickMag(Hand.kLeft) > DriveConstants.MIN_DIRECTION_MAG) {
+		else if (getStickLinearVel() < Config.DriveConstants.MIN_LINEAR_VELOCITY
+				&& getStickMag(Hand.kLeft) > Config.DriveConstants.MIN_DIRECTION_MAG) {
 			linVel = LinearVelocity.ANGLE_ONLY;
 		} 
-		else if (getStickLinearVel() > DriveConstants.MIN_LINEAR_VELOCITY) {
+		else if (getStickLinearVel() > Config.DriveConstants.MIN_LINEAR_VELOCITY) {
 			linVel = LinearVelocity.NORMAL;
 		}
 
