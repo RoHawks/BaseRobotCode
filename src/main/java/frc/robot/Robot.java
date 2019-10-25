@@ -12,10 +12,6 @@ import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
-import constants.DriveConstants;
-import constants.Ports;
-import constants.RunConstants;
-import constants.RobotState;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
@@ -65,7 +61,6 @@ public class Robot extends SampleRobot {
 	private boolean mInGame = false;
 
 	private long mGameStartMillis;
-	RobotState mCurrentState = RobotState.DEFAULT;
 
 	// ****************//
 	// GENERAL CODE //
