@@ -18,4 +18,10 @@ public class TalonMotor implements IMotorWithEncoder {
     public void setOutput(double percentage) {
         mTurn.set(percentage);
     }
+
+    public double getPosition() {
+        return mEncoder.getAngleDegrees();
+    }
+
+
 }
