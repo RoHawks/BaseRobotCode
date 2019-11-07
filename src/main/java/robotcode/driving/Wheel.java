@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 // import constants.DriveConstants;
 import config.Config;
+import drivetrain.controllers.SparkMax;
 import drivetrain.controllers.TalonSRX;
 import drivetrain.controllers.TalonSRXWithEncoder;
 import drivetrain.interfaces.IMotor;
@@ -18,10 +19,10 @@ public class Wheel {
 	private IMotorWithEncoder mTurn;
 	private IMotor mDrive;
 
-	public Wheel(int driveMotorPort, int turnMotorPort, int turnEncoderPort, double offset) 
+	public Wheel(IMotorWithEncoder pTurn, IMotor pDrive) 
 	{
-		mTurn = new TalonSRXWithEncoder(turnMotorPort, turnEncoderPort, offset);
-		mDrive = new TalonSRX(driveMotorPort);
+		mTurn = pTurn;
+		mDrive = pDrive;
 	}
 
 	/**

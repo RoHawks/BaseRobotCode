@@ -295,6 +295,11 @@ public class Robot extends SampleRobot {
 
 			// initialize turn motors' encoders, as well as wheels:
 			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], ResourceFunctions.tickToAngle(turnOffset));
+
+			// how to determine IMotor type? reflection?
+			// OR maybe, enum for motors and types of motors, then add mappings in the config, then add switch statement to initlaize the wheels propperly?
+			// mTurn = new TalonSRXWithEncoder(turnMotorPort, turnEncoderPort, offset);
+			// mDrive = new SparkMax(driveMotorPort);
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i]);
 		}
 
