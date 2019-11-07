@@ -431,16 +431,16 @@ public class DriveTrain {
 
 	private void pidInit() {
 		mGyroOutput = new GenericPIDOutput();
-		mGyroPID = new PIDController(Config.ActualRobot.GYRO_P, Config.ActualRobot.GYRO_I,
-				Config.ActualRobot.GYRO_D, mRobotAngle, mGyroOutput);
+		mGyroPID = new PIDController(Config.DriveConstants.ActualRobot.GYRO_P, Config.DriveConstants.ActualRobot.GYRO_I,
+				Config.DriveConstants.ActualRobot.GYRO_D, mRobotAngle, mGyroOutput);
 		mGyroPID.setInputRange(0, 360.0);
-		mGyroPID.setOutputRange(-Config.ActualRobot.GYRO_MAX_SPEED, Config.ActualRobot.GYRO_MAX_SPEED);
-		mGyroPID.setAbsoluteTolerance(Config.ActualRobot.GYRO_TOLERANCE);
+		mGyroPID.setOutputRange(-Config.DriveConstants.ActualRobot.GYRO_MAX_SPEED, Config.DriveConstants.ActualRobot.GYRO_MAX_SPEED);
+		mGyroPID.setAbsoluteTolerance(Config.DriveConstants.ActualRobot.GYRO_TOLERANCE);
 		mGyroPID.setContinuous(true);
 
 		mDriftCompensationOutput = new GenericPIDOutput();
-		mDriftCompensationPID = new PIDController(Config.ActualRobot.DRIFT_COMP_P,
-				Config.ActualRobot.DRIFT_COMP_I, Config.ActualRobot.DRIFT_COMP_D, mRobotAngle,
+		mDriftCompensationPID = new PIDController(Config.DriveConstants.ActualRobot.DRIFT_COMP_P,
+				Config.DriveConstants.ActualRobot.DRIFT_COMP_I, Config.DriveConstants.ActualRobot.DRIFT_COMP_D, mRobotAngle,
 				mDriftCompensationOutput);
 		mDriftCompensationPID.setInputRange(0, 360);
 		mDriftCompensationPID.setContinuous(true);
