@@ -7,13 +7,13 @@ import sensors.TalonAbsoluteEncoder;
 
 public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected TalonAbsoluteEncoder encoder;
-    protected int sensorPositon;
+    protected int sensorPosition;
 
-    //could potentially make sensor position an optional parameter because getSelectedSensorPositon/Velocity have parameterless overloads
+    //could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
     public TalonSRXWithEncoder(int port, int sensorPos, double offset) {
         super(port);
         encoder = new TalonAbsoluteEncoder(super.talon, offset);
-        this.sensorPositon = sensorPos;
+        this.sensorPosition = sensorPos;
     }
 
     public void setPosition(int position) {
@@ -22,13 +22,13 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public int getPosition() {
         //do we need to adjust this to be degrees? what does the spark do?
         //if spark can give ticks, use ticks, o.w. use degrees
-        return super.talon.getSelectedSensorPosition(sensorPositon);
+        return super.talon.getSelectedSensorPosition(sensorPosition);
     }
 
     public void setVelocity(double velocity) {
         super.talon.set(ControlMode.Velocity, velocity);
     }
     public double getVelocity() {
-        return super.talon.getSelectedSensorVelocity(sensorPositon);
+        return super.talon.getSelectedSensorVelocity(sensorPosition);
     }
 }
