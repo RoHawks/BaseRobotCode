@@ -69,7 +69,7 @@ public class Wheel {
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 
 		if (Math.abs(error) > 90) {
-			mEncoder.setAdd180(!mEncoder.getAdd180()); // TODO: fix flip tick position
+			mTurn.setAdd180(!mTurn.getAdd180()); // TODO: fix flip tick position
 			mDrive.setInverted(!mDrive.getInverted());
 			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
 		}
