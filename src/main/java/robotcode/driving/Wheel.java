@@ -5,6 +5,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 // import constants.DriveConstants;
 import config.Config;
+import drivetrain.controllers.SparkMax;
+import drivetrain.interfaces.IMotor;
 import resource.ResourceFunctions;
 import resource.Vector;
 import sensors.TalonAbsoluteEncoder;
@@ -12,10 +14,10 @@ import sensors.TalonAbsoluteEncoder;
 public class Wheel {
 
 	private WPI_TalonSRX mTurn;
-	private WPI_TalonSRX mDrive;
+	private IMotor mDrive;
 	private TalonAbsoluteEncoder mEncoder;
 
-	public Wheel(WPI_TalonSRX pTurn, WPI_TalonSRX pDrive, TalonAbsoluteEncoder pEncoder) 
+	public Wheel(WPI_TalonSRX pTurn, IMotor pDrive, TalonAbsoluteEncoder pEncoder) 
 	{
 		mTurn = pTurn;
 		mDrive = pDrive;
@@ -31,6 +33,7 @@ public class Wheel {
 	public void set(Vector pWheelVelocity) 
 	{
 		set(pWheelVelocity.getAngle(), pWheelVelocity.getMagnitude());
+		mTurn.configSelectedFeedbackSensor()
 	}
 
 	/**
@@ -50,7 +53,7 @@ public class Wheel {
 	public void setLinearVelocity(double pSpeed) 
 	{
 		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), Config.DriveConstants.MAX_LINEAR_VELOCITY);
-		mDrive.set(ControlMode.PercentOutput, speed);
+		mDrive.setVelocity(speed);
 	}
 
 	public void setAngle(double pAngle) 
