@@ -38,6 +38,7 @@ public class SparkMaxMotor implements IMotorWithEncoder {
         spark.setInverted(inverted);
     }
 
+    
     public boolean getInverted() {
         return spark.getInverted();
     }

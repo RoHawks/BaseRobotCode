@@ -6,22 +6,23 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 // import constants.DriveConstants;
 import config.Config;
 import drivetrain.controllers.SparkMax;
+import drivetrain.controllers.TalonSRX;
+import drivetrain.controllers.TalonSRXWithEncoder;
 import drivetrain.interfaces.IMotor;
+import drivetrain.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 import resource.Vector;
 import sensors.TalonAbsoluteEncoder;
 
 public class Wheel {
 
-	private WPI_TalonSRX mTurn;
+	private IMotorWithEncoder mTurn;
 	private IMotor mDrive;
-	private TalonAbsoluteEncoder mEncoder;
 
-	public Wheel(WPI_TalonSRX pTurn, IMotor pDrive, TalonAbsoluteEncoder pEncoder) 
+	public Wheel(IMotorWithEncoder pTurn, IMotor pDrive) 
 	{
 		mTurn = pTurn;
 		mDrive = pDrive;
-		mEncoder = pEncoder;
 	}
 
 	/**
@@ -33,7 +34,7 @@ public class Wheel {
 	public void set(Vector pWheelVelocity) 
 	{
 		set(pWheelVelocity.getAngle(), pWheelVelocity.getMagnitude());
-		mTurn.configSelectedFeedbackSensor()
+		mTurn.configSelectedFeedbackSensor();
 	}
 
 	/**
@@ -53,7 +54,7 @@ public class Wheel {
 	public void setLinearVelocity(double pSpeed) 
 	{
 		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), Config.DriveConstants.MAX_LINEAR_VELOCITY);
-		mDrive.setVelocity(speed);
+		mDrive.setOutput(speed);
 	}
 
 	public void setAngle(double pAngle) 
@@ -63,32 +64,32 @@ public class Wheel {
 
 	private void TalonPID(double pTarget) 
 	{
-		double current = ResourceFunctions.tickToAngle(mTurn.getSelectedSensorPosition(0));
-		double realCurrent = mEncoder.getAngleDegrees();
+		double current = ResourceFunctions.tickToAngle(mTurn.getPosition());
+		double realCurrent = mTurn.getAnglePosition();
 
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 
 		if (Math.abs(error) > 90) {
-			mEncoder.setAdd180(!mEncoder.getAdd180());
+			mEncoder.setAdd180(!mEncoder.getAdd180()); // TODO: fix flip tick position
 			mDrive.setInverted(!mDrive.getInverted());
 			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
 		}
-		mTurn.set(ControlMode.Position, ResourceFunctions.angleToTick(current + error));
+		mTurn.setPosition(ResourceFunctions.angleToTick(current + error));
 	}
 
 	public void setTurnSpeed(double pSpeed) 
 	{
-		mTurn.set(ControlMode.PercentOutput, pSpeed);
+		mTurn.setOutput(pSpeed);
 	}
 
 	public double getAngle()
 	{
-		return mEncoder.getAngleDegrees();
+		return mTurn.getAnglePosition();
 	}
 	
 	public boolean IsInRange(double pTarget) 
 	{
-		double realCurrent = mEncoder.getAngleDegrees();
+		double realCurrent = mTurn.getAnglePosition();
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 		return Math.abs(error) < Config.DriveConstants.ROTATION_TOLERANCE[0];
 	}
