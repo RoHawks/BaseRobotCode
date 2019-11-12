@@ -8,7 +8,7 @@ import resource.ResourceFunctions;
 
 public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected int sensorPosition;
-    protected boolean isReversed;
+    protected boolean isReversed; // TODO: Figure out if motor reversal reverses encoder
     protected static final int ticksPerRotation = 4096;
     protected int offset; // offset in ticks
 
@@ -20,8 +20,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         isReversed = false;
     }
 
-    public void setPosition(int position) {
-        super.talon.set(ControlMode.Position, position);
+    public void setPosition(int ticks) {
+        super.talon.set(ControlMode.Position, ticks);
     }
 
     public int getPosition() {
@@ -38,20 +38,33 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         return super.talon.getSelectedSensorVelocity(sensorPosition);
     }
 
+    /**
+     * reverses the virtual front of the motor
+     * @param reversed the reversal of the motor
+     */
     @Override
     public void setReversed(boolean reversed) {
         isReversed = reversed;
     }
 
+    /**
+    * returns wether or not the motor is reversed
+    * @return the reversal of the motor
+    */
     @Override
     public boolean getReversed() {
         return isReversed;
     }
 
+    /**
+     * sets the angle of the motor with respect to reversal
+     * @param angle the desired position of the motor
+     */
     @Override
     public void setAnglePosition(double angle) {
         double angleTarget = ResourceFunctions.putAngleInRange(angle);
         double delta = getAnglePosition() - angleTarget;
+        // reverse the motor if |delta| > 90 
         if (delta > 90) {
             delta -= 180;
             isReversed = !isReversed;
@@ -60,15 +73,12 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
             isReversed = !isReversed;
         }
         setRawAnglePosition(delta);
-
-        // setPosition(getRawTicks() + tickChange);    
     }
 
-    @Override
-    public double getRawAnglePosition() {
-        return ResourceFunctions.putAngleInRange(ticksToDegrees(getOffsetTicks()));
-    }
-
+    /**
+    * sets the absolute rotation of the motor
+    * @param angle the desired position of the motor
+    */
     @Override
     public void setRawAnglePosition(double angle) {
         int tickChange;
@@ -81,6 +91,10 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         setPosition(getRawTicks() + tickChange);
     }
 
+    /**
+     * returns the motor's angle with respect to its reversal
+     * @return the angle of the motor
+     */
     @Override
     public double getAnglePosition() {
         int rawTicks = getOffsetTicks();
@@ -88,6 +102,15 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
             rawTicks += ticksPerRotation / 2;
         }
         return ResourceFunctions.putAngleInRange(ticksToDegrees(rawTicks));
+    }
+
+    /**
+     * returns the motor's absolute rotation
+     * @return the absolute rotation of the motor
+     */
+    @Override
+    public double getRawAnglePosition() {
+        return ResourceFunctions.putAngleInRange(ticksToDegrees(getOffsetTicks()));
     }
 
     protected double ticksToDegrees(int ticks) {
@@ -100,10 +123,10 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     protected int getOffsetTicks() {
-        return super.talon.getSelectedSensorPosition(0) - offset;
+        return super.talon.getSelectedSensorPosition(0) - offset; // accounts for offset
     }
 
     protected int getRawTicks() {
-        return super.talon.getSelectedSensorPosition(0);
+        return super.talon.getSelectedSensorPosition(0); // does not account for offset
     }
 }

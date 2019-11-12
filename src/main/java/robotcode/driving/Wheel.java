@@ -19,8 +19,7 @@ public class Wheel {
 	private IMotorWithEncoder mTurn;
 	private IMotor mDrive;
 
-	public Wheel(IMotorWithEncoder pTurn, IMotor pDrive) 
-	{
+	public Wheel(IMotorWithEncoder pTurn, IMotor pDrive) {
 		mTurn = pTurn;
 		mDrive = pDrive;
 	}
@@ -31,8 +30,7 @@ public class Wheel {
 	 * @param pWheelVelocity
 	 *            Vector of wheel velocity
 	 */
-	public void set(Vector pWheelVelocity) 
-	{
+	public void set(Vector pWheelVelocity) {
 		set(pWheelVelocity.getAngle(), pWheelVelocity.getMagnitude());
 	}
 
@@ -44,55 +42,47 @@ public class Wheel {
 	 * @param speed
 	 *            magnitude to drive the wheel
 	 */
-	public void set(double angle, double speed) 
-	{
+	public void set(double angle, double speed) {
 		setAngle(angle);
 		setLinearVelocity(speed);
 	}
 
-	public void setLinearVelocity(double pSpeed) 
-	{
+	public void setLinearVelocity(double pSpeed) {
 		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), Config.DriveConstants.MAX_LINEAR_VELOCITY);
 		mDrive.setOutput(speed);
 	}
 
-	public void setAngle(double pAngle) 
-	{
+	public void setAngle(double pAngle) {
 		TalonPID(pAngle);
 	}
 
-	private void TalonPID(double pTarget) 
-	{
+	private void TalonPID(double pTarget) {
 		double current = ResourceFunctions.tickToAngle(mTurn.getPosition());
 		double realCurrent = mTurn.getAnglePosition();
 
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 
 		if (Math.abs(error) > 90) {
-			mTurn.setAdd180(!mTurn.getAdd180()); // TODO: fix flip tick position
 			mDrive.setInverted(!mDrive.getInverted());
 			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
 		}
 		mTurn.setPosition(ResourceFunctions.angleToTick(current + error));
 	}
 
-	public void setTurnSpeed(double pSpeed) 
-	{
+	public void setTurnSpeed(double pSpeed) {
 		mTurn.setOutput(pSpeed);
 	}
 
-	public double getAngle()
-	{
+	public double getAngle() {
 		return mTurn.getAnglePosition();
 	}
-	
-	public boolean IsInRange(double pTarget) 
-	{
+
+	public boolean IsInRange(double pTarget) {
 		double realCurrent = mTurn.getAnglePosition();
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 		return Math.abs(error) < Config.DriveConstants.ROTATION_TOLERANCE[0];
 	}
-	
+
 	/*
 	 * Methods to run a self written PID (just proportional) on the roborio
 	 * instead of the Talons Requires some constants to be changed
