@@ -17,7 +17,7 @@ public class SparkMaxMotor implements IMotorWithEncoder {
         spark.set(percentage);
     }
 
-    public void setAdd180(boolean add180) {
+    public void setReversed(boolean add180) {
         
     }
 
@@ -51,7 +51,7 @@ public class SparkMaxMotor implements IMotorWithEncoder {
         return spark.getEncoder().getPosition();
     }
     
-    public boolean getAdd180() {
+    public boolean getReversed() {
         return false;
     }
 
