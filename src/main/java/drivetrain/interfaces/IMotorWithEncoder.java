@@ -1,5 +1,5 @@
 package drivetrain.interfaces;
 
-public interface IMotorWithEncoder extends IMotor, ITargetPosition, ITargetVelocity {
+public interface IMotorWithEncoder extends IMotor, IEncoder {
 
 }
