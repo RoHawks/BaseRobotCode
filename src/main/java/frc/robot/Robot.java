@@ -243,29 +243,29 @@ public class Robot extends SampleRobot {
 
 		for (int i = 0; i < 4; i++) {
 			if (RunConstants.IS_PROTOTYPE) { // determine values based on if prototype or real robot being used
-				turnPort = Ports.PrototypeRobot.TURN[i];
-				turnEncoderReversed = DriveConstants.PrototypeRobot.ENCODER_REVERSED[i];
-				turnReversed = DriveConstants.PrototypeRobot.TURN_INVERTED[i];
-				turnOffset = DriveConstants.PrototypeRobot.OFFSETS[i];
-				driveReversed = DriveConstants.PrototypeRobot.DRIVE_INVERTED[i];
-				drivePort = Ports.PrototypeRobot.DRIVE[i];
-				P_PID = DriveConstants.PrototypeRobot.ROTATION_P[i];
-				I_PID = DriveConstants.PrototypeRobot.ROTATION_I[i];
-				D_PID = DriveConstants.PrototypeRobot.ROTATION_D[i];
-				iZone = DriveConstants.PrototypeRobot.ROTATION_IZONE[i];
-				rotTol = DriveConstants.PrototypeRobot.ROTATION_TOLERANCE[i];
+				turnPort = Config.Ports.PrototypeRobot.TURN[i];
+				turnEncoderReversed = Config.DriveConstants.PrototypeRobot.ENCODER_REVERSED[i];
+				turnReversed = Config.DriveConstants.PrototypeRobot.TURN_INVERTED[i];
+				turnOffset = Config.DriveConstants.PrototypeRobot.OFFSETS[i];
+				driveReversed = Config.DriveConstants.PrototypeRobot.DRIVE_INVERTED[i];
+				drivePort = Config.Ports.PrototypeRobot.DRIVE[i];
+				P_PID = Config.DriveConstants.PrototypeRobot.ROTATION_P[i];
+				I_PID = Config.DriveConstants.PrototypeRobot.ROTATION_I[i];
+				D_PID = Config.DriveConstants.PrototypeRobot.ROTATION_D[i];
+				iZone = Config.DriveConstants.PrototypeRobot.ROTATION_IZONE[i];
+				rotTol = Config.DriveConstants.PrototypeRobot.ROTATION_TOLERANCE[i];
 			} else {
-				turnPort = Ports.ActualRobot.TURN[i];
-				turnEncoderReversed = DriveConstants.ActualRobot.ENCODER_REVERSED[i];
-				turnReversed = DriveConstants.ActualRobot.TURN_INVERTED[i];
-				turnOffset = DriveConstants.ActualRobot.OFFSETS[i];
-				driveReversed = DriveConstants.ActualRobot.DRIVE_INVERTED[i];
-				drivePort = Ports.ActualRobot.DRIVE[i];
-				P_PID = DriveConstants.ActualRobot.ROTATION_P[i];
-				I_PID = DriveConstants.ActualRobot.ROTATION_I[i];
-				D_PID = DriveConstants.ActualRobot.ROTATION_D[i];
-				iZone = DriveConstants.ActualRobot.ROTATION_IZONE[i];
-				rotTol = DriveConstants.ActualRobot.ROTATION_TOLERANCE[i];
+				turnPort = Config.Ports.ActualRobot.TURN[i];
+				turnEncoderReversed = Config.DriveConstants.ActualRobot.ENCODER_REVERSED[i];
+				turnReversed = Config.DriveConstants.ActualRobot.TURN_INVERTED[i];
+				turnOffset = Config.DriveConstants.ActualRobot.OFFSETS[i];
+				driveReversed = Config.DriveConstants.ActualRobot.DRIVE_INVERTED[i];
+				drivePort = Config.Ports.ActualRobot.DRIVE[i];
+				P_PID = Config.DriveConstants.ActualRobot.ROTATION_P[i];
+				I_PID = Config.DriveConstants.ActualRobot.ROTATION_I[i];
+				D_PID = Config.DriveConstants.ActualRobot.ROTATION_D[i];
+				iZone = Config.DriveConstants.ActualRobot.ROTATION_IZONE[i];
+				rotTol = Config.DriveConstants.ActualRobot.ROTATION_TOLERANCE[i];
 			}
 
 			// initialize turn motors and set values:

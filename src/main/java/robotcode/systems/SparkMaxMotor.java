@@ -2,7 +2,7 @@ package robotcode.systems;
 
 import drivetrain.interfaces.*;
 import com.revrobotics;
-import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.CANSparkMax;
 
 
 public class SparkMaxMotor implements IMotorWithEncoder {
