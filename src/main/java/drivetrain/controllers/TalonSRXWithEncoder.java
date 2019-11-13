@@ -3,6 +3,7 @@ package drivetrain.controllers;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
+import drivetrain.controllers.configs.TalonSRXWithEncoderConfig;
 import drivetrain.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
@@ -13,9 +14,10 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected int offset; // offset in ticks
 
     // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
-    public TalonSRXWithEncoder(int port, int sensorPos, int offset) {
-        super(port);
-        this.sensorPosition = sensorPos;
+    public TalonSRXWithEncoder(TalonSRXWithEncoderConfig config) {
+        super(config);
+        talon.setSensorPhase(config.reversed);
+        this.sensorPosition = config.sensorPosition;
         super.talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
         isReversed = false;
     }
