@@ -12,7 +12,7 @@ public class SparkMax implements IMotorWithEncoder {
     protected boolean isReversed;
     protected int offset; // offset in ticks
 
-    protected static final int ticksPerRotation = 4096; // TODO: replace with correct number
+    protected static final int ticksPerRotation = 1; // TODO: represent ticks as ints
 
     public SparkMax(int port, int offset) {
         spark = new CANSparkMax(port, MotorType.kBrushless);
@@ -41,10 +41,12 @@ public class SparkMax implements IMotorWithEncoder {
         return (int) spark.getEncoder().getPosition();
     }
 
+    @Override
     public boolean getInverted() {
         return spark.getInverted();
     }
 
+    @Override
     public void setInverted(boolean inverted) {
         spark.setInverted(inverted);
     }

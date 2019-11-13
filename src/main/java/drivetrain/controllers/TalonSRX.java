@@ -16,10 +16,12 @@ public class TalonSRX implements IMotor {
         talon.set(percentage);
     }
 
+    @Override
     public boolean getInverted() {
         return talon.getInverted();
     }
 
+    @Override
     public void setInverted(boolean inverted) {
         talon.setInverted(inverted);
     }

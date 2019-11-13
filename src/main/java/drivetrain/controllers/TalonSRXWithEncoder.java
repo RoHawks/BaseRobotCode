@@ -123,11 +123,11 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     protected int getOffsetTicks() {
-        return super.talon.getSelectedSensorPosition(0) - offset; // accounts for offset
+        return super.talon.getSelectedSensorPosition(sensorPosition) - offset; // accounts for offset
     }
 
     protected int getRawTicks() {
-        return super.talon.getSelectedSensorPosition(0); // does not account for offset
+        return super.talon.getSelectedSensorPosition(sensorPosition); // does not account for offset
     }
 
 }
