@@ -32,7 +32,6 @@ public class Wheel {
 	 */
 	public void set(Vector pWheelVelocity) {
 		set(pWheelVelocity.getAngle(), pWheelVelocity.getMagnitude());
-		mTurn.configSelectedFeedbackSensor();
 	}
 
 	/**
