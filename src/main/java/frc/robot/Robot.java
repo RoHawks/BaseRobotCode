@@ -162,7 +162,6 @@ public class Robot extends SampleRobot {
 			}
 
 			// put info on SmartDashboard
-			SmartDashboard.putString("Current State", mCurrentState.toString());
 			if (Config.RunConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
 					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getMotorOutputPercent());
@@ -174,15 +173,7 @@ public class Robot extends SampleRobot {
 	}
 
 	private void doWork() {
-		switch (mCurrentState) {
-		case DEFAULT:
-			doSomeAction();
-			break;
-		default:
-			throw new RuntimeException("Unknown state");
-		}
 
-		SmartDashboard.putString("Current State", mCurrentState.name());
 	}
 
 	private void doSomeAction() {
@@ -417,8 +408,6 @@ public class Robot extends SampleRobot {
 		}
 		addLogValueDouble(logString, mPDP.getTotalCurrent());
 		addLogValueDouble(logString, mPDP.getVoltage());
-
-		addLogValueString(logString, mCurrentState.toString());
 
 		addLogValueEndDouble(logString, mRobotAngle.getAngleDegrees());
 
