@@ -243,31 +243,17 @@ public class Robot extends SampleRobot {
 		boolean turnEncoderReversed, turnReversed, driveReversed;
 
 		for (int i = 0; i < 4; i++) {
-			if (RunConstants.IS_PROTOTYPE) { // determine values based on if prototype or real robot being used
-				turnPort = Ports.PrototypeRobot.TURN[i];
-				turnEncoderReversed = DriveConstants.PrototypeRobot.ENCODER_REVERSED[i];
-				turnReversed = DriveConstants.PrototypeRobot.TURN_INVERTED[i];
-				turnOffset = DriveConstants.PrototypeRobot.OFFSETS[i];
-				driveReversed = DriveConstants.PrototypeRobot.DRIVE_INVERTED[i];
-				drivePort = Ports.PrototypeRobot.DRIVE[i];
-				P_PID = DriveConstants.PrototypeRobot.ROTATION_P[i];
-				I_PID = DriveConstants.PrototypeRobot.ROTATION_I[i];
-				D_PID = DriveConstants.PrototypeRobot.ROTATION_D[i];
-				iZone = DriveConstants.PrototypeRobot.ROTATION_IZONE[i];
-				rotTol = DriveConstants.PrototypeRobot.ROTATION_TOLERANCE[i];
-			} else {
-				turnPort = Ports.ActualRobot.TURN[i];
-				turnEncoderReversed = DriveConstants.ActualRobot.ENCODER_REVERSED[i];
-				turnReversed = DriveConstants.ActualRobot.TURN_INVERTED[i];
-				turnOffset = DriveConstants.ActualRobot.OFFSETS[i];
-				driveReversed = DriveConstants.ActualRobot.DRIVE_INVERTED[i];
-				drivePort = Ports.ActualRobot.DRIVE[i];
-				P_PID = DriveConstants.ActualRobot.ROTATION_P[i];
-				I_PID = DriveConstants.ActualRobot.ROTATION_I[i];
-				D_PID = DriveConstants.ActualRobot.ROTATION_D[i];
-				iZone = DriveConstants.ActualRobot.ROTATION_IZONE[i];
-				rotTol = DriveConstants.ActualRobot.ROTATION_TOLERANCE[i];
-			}
+				turnPort = Config.Ports.TURN[i];
+				turnEncoderReversed = Config.DriveConstants.ENCODER_REVERSED[i];
+				turnReversed = Config.DriveConstants.TURN_INVERTED[i];
+				turnOffset = Config.DriveConstants.OFFSETS[i];
+				driveReversed = Config.DriveConstants.DRIVE_INVERTED[i];
+				drivePort = Config.Ports.DRIVE[i];
+				P_PID = Config.DriveConstants.ROTATION_P[i];
+				I_PID = Config.DriveConstants.ROTATION_I[i];
+				D_PID = Config.DriveConstants.ROTATION_D[i];
+				iZone = Config.DriveConstants.ROTATION_IZONE[i];
+				rotTol = Config.DriveConstants.ROTATION_TOLERANCE[i];
 
 			// initialize turn motors and set values:
 			mTurn[i] = new WPI_TalonSRX(turnPort);
