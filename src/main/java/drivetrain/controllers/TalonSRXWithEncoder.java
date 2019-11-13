@@ -88,7 +88,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         } else {
             tickChange = tickTarget - ticksPerRotation;
         }
-        setPosition(getRawTicks() + tickChange);
+        setPosition(getOffsetTicks() + tickChange);
     }
 
     /**
@@ -129,4 +129,5 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected int getRawTicks() {
         return super.talon.getSelectedSensorPosition(0); // does not account for offset
     }
+
 }

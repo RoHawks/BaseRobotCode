@@ -1,6 +1,8 @@
 package drivetrain.controllers;
 
 import drivetrain.interfaces.IMotorWithEncoder;
+import resource.ResourceFunctions;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -20,7 +22,6 @@ public class SparkMax implements IMotorWithEncoder {
 
     public void setOutput(double percentage) {
         spark.set(percentage);
-
     }
 
     public double getVelocity() {
@@ -32,7 +33,7 @@ public class SparkMax implements IMotorWithEncoder {
         spark.set(speed);
     }
 
-    public void setPosition(int position) {
+    public void setPosition(int position) { // rename to ticks
         spark.getEncoder().setPosition(position);
     }
 
@@ -49,54 +50,67 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     @Override
-    public void setReversed(boolean inverted) {
-
+    public void setReversed(boolean reversed) {
+        isReversed = reversed;
     }
 
     @Override
     public boolean getReversed() {
-        // TODO Auto-generated method stub
-        return false;
+        return isReversed;
     }
 
     @Override
-    public void setAnglePosition(double value) {
-        // TODO Auto-generated method stub
-
+    public void setAnglePosition(double angle) {
+        double angleTarget = ResourceFunctions.putAngleInRange(angle);
+        double delta = getAnglePosition() - angleTarget;
+        // reverse the motor if |delta| > 90 
+        if (delta > 90) {
+            delta -= 180;
+            isReversed = !isReversed;
+        } else if (delta < -90) {
+            delta += 180;
+            isReversed = !isReversed;
+        }
+        setRawAnglePosition(delta);
     }
 
     @Override
     public double getAnglePosition() {
-        // TODO Auto-generated method stub
-        return 0;
+        int rawTicks = getOffsetTicks();
+        if (isReversed) {
+            rawTicks += ticksPerRotation / 2;
+        }
+        return ResourceFunctions.putAngleInRange(ticksToDegrees(rawTicks));
     }
 
     @Override
-    public void setRawAnglePosition(double value) {
-        // TODO Auto-generated method stub
-
+    public void setRawAnglePosition(double angle) {
+        int tickChange;
+        int tickTarget = degreesToTicks(angle);
+        if (tickTarget > ticksPerRotation / 2) {
+            tickChange = ticksPerRotation - tickTarget;
+        } else {
+            tickChange = tickTarget - ticksPerRotation;
+        }
+        setPosition(getOffsetTicks() + tickChange);
     }
 
     @Override
     public double getRawAnglePosition() {
-        // TODO Auto-generated method stub
-        return 0;
+        return ResourceFunctions.putAngleInRange(ticksToDegrees(getOffsetTicks()));
     }
 
     protected double ticksToDegrees(int ticks) {
-        // return ticks * 360 / ticksPerRotation;
+        return ticks * 360 / ticksPerRotation;
     }
 
     protected int degreesToTicks(double degrees) {
         degrees = ResourceFunctions.putAngleInRange(degrees);
-        // return (int) degrees / 360 * ticksPerRotation;
+        return (int) degrees / 360 * ticksPerRotation;
     }
 
     protected int getOffsetTicks() {
-        // return super.talon.getSelectedSensorPosition(0) - offset; // accounts for offset
+        return getPosition() - offset; // accounts for offset
     }
 
-    protected int getRawTicks() {
-        // return super.talon.getSelectedSensorPosition(0); // does not account for offset
-    }
 }
