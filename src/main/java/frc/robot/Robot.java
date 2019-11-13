@@ -385,13 +385,13 @@ public class Robot extends SampleRobot {
 		addLogValueDouble(logString, mController.getX(Hand.kRight));
 		addLogValueDouble(logString, mController.getY(Hand.kRight));
 
-		if (RunConstants.SECONDARY_JOYSTICK) {
+		if (Config.RunConstants.SECONDARY_JOYSTICK) {
 			for (int i = 1; i < 12; i++) {
 				addLogValueBoolean(logString, mJoystick.getRawButton(i));
 			}
 		}
 
-		if (RunConstants.RUNNING_DRIVE) {
+		if (Config.RunConstants.RUNNING_DRIVE) {
 			for (int i = 0; i < 4; i++) {
 				addLogValueDouble(logString, mTurn[i].getOutputCurrent());
 				addLogValueDouble(logString, mDrive[i].getOutputCurrent());
@@ -407,7 +407,7 @@ public class Robot extends SampleRobot {
 			addLogValueDouble(logString, mDriveTrain.getDesiredAngularVel());
 		}
 
-		if (RunConstants.RUNNING_PNEUMATICS) {
+		if (Config.RunConstants.RUNNING_PNEUMATICS) {
 			addLogValueDouble(logString, mCompressor.getCompressorCurrent());
 		}
 		addLogValueDouble(logString, mPDP.getTotalCurrent());
