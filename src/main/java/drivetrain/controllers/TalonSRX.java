@@ -12,8 +12,14 @@ public class TalonSRX implements IMotor {
         talon = new WPI_TalonSRX(port);
     }
 
+    @Override
     public void setOutput(double percentage) {
         talon.set(percentage);
+    }
+    
+    @Override
+    public double getOutput() {
+        return talon.get();
     }
 
     @Override
