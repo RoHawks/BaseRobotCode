@@ -83,4 +83,20 @@ public class SparkMax implements IMotorWithEncoder {
         return 0;
     }
 
+    protected double ticksToDegrees(int ticks) {
+        // return ticks * 360 / ticksPerRotation;
+    }
+
+    protected int degreesToTicks(double degrees) {
+        degrees = ResourceFunctions.putAngleInRange(degrees);
+        // return (int) degrees / 360 * ticksPerRotation;
+    }
+
+    protected int getOffsetTicks() {
+        // return super.talon.getSelectedSensorPosition(0) - offset; // accounts for offset
+    }
+
+    protected int getRawTicks() {
+        // return super.talon.getSelectedSensorPosition(0); // does not account for offset
+    }
 }
