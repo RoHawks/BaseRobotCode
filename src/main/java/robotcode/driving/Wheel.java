@@ -38,10 +38,8 @@ public class Wheel {
 	/**
 	 * Set wheel angle & speed
 	 * 
-	 * @param angle
-	 *            direction to point the wheel
-	 * @param speed
-	 *            magnitude to drive the wheel
+	 * @param angle direction to point the wheel
+	 * @param speed magnitude to drive the wheel
 	 */
 	public void set(double angle, double speed) {
 		setAngle(angle);
