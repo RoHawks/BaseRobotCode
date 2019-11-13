@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.Vector;
 
 /**
- * Performs calculations regarding the swerve drive Given a linear and angular
- * velocity, determines individual wheel velocities
+ * Performs calculations regarding the swerve drive Given a linear and angular velocity, determines
+ * individual wheel velocities
  * 
  * @author 3419
  *
@@ -29,12 +29,7 @@ public class SwerveDrive {
 		mOutputs = new Vector[4];
 		double sumDistFromCenter = 0;
 		for (int i = 0; i < 4; i++) {
-			if(RunConstants.IS_PROTOTYPE) {
-				mOffsets[i] = new Vector(DriveConstants.PrototypeRobot.X_OFF[i], DriveConstants.PrototypeRobot.Y_OFF[i]);
-			}
-			else {
-				mOffsets[i] = new Vector(DriveConstants.ActualRobot.X_OFF[i], DriveConstants.ActualRobot.Y_OFF[i]);
-			}
+			mOffsets[i] = new Vector(Config.DriveConstants.X_OFF[i], Config.DriveConstants.Y_OFF[i]);
 			mOutputs[i] = new Vector();
 			sumDistFromCenter += mOffsets[i].getMagnitude();
 		}
@@ -77,8 +72,8 @@ public class SwerveDrive {
 		}
 
 		// if our maximum empirical length is too big, scale it all down
-		if (maximumLength > DriveConstants.MAX_INDIVIDUAL_VELOCITY) {
-			double velScale = DriveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
+		if (maximumLength > Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY) {
+			double velScale = Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
 			for (int i = 0; i < 4; i++) {
 				velocities[i].scaleTotal(velScale);
 			}
@@ -128,8 +123,8 @@ public class SwerveDrive {
 		}
 
 		// if our maximum empirical length is too big, scale it all down
-		if (maximumLength > DriveConstants.MAX_INDIVIDUAL_VELOCITY) {
-			double velScale = DriveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
+		if (maximumLength > Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY) {
+			double velScale = Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
 			for (int i = 0; i < 4; i++) {
 				velocities[i].scaleTotal(velScale);
 			}
