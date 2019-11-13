@@ -15,6 +15,10 @@ import config.Config;
 import config.Config.RunConstants;
 import config.TestChassis;
 import config.TestChassis.Ports;
+import drivetrain.controllers.SparkMax;
+import drivetrain.controllers.SparkMax;
+import drivetrain.controllers.SparkMax;
+import drivetrain.controllers.TalonSRX;
 // import constants.DriveConstants;
 // import constants.Ports;
 // import constants.RunConstants;
@@ -51,8 +55,8 @@ public class Robot extends SampleRobot {
 	// drive train
 	private DriveTrain mDriveTrain;
 	private Wheel[] mWheel = new Wheel[4];
-	private WPI_TalonSRX[] mTurn = new WPI_TalonSRX[4];
-	private WPI_TalonSRX[] mDrive = new WPI_TalonSRX[4];
+	private TalonSRX[] mTurn = new TalonSRX[4];
+	private SparkMax[] mDrive = new SparkMax[4];
 	private TalonAbsoluteEncoder[] mEncoder = new TalonAbsoluteEncoder[4];
 
 	// gyro
@@ -164,7 +168,7 @@ public class Robot extends SampleRobot {
 			// put info on SmartDashboard
 			if (Config.RunConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
-					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getMotorOutputPercent());
+					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getOutput());
 				}
 			}
 
@@ -260,6 +264,8 @@ public class Robot extends SampleRobot {
 			}
 
 			// initialize turn motors and set values:
+			
+			mTurn[i] = new TalonSRX(config);
 			mTurn[i] = new WPI_TalonSRX(turnPort);
 			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			mTurn[i].setNeutralMode(NeutralMode.Brake);
@@ -291,7 +297,7 @@ public class Robot extends SampleRobot {
 			// OR maybe, enum for motors and types of motors, then add mappings in the config, then add switch statement to initlaize the wheels propperly?
 			// mTurn = new TalonSRXWithEncoder(turnMotorPort, turnEncoderPort, offset);
 			// mDrive = new SparkMax(driveMotorPort);
-			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i]);
+			mWheel[i] = new Wheel(mTurn[i], mDrive[i]);
 		}
 
 		mRobotAngle = new RobotAngle(mNavX, false, 0);
@@ -389,11 +395,12 @@ public class Robot extends SampleRobot {
 
 		if (RunConstants.RUNNING_DRIVE) {
 			for (int i = 0; i < 4; i++) {
-				addLogValueDouble(logString, mTurn[i].getOutputCurrent());
-				addLogValueDouble(logString, mDrive[i].getOutputCurrent());
+				//TODO: put these back
+				// addLogValueDouble(logString, mTurn[i].getOutputCurrent());
+				// addLogValueDouble(logString, mDrive[i].getOutputCurrent());
 
-				addLogValueDouble(logString, mTurn[i].getMotorOutputVoltage());
-				addLogValueDouble(logString, mDrive[i].getMotorOutputVoltage());
+				// addLogValueDouble(logString, mTurn[i].getMotorOutputVoltage());
+				// addLogValueDouble(logString, mDrive[i].getMotorOutputVoltage());
 
 				addLogValueDouble(logString, mEncoder[i].getAngleDegrees());
 			}
