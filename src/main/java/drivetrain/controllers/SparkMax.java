@@ -115,4 +115,9 @@ public class SparkMax implements IMotorWithEncoder {
         return getPosition() - offset; // accounts for offset
     }
 
+    @Override
+    public double getOutput() {   
+        return spark.get();
+    }
+
 }
