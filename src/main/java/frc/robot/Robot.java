@@ -19,6 +19,9 @@ import drivetrain.controllers.SparkMax;
 import drivetrain.controllers.SparkMax;
 import drivetrain.controllers.SparkMax;
 import drivetrain.controllers.TalonSRX;
+import drivetrain.controllers.TalonSRXWithEncoder;
+import drivetrain.controllers.configs.TalonSRXConfig;
+import drivetrain.controllers.configs.TalonSRXWithEncoderConfig;
 // import constants.DriveConstants;
 // import constants.Ports;
 // import constants.RunConstants;
@@ -232,66 +235,29 @@ public class Robot extends SampleRobot {
 	}
 
 	public void driveInit() {
-		int turnPort, turnOffset, drivePort, iZone, rotTol;
-		double P_PID, I_PID, D_PID;
-		boolean turnEncoderReversed, turnReversed, driveReversed;
-
+		TalonSRXConfig driveConfig;
+		TalonSRXWithEncoderConfig turnConfig;
 		for (int i = 0; i < 4; i++) {
-			if (RunConstants.IS_PROTOTYPE) { // determine values based on if prototype or real robot being used
-				turnPort = Config.Ports.PrototypeRobot.TURN[i];
-				turnEncoderReversed = Config.DriveConstants.PrototypeRobot.ENCODER_REVERSED[i];
-				turnReversed = Config.DriveConstants.PrototypeRobot.TURN_INVERTED[i];
-				turnOffset = Config.DriveConstants.PrototypeRobot.OFFSETS[i];
-				driveReversed = Config.DriveConstants.PrototypeRobot.DRIVE_INVERTED[i];
-				drivePort = Config.Ports.PrototypeRobot.DRIVE[i];
-				P_PID = Config.DriveConstants.PrototypeRobot.ROTATION_P[i];
-				I_PID = Config.DriveConstants.PrototypeRobot.ROTATION_I[i];
-				D_PID = Config.DriveConstants.PrototypeRobot.ROTATION_D[i];
-				iZone = Config.DriveConstants.PrototypeRobot.ROTATION_IZONE[i];
-				rotTol = Config.DriveConstants.PrototypeRobot.ROTATION_TOLERANCE[i];
-			} else {
-				turnPort = Config.Ports.ActualRobot.TURN[i];
-				turnEncoderReversed = Config.DriveConstants.ActualRobot.ENCODER_REVERSED[i];
-				turnReversed = Config.DriveConstants.ActualRobot.TURN_INVERTED[i];
-				turnOffset = Config.DriveConstants.ActualRobot.OFFSETS[i];
-				driveReversed = Config.DriveConstants.ActualRobot.DRIVE_INVERTED[i];
-				drivePort = Config.Ports.ActualRobot.DRIVE[i];
-				P_PID = Config.DriveConstants.ActualRobot.ROTATION_P[i];
-				I_PID = Config.DriveConstants.ActualRobot.ROTATION_I[i];
-				D_PID = Config.DriveConstants.ActualRobot.ROTATION_D[i];
-				iZone = Config.DriveConstants.ActualRobot.ROTATION_IZONE[i];
-				rotTol = Config.DriveConstants.ActualRobot.ROTATION_TOLERANCE[i];
-			}
+			driveConfig = new SparkMaxConfig();
+			turnConfig = new TalonSRXWithEncoderConfig();
+			
+			driveConfig.inverted = Config.DriveConstants.DRIVE_INVERTED[i];
+			driveConfig.port = Config.Ports.DRIVE[i];
+
+			turnConfig.port = Config.Ports.TURN[i];
+			turnConfig.reversed = Config.DriveConstants.ENCODER_REVERSED[i];
+			turnConfig.inverted = Config.DriveConstants.TURN_INVERTED[i];
+			turnConfig.offset = Config.DriveConstants.OFFSETS[i];
+			turnConfig.p = Config.DriveConstants.ROTATION_P[i];
+			turnConfig.i = Config.DriveConstants.ROTATION_I[i];
+			turnConfig.d = Config.DriveConstants.ROTATION_D[i];
+			turnConfig.iZone = Config.DriveConstants.ROTATION_IZONE[i];
+			turnConfig.rotationTolerance = Config.DriveConstants.ROTATION_TOLERANCE[i];
 
 			// initialize turn motors and set values:
 			
-			mTurn[i] = new TalonSRX(config);
-			mTurn[i] = new WPI_TalonSRX(turnPort);
-			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
-			mTurn[i].setNeutralMode(NeutralMode.Brake);
-			mTurn[i].setSensorPhase(turnEncoderReversed);
-			mTurn[i].setInverted(turnReversed);
-			mTurn[i].config_kP(0, P_PID, 10);
-			mTurn[i].config_kI(0, I_PID, 10);
-			mTurn[i].config_kD(0, D_PID, 10);
-			mTurn[i].config_IntegralZone(0, iZone, 10);
-			mTurn[i].configAllowableClosedloopError(0, rotTol, 10);
-			mTurn[i].configPeakOutputForward(1, 10);
-			mTurn[i].configPeakOutputReverse(-1, 10);
-
-			// initialize drive motors and set values:
-			mDrive[i] = new WPI_TalonSRX(drivePort);
-			mDrive[i].setInverted(driveReversed);
-			mDrive[i].setNeutralMode(NeutralMode.Brake);
-			mDrive[i].configPeakOutputForward(1, 10);
-			mDrive[i].configPeakOutputReverse(-1, 10);
-			mDrive[i].configPeakCurrentDuration(1000, 10);
-			mDrive[i].configPeakCurrentLimit(150, 10);
-			mDrive[i].configContinuousCurrentLimit(80, 10);
-			mDrive[i].enableCurrentLimit(true);
-
-			// initialize turn motors' encoders, as well as wheels:
-			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], ResourceFunctions.tickToAngle(turnOffset));
+			mTurn[i] = new TalonSRXWithEncoder(turnConfig);
+			mDrive[i] = new SparkMax(driveConfig);
 
 			// how to determine IMotor type? reflection?
 			// OR maybe, enum for motors and types of motors, then add mappings in the config, then add switch statement to initlaize the wheels propperly?
@@ -387,13 +353,13 @@ public class Robot extends SampleRobot {
 		addLogValueDouble(logString, mController.getX(Hand.kRight));
 		addLogValueDouble(logString, mController.getY(Hand.kRight));
 
-		if (RunConstants.SECONDARY_JOYSTICK) {
+		if (Config.RunConstants.SECONDARY_JOYSTICK) {
 			for (int i = 1; i < 12; i++) {
 				addLogValueBoolean(logString, mJoystick.getRawButton(i));
 			}
 		}
 
-		if (RunConstants.RUNNING_DRIVE) {
+		if (Config.RunConstants.RUNNING_DRIVE) {
 			for (int i = 0; i < 4; i++) {
 				//TODO: put these back
 				// addLogValueDouble(logString, mTurn[i].getOutputCurrent());
@@ -410,7 +376,7 @@ public class Robot extends SampleRobot {
 			addLogValueDouble(logString, mDriveTrain.getDesiredAngularVel());
 		}
 
-		if (RunConstants.RUNNING_PNEUMATICS) {
+		if (Config.RunConstants.RUNNING_PNEUMATICS) {
 			addLogValueDouble(logString, mCompressor.getCompressorCurrent());
 		}
 		addLogValueDouble(logString, mPDP.getTotalCurrent());
