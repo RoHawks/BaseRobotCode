@@ -58,7 +58,7 @@ public class Robot extends SampleRobot {
 	// drive train
 	private DriveTrain mDriveTrain;
 	private Wheel[] mWheel = new Wheel[4];
-	private TalonSRX[] mTurn = new TalonSRX[4];
+	private TalonSRXWithEncoder[] mTurn = new TalonSRXWithEncoder[4];
 	private SparkMax[] mDrive = new SparkMax[4];
 	private TalonAbsoluteEncoder[] mEncoder = new TalonAbsoluteEncoder[4];
 
