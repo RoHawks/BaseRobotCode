@@ -18,7 +18,15 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         super(config);
         talon.setSensorPhase(config.reversed);
         this.sensorPosition = config.sensorPosition;
-        super.talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
+        this.offset = config.offset;
+        talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
+        talon.config_kP(0, config.p, 10);
+        talon.config_kI(0, config.i, 10);
+        talon.config_kD(0, config.d, 10);
+        talon.config_IntegralZone(0, config.iZone, 10);
+        talon.configAllowableClosedloopError(0, config.rotationTolerance, 10);
+        talon.configPeakOutputForward(1, 10);
+        talon.configPeakOutputReverse(-1, 10);
         isReversed = false;
     }
 
