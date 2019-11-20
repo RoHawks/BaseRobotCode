@@ -68,9 +68,9 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     @Override
-    public void setAnglePosition(double angle) {
+    public void setOffsetAnglePosition(double angle) {
         double angleTarget = ResourceFunctions.putAngleInRange(angle);
-        double delta = getAnglePosition() - angleTarget;
+        double delta = getOffsetAnglePosition() - angleTarget;
         // reverse the motor if |delta| > 90 
         if (delta > 90) {
             delta -= 180;
@@ -83,7 +83,7 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     @Override
-    public double getAnglePosition() {
+    public double getOffsetAnglePosition() {
         int rawTicks = getOffsetPosition();
         if (isReversed) {
             rawTicks += ticksPerRotation / 2;

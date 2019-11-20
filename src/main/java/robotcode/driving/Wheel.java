@@ -56,7 +56,7 @@ public class Wheel {
 
 	private void TalonPID(double pTarget) {
 		double current = ResourceFunctions.tickToAngle(mTurn.getOffsetPosition());
-		double realCurrent = mTurn.getAnglePosition();
+		double realCurrent = mTurn.getOffsetAnglePosition();
 
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 
@@ -72,11 +72,11 @@ public class Wheel {
 	}
 
 	public double getAngle() {
-		return mTurn.getAnglePosition();
+		return mTurn.getOffsetAnglePosition();
 	}
 
 	public boolean IsInRange(double pTarget) {
-		double realCurrent = mTurn.getAnglePosition();
+		double realCurrent = mTurn.getOffsetAnglePosition();
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 		return Math.abs(error) < Config.DriveConstants.ROTATION_TOLERANCE[0];
 	}

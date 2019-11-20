@@ -4,6 +4,6 @@ public interface ITargetAngleReversible extends ITargetAngle {
     void setReversed(boolean inverted);
     boolean getReversed();
 
-    void setAnglePosition(double value);
-    double getAnglePosition();
+    void setOffsetAnglePosition(double value);
+    double getOffsetAnglePosition();
 }
