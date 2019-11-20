@@ -1,5 +1,6 @@
 package drivetrain.controllers;
 
+import drivetrain.controllers.configs.SparkMaxConfig;
 import drivetrain.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
@@ -14,10 +15,11 @@ public class SparkMax implements IMotorWithEncoder {
 
     protected static final int ticksPerRotation = 1; // TODO: represent ticks as ints
 
-    public SparkMax(int port, int offset) {
-        spark = new CANSparkMax(port, MotorType.kBrushless);
+    public SparkMax(SparkMaxConfig config) {
+        spark = new CANSparkMax(config.port, MotorType.kBrushless);
         isReversed = false;
-        this.offset = offset;
+        offset = config.offset;
+        spark.setInverted(config.inverted);
     }
 
     public void setOutput(double percentage) {
