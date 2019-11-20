@@ -22,6 +22,7 @@ import drivetrain.controllers.TalonSRX;
 import drivetrain.controllers.TalonSRXWithEncoder;
 import drivetrain.controllers.configs.TalonSRXConfig;
 import drivetrain.controllers.configs.TalonSRXWithEncoderConfig;
+import drivetrain.controllers.configs.SparkMaxConfig;
 // import constants.DriveConstants;
 // import constants.Ports;
 // import constants.RunConstants;
@@ -235,7 +236,7 @@ public class Robot extends SampleRobot {
 	}
 
 	public void driveInit() {
-		TalonSRXConfig driveConfig;
+		SparkMaxConfig driveConfig;
 		TalonSRXWithEncoderConfig turnConfig;
 		for (int i = 0; i < 4; i++) {
 			driveConfig = new SparkMaxConfig();
