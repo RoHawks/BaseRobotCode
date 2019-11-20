@@ -1,6 +1,9 @@
 package drivetrain.interfaces;
 
 public interface ITargetPosition {
-    void setPosition(int value);
-    int getPosition(); // must be TICKS
+    void setOffsetPosition(int value);
+    int getOffsetPosition(); // TICKS
+
+    void setRawPosition(int value);
+    int getRawPosition();
 }
