@@ -29,7 +29,9 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         talon.configPeakOutputReverse(-1, 10);
         isReversed = false;
     }
-
+    public double getPIDTarget() {
+        return talon.getClosedLoopTarget();
+    }
     public void setRawPosition(int ticks) {
         super.talon.set(ControlMode.Position, ticks);
     }
@@ -47,7 +49,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public int getOffsetPosition() {
         //do we need to adjust this to be degrees? what does the spark do?
         //if spark can give ticks, use ticks, o.w. use degrees
-        return super.talon.getSelectedSensorPosition(sensorPosition) + offset;
+        return super.talon.getSelectedSensorPosition(sensorPosition) - offset; 
+        //changed to subtract because adding the offset gives you a value greater than 4096
     }
 
     public void setVelocity(double velocity) {
@@ -117,11 +120,11 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      */
     @Override
     public double getAnglePosition() {
-        int rawTicks = getOffsetPosition();
+        int offsetTicks = getOffsetPosition();
         if (isReversed) {
-            rawTicks += ticksPerRotation / 2;
+            offsetTicks += ticksPerRotation / 2;
         }
-        return ResourceFunctions.putAngleInRange(ticksToDegrees(rawTicks));
+        return ResourceFunctions.putAngleInRange(ticksToDegrees(offsetTicks));
     }
 
     /**
@@ -130,7 +133,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      */
     @Override
     public double getRawAnglePosition() {
-        return ResourceFunctions.putAngleInRange(ticksToDegrees(getOffsetPosition()));
+        return ResourceFunctions.putAngleInRange(ticksToDegrees(getRawPosition()));
     }
 
     protected double ticksToDegrees(int ticks) {
