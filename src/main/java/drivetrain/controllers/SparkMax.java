@@ -5,6 +5,7 @@ import drivetrain.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class SparkMax implements IMotorWithEncoder {
@@ -20,6 +21,9 @@ public class SparkMax implements IMotorWithEncoder {
         isReversed = false;
         offset = config.offset;
         spark.setInverted(config.inverted);
+        spark.setIdleMode(IdleMode.kBrake);
+        spark.setCANTimeout(10);
+		spark.setOpenLoopRampRate(0.35);
     }
 
     public void setOutput(double percentage) {
