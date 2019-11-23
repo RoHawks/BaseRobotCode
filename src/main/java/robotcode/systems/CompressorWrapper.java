@@ -7,7 +7,7 @@ public class CompressorWrapper {
     public static void action(Compressor airCompressor) {
         if (Config.RunConstants.RUNNING_PNEUMATICS) {
 				airCompressor.start();
-			} else {
+			} else if(airCompressor != null) {
 				airCompressor.stop();
 		}
     }
