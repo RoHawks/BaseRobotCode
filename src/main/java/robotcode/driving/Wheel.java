@@ -62,7 +62,6 @@ public class Wheel {
 
 		if (Math.abs(error) > 90) {
 			mDrive.setInverted(!mDrive.getInverted());
-			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
 		}
 		mTurn.setOffsetPosition(ResourceFunctions.angleToTick(current + error));
 	}
