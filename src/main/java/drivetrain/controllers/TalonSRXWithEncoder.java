@@ -123,7 +123,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      * @return the angle of the motor
      */
     @Override
-    public double getAnglePosition() {
+    public double getOffsetAngle() {
         int offsetTicks = getOffsetPosition();
         if (isReversed) {
             offsetTicks += ticksPerRotation / 2;
