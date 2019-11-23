@@ -45,32 +45,33 @@ public class Config {
             MAX_LINEAR_VELOCITY = 0.3;
 
         public static final boolean[] 
-            TURN_INVERTED = new boolean[] { false, false, false, false },
-            DRIVE_INVERTED = new boolean[] { true, false, false, false },
-            ENCODER_REVERSED = new boolean[] { true, true, true, true };
+            TURN_INVERTED = new boolean[] { false, false, true, true },
+            DRIVE_INVERTED = new boolean[] { false, false, false, false },
+            ENCODER_REVERSED = new boolean[] { false, false, true, true };
 
         public static final double[] 
-            X_OFF = new double[] { -27.438 / 2.0, 27.438 / 2.0, 27.438 / 2.0, -27.438 / 2.0 }, 
-            Y_OFF = new double[] { 22.563 / 2.0, 22.563 / 2.0, -22.563 / 2.0, -22.563 / 2.0 },
+            X_OFF = new double[] { -21.5/2.0, 21.5/2.0 , 21.5/2.0 , -21.5/2.0 }, 
+            Y_OFF = new double[] { 21.938/2.0, 21.938/2.0 , -21.938/2.0 , -29.138/2.0 }, 
 
             ROTATION_P = new double[] { 1.0, 1.0, 1.0, 1.0 },
-            ROTATION_I = new double[] { 0.001, 0.001, 0.001, 0.001 }, 
-            ROTATION_D = new double[] { 0, 0, 0, 0 };
+			ROTATION_I = new double[] { 0.001, 0.001, 0.001, 0.001 },
+			ROTATION_D = new double[] { 0, 0, 0, 0 };
 
         public static final int[] 
-            OFFSETS = new int[] { 75, 2269, 3056, 1252 },
+            // OFFSETS = new int[] { 2311, 125 , 899, 528 },
+            OFFSETS = new int[] { 2311, 125 , 3428, 2779 },
             ROTATION_IZONE = new int[] { 500, 500, 500, 500 }, 
-            ROTATION_TOLERANCE = new int[] { 3, 3, 3, 3 };
+            ROTATION_TOLERANCE = new int[] { 5, 5, 5, 5 };
 
         public static final double 
-            GYRO_P = 0.00085, 
-            GYRO_I = 0.0003, 
+            GYRO_P = 0.004, 
+            GYRO_I = 0.00002, 
             GYRO_D = 0, 
             GYRO_TOLERANCE = 5,
             GYRO_MAX_SPEED = 1,
 
-            DRIFT_COMP_P = 0.08, 
-            DRIFT_COMP_I = 0.0008, 
+            DRIFT_COMP_P = 0.03, 
+            DRIFT_COMP_I = 0, 
             DRIFT_COMP_D = 0, 
             DRIFT_COMP_MAX = 0.3;
     }
@@ -84,7 +85,7 @@ public class Config {
             COMPRESSOR = 0;
         
         public static final int[] 
-            TURN = new int[] { 6, 1, 3, 11 },
-            DRIVE = new int[] { 8, 7, 5, 13 }; // Right back, right front, left front, left back
+            TURN = new int[] { 11, 1, 2, 10 },
+            DRIVE = new int[] { 3, 4, 1, 2 }; // Right back, right front, left front, left back
     }
 }
