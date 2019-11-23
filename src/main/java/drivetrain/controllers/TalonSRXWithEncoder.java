@@ -32,6 +32,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public double getPIDTarget() {
         return talon.getClosedLoopTarget();
     }
+
+    // set raw/offset position
     public void setRawPosition(int ticks) {
         super.talon.set(ControlMode.Position, ticks);
     }
@@ -40,6 +42,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         super.talon.set(ControlMode.Position, ticks + offset);
     }
 
+    // get raw/offset position
     public int getRawPosition() {
         //do we need to adjust this to be degrees? what does the spark do?
         //if spark can give ticks, use ticks, o.w. use degrees
@@ -53,6 +56,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         //changed to subtract because adding the offset gives you a value greater than 4096
     }
 
+    // velocity
     public void setVelocity(double velocity) {
         super.talon.set(ControlMode.Velocity, velocity);
     }
@@ -84,9 +88,9 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      * @param angle the desired position of the motor
      */
     @Override
-    public void setAnglePosition(double angle) {
+    public void setOffsetAngle(double angle) {
         double angleTarget = ResourceFunctions.putAngleInRange(angle);
-        double delta = getAnglePosition() - angleTarget;
+        double delta = getOffsetAngle() - angleTarget;
         // reverse the motor if |delta| > 90 
         if (delta > 90) {
             delta -= 180;
@@ -95,7 +99,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
             delta += 180;
             isReversed = !isReversed;
         }
-        setRawAnglePosition(delta);
+        setRawAngle(delta);
     }
 
     /**
@@ -103,7 +107,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     * @param angle the desired position of the motor
     */
     @Override
-    public void setRawAnglePosition(double angle) {
+    public void setRawAngle(double angle) {
         int tickChange;
         int tickTarget = degreesToTicks(angle);
         if (tickTarget > ticksPerRotation / 2) {
@@ -132,7 +136,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      * @return the absolute rotation of the motor
      */
     @Override
-    public double getRawAnglePosition() {
+
+    public double getRawAngle() {
         return ResourceFunctions.putAngleInRange(ticksToDegrees(getRawPosition()));
     }
 

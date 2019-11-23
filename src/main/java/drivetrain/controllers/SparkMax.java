@@ -8,6 +8,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+//We need to change the ticks from int to double because sparks use revolutions instead of ticks
+
 public class SparkMax implements IMotorWithEncoder {
 
     private CANSparkMax spark;
@@ -30,6 +32,11 @@ public class SparkMax implements IMotorWithEncoder {
         spark.set(percentage);
     }
 
+    @Override
+    public double getOutput() {
+        return spark.get();
+    }
+
     public double getVelocity() {
         return spark.getEncoder().getVelocity();
     }
@@ -39,16 +46,23 @@ public class SparkMax implements IMotorWithEncoder {
         spark.set(speed);
     }
 
+    // set position
     public void setRawPosition(int position) { // rename to ticks
         spark.getEncoder().setPosition(position);
     }
+    
+    @Override
+    public void setOffsetPosition(int position) {
+        spark.getEncoder().setPosition(position - offset);
+    }
 
+    // get position
     public int getRawPosition() {
         return (int) spark.getEncoder().getPosition();
     }
 
     public int getOffsetPosition() {
-        return (int) spark.getEncoder().getPosition() + offset;
+        return (int) spark.getEncoder().getPosition() - offset;
     }
 
     @Override
@@ -71,10 +85,11 @@ public class SparkMax implements IMotorWithEncoder {
         return isReversed;
     }
 
+    // set angle
     @Override
-    public void setAnglePosition(double angle) {
+    public void setOffsetAngle(double angle) {
         double angleTarget = ResourceFunctions.putAngleInRange(angle);
-        double delta = getAnglePosition() - angleTarget;
+        double delta = getOffsetAngle() - angleTarget;
         // reverse the motor if |delta| > 90 
         if (delta > 90) {
             delta -= 180;
@@ -83,11 +98,11 @@ public class SparkMax implements IMotorWithEncoder {
             delta += 180;
             isReversed = !isReversed;
         }
-        setRawAnglePosition(delta);
+        setRawAngle(delta);
     }
 
     @Override
-    public double getAnglePosition() {
+    public double getOffsetAngle() {
         int rawTicks = getOffsetPosition();
         if (isReversed) {
             rawTicks += ticksPerRotation / 2;
@@ -96,7 +111,7 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     @Override
-    public void setRawAnglePosition(double angle) {
+    public void setRawAngle(double angle) {
         int tickChange;
         int tickTarget = degreesToTicks(angle);
         if (tickTarget > ticksPerRotation / 2) {
@@ -108,7 +123,7 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     @Override
-    public double getRawAnglePosition() {
+    public double getRawAngle() {
         return ResourceFunctions.putAngleInRange(ticksToDegrees(getOffsetPosition()));
     }
 
@@ -119,16 +134,6 @@ public class SparkMax implements IMotorWithEncoder {
     protected int degreesToTicks(double degrees) {
         degrees = ResourceFunctions.putAngleInRange(degrees);
         return (int) degrees / 360 * ticksPerRotation;
-    }
-
-    @Override
-    public double getOutput() {   
-        return spark.get();
-    }
-
-    @Override
-    public void setOffsetPosition(int position) {
-        spark.getEncoder().setPosition(position + offset);
     }
 
 }
