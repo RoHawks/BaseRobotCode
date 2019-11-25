@@ -108,14 +108,12 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     */
     @Override
     public void setRawAngle(double angle) {
-        int tickChange;
         int tickTarget = degreesToTicks(angle);
-        if (tickTarget > ticksPerRotation / 2) {
-            tickChange = ticksPerRotation - tickTarget;
-        } else {
-            tickChange = tickTarget - ticksPerRotation;
+        int tickChange = tickTarget - getRawPosition();
+        if (tickChange > ticksPerRotation / 2) {
+            tickChange = tickChange - ticksPerRotation;
         }
-        setOffsetPosition(getOffsetPosition() + tickChange);
+        setRawPosition(getRawPosition() + tickChange);
     }
 
     /**
