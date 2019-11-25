@@ -84,21 +84,18 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     /**
-     * sets the angle of the motor with respect to reversal
+     * sets the angle of the motor with respect to reversal and offset
      * @param angle the desired position of the motor
      */
     @Override
     public void setOffsetAngle(double angle) {
         double angleTarget = ResourceFunctions.putAngleInRange(angle);
-        double delta = getOffsetAngle() - angleTarget;
+        double delta = angleTarget - getOffsetAngle();
         // reverse the motor if |delta| > 90 
-        if (delta > 90) {
-            delta -= 180;
-            isReversed = !isReversed;
-        } else if (delta < -90) {
+        if (Math.abs(delta) > 90) {
             delta += 180;
             isReversed = !isReversed;
-        }
+        } 
         setRawAngle(getRawAngle() + delta);
     }
 
@@ -110,8 +107,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public void setRawAngle(double angle) {
         int tickTarget = degreesToTicks(angle);
         int tickChange = tickTarget - getRawPosition();
-        if (tickChange > ticksPerRotation / 2) {
-            tickChange = tickChange - ticksPerRotation;
+        if (tickChange > ticksPerRotation / 2) { 
+            tickChange = tickChange - ticksPerRotation; // determines clockwise or counterclockwise rotation
         }
         setRawPosition(getRawPosition() + tickChange);
     }
