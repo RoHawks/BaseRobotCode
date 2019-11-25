@@ -50,20 +50,12 @@ public class Wheel {
 		mDrive.setOutput(speed);
 	}
 
-	public void setAngle(double pAngle) {
-		TalonPID(pAngle);
-	}
-
-	private void TalonPID(double pTarget) {
-		double current = ResourceFunctions.tickToAngle(mTurn.getOffsetPosition());
-		double realCurrent = mTurn.getOffsetAngle();
-
-		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
-
+	public void setAngle(double pTarget) {
+		double error = pTarget - mTurn.getOffsetAngle();
 		if (Math.abs(error) > 90) {
 			mDrive.setInverted(!mDrive.getInverted());
 		}
-		mTurn.setOffsetPosition(ResourceFunctions.angleToTick(current + error));
+		mTurn.setOffsetAngle(pTarget);
 	}
 
 	public void setTurnSpeed(double pSpeed) {
