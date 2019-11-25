@@ -99,7 +99,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
             delta += 180;
             isReversed = !isReversed;
         }
-        setRawAngle(delta);
+        setRawAngle(getRawAngle() + delta);
     }
 
     /**
