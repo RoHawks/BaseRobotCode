@@ -10,7 +10,7 @@ import resource.ResourceFunctions;
 public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected int sensorPosition;
     protected boolean isReversed; // TODO: Figure out if motor reversal reverses encoder
-    protected static final int ticksPerRotation = 4096;
+    protected static final int TICKS_PER_ROTATION = 4096;
     protected int offset; // offset in ticks
 
     // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
@@ -106,12 +106,11 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     */
     @Override
     public void setRawAngle(double angle) {
-        int tickTarget = degreesToTicks(angle);
-        int tickChange = tickTarget - getRawPosition();
-        if (tickChange > ticksPerRotation / 2) {
-            tickChange = tickChange - ticksPerRotation; // determines clockwise or counterclockwise rotation
+        double delta = ResourceFunctions.putAngleInRange(angle - getRawAngle());
+        if (delta > 180) {
+            delta = delta - 360; // determines clockwise or counterclockwise rotation
         }
-        setRawPosition(getRawPosition() + tickChange);
+        setRawPosition(degreesToTicks(getRawAngle() + delta));
     }
 
     /**
@@ -122,7 +121,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public double getOffsetAngle() {
         int offsetTicks = getOffsetPosition();
         if (isReversed) {
-            offsetTicks += ticksPerRotation / 2;
+            offsetTicks += TICKS_PER_ROTATION / 2;
         }
         return ResourceFunctions.putAngleInRange(ticksToDegrees(offsetTicks));
     }
@@ -138,12 +137,12 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     protected double ticksToDegrees(int ticks) {
-        return ticks * 360 / ticksPerRotation;
+        return ticks * 360 / TICKS_PER_ROTATION;
     }
 
     protected int degreesToTicks(double degrees) {
         degrees = ResourceFunctions.putAngleInRange(degrees);
-        return (int) degrees / 360 * ticksPerRotation;
+        return (int) degrees / 360 * TICKS_PER_ROTATION;
     }
 
 }
