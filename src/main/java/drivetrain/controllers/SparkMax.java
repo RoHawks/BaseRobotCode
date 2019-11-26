@@ -16,7 +16,7 @@ public class SparkMax implements IMotorWithEncoder {
     protected boolean isReversed;
     protected int offset; // offset in ticks
 
-    protected static final int ticksPerRotation = 1; // TODO: represent ticks as ints
+    protected static final int TICKS_PER_ROTATION = 1; // TODO: represent ticks as ints
 
     public SparkMax(SparkMaxConfig config) {
         spark = new CANSparkMax(config.port, MotorType.kBrushless);
@@ -105,7 +105,7 @@ public class SparkMax implements IMotorWithEncoder {
     public double getOffsetAngle() {
         int rawTicks = getOffsetPosition();
         if (isReversed) {
-            rawTicks += ticksPerRotation / 2;
+            rawTicks += TICKS_PER_ROTATION / 2;
         }
         return ResourceFunctions.putAngleInRange(ticksToDegrees(rawTicks));
     }
@@ -114,10 +114,10 @@ public class SparkMax implements IMotorWithEncoder {
     public void setRawAngle(double angle) {
         int tickChange;
         int tickTarget = degreesToTicks(angle);
-        if (tickTarget > ticksPerRotation / 2) {
-            tickChange = ticksPerRotation - tickTarget;
+        if (tickTarget > TICKS_PER_ROTATION / 2) {
+            tickChange = TICKS_PER_ROTATION - tickTarget;
         } else {
-            tickChange = tickTarget - ticksPerRotation;
+            tickChange = tickTarget - TICKS_PER_ROTATION;
         }
         setOffsetPosition(getOffsetPosition() + tickChange);
     }
@@ -128,12 +128,12 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     protected double ticksToDegrees(int ticks) {
-        return ticks * 360 / ticksPerRotation;
+        return ticks * 360 / TICKS_PER_ROTATION;
     }
 
     protected int degreesToTicks(double degrees) {
         degrees = ResourceFunctions.putAngleInRange(degrees);
-        return (int) degrees / 360 * ticksPerRotation;
+        return (int) degrees / 360 * TICKS_PER_ROTATION;
     }
 
 }
