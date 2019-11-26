@@ -29,6 +29,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         talon.configPeakOutputReverse(-1, 10);
         isReversed = false;
     }
+
     public double getPIDTarget() {
         return talon.getClosedLoopTarget();
     }
@@ -52,7 +53,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public int getOffsetPosition() {
         //do we need to adjust this to be degrees? what does the spark do?
         //if spark can give ticks, use ticks, o.w. use degrees
-        return super.talon.getSelectedSensorPosition(sensorPosition) - offset; 
+        return super.talon.getSelectedSensorPosition(sensorPosition) - offset;
         //changed to subtract because adding the offset gives you a value greater than 4096
     }
 
@@ -95,7 +96,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         if (Math.abs(delta) > 90) {
             delta += 180;
             isReversed = !isReversed;
-        } 
+        }
         setRawAngle(getRawAngle() + delta);
     }
 
@@ -107,7 +108,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public void setRawAngle(double angle) {
         int tickTarget = degreesToTicks(angle);
         int tickChange = tickTarget - getRawPosition();
-        if (tickChange > ticksPerRotation / 2) { 
+        if (tickChange > ticksPerRotation / 2) {
             tickChange = tickChange - ticksPerRotation; // determines clockwise or counterclockwise rotation
         }
         setRawPosition(getRawPosition() + tickChange);
