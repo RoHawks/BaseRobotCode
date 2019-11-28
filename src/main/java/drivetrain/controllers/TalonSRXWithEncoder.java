@@ -27,7 +27,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         talon.configAllowableClosedloopError(0, config.rotationTolerance, 10);
         talon.configPeakOutputForward(1, 10);
         talon.configPeakOutputReverse(-1, 10);
-        isReversed = false;
+        //TODO: do we need to set this relative to starting tick position??
+        isReversed = config.reversed;
     }
 
     public double getPIDTarget() {
@@ -90,14 +91,15 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      */
     @Override
     public void setOffsetAngle(double angle) {
-        double angleTarget = ResourceFunctions.putAngleInRange(angle);
-        double delta = angleTarget - getOffsetAngle();
+        double target = ResourceFunctions.putAngleInRange(angle);
+        double delta = target - getOffsetAngle();
         // reverse the motor if |delta| > 90 
-        if (Math.abs(delta) > 90) {
+        if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
             delta += 180;
             isReversed = !isReversed;
         }
-        setRawAngle(getRawAngle() + delta);
+        //TODO: need to find shortest route to target
+        setOffsetPosition(getOffsetPosition() + degreesToTicks(delta));
     }
 
     /**
@@ -106,11 +108,9 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     */
     @Override
     public void setRawAngle(double angle) {
-        double delta = ResourceFunctions.putAngleInRange(angle - getRawAngle());
-        if (delta > 180) {
-            delta = delta - 360; // determines clockwise or counterclockwise rotation
-        }
-        setRawPosition(degreesToTicks(getRawAngle() + delta));
+        double target = ResourceFunctions.putAngleInRange(angle);
+        double delta = target - getRawAngle();
+        setRawPosition(getRawPosition() + degreesToTicks(delta));
     }
 
     /**
@@ -141,8 +141,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     protected int degreesToTicks(double degrees) {
-        degrees = ResourceFunctions.putAngleInRange(degrees);
-        return (int) degrees / 360 * TICKS_PER_ROTATION;
+        return (int) (degrees / 360 * TICKS_PER_ROTATION);
     }
 
 }

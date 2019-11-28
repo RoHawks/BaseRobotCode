@@ -51,11 +51,12 @@ public class Wheel {
 	}
 
 	public void setAngle(double pTarget) {
-		double error = pTarget - mTurn.getOffsetAngle();
-		if (Math.abs(error) > 90) {
+		pTarget = ResourceFunctions.putAngleInRange(pTarget);
+		boolean reversed = mTurn.getReversed();
+		mTurn.setOffsetAngle(pTarget);
+		if(reversed != mTurn.getReversed()) {
 			mDrive.setInverted(!mDrive.getInverted());
 		}
-		mTurn.setOffsetAngle(pTarget);
 	}
 
 	public void setTurnSpeed(double pSpeed) {
