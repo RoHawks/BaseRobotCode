@@ -144,11 +144,11 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     protected double ticksToDegrees(int ticks) {
-        return ticks * 360 / TICKS_PER_ROTATION;
+        return ticks * 360.0 / TICKS_PER_ROTATION;
     }
 
     protected int degreesToTicks(double degrees) {
-        return (int) (degrees / 360 * TICKS_PER_ROTATION);
+        return (int) (degrees / 360.0 * TICKS_PER_ROTATION);
     }
 
 }
