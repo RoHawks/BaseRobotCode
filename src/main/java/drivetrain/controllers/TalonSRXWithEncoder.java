@@ -108,6 +108,13 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public void setRawAngle(double angle) {
         double target = ResourceFunctions.putAngleInRange(angle);
         double delta = target - getRawAngle();
+
+        if (delta > 180) {
+            delta -= 360;
+        } else if (delta < -180) {
+            delta += 360;
+        }
+        
         setRawPosition(getRawPosition() + degreesToTicks(delta));
     }
 
