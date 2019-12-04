@@ -27,8 +27,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         talon.configAllowableClosedloopError(0, config.rotationTolerance, 10);
         talon.configPeakOutputForward(1, 10);
         talon.configPeakOutputReverse(-1, 10);
-        //TODO: do we need to set this relative to starting tick position??
-        isReversed = config.reversed;
+        isReversed = false;
     }
 
     public double getPIDTarget() {
@@ -93,13 +92,12 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     public void setOffsetAngle(double angle) {
         double target = ResourceFunctions.putAngleInRange(angle);
         double delta = target - getOffsetAngle();
-        // reverse the motor if |delta| > 90 
+        // reverse the motor if turning more than 90 degrees away in either direction
         if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
-            delta += 180;
+            target += 180;
             isReversed = !isReversed;
         }
-        //TODO: need to find shortest route to target
-        setOffsetPosition(getOffsetPosition() + degreesToTicks(delta));
+        setRawAngle(ResourceFunctions.putAngleInRange(target));
     }
 
     /**
