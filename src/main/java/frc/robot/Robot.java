@@ -173,6 +173,9 @@ public class Robot extends SampleRobot {
 			if (Config.RunConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
 					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getOutput());
+					SmartDashboard.putNumber("Current Offset Angle " + i, mTurn[i].getOffsetAngle());
+					SmartDashboard.putBoolean("Wheel Reversed " + i, mTurn[i].getReversed());
+					SmartDashboard.putBoolean("Drive Inverted " + i, mDrive[i].getInverted());
 				}
 			}
 
@@ -256,9 +259,12 @@ public class Robot extends SampleRobot {
 			turnConfig.rotationTolerance = Config.DriveConstants.ROTATION_TOLERANCE[i];
 
 			// initialize turn motors and set values:
-			
-			mTurn[i] = new TalonSRXWithEncoder(turnConfig);
 			mDrive[i] = new SparkMax(driveConfig);
+			mTurn[i] = new TalonSRXWithEncoder(turnConfig);
+			
+			if(mTurn[i].getReversed()) {
+				mDrive[i].setInverted(!mDrive[i].getInverted());
+			}
 
 			// how to determine IMotor type? reflection?
 			// OR maybe, enum for motors and types of motors, then add mappings in the config, then add switch statement to initlaize the wheels propperly?

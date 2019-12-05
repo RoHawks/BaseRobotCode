@@ -27,7 +27,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         talon.configAllowableClosedloopError(0, config.rotationTolerance, 10);
         talon.configPeakOutputForward(1, 10);
         talon.configPeakOutputReverse(-1, 10);
-        isReversed = false;
+        var startAngle = getOffsetAngle();
+        isReversed = startAngle > 90 && startAngle < 270 ? true : false;
     }
 
     public double getPIDTarget() {
@@ -94,10 +95,10 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         double delta = target - getOffsetAngle();
         // reverse the motor if turning more than 90 degrees away in either direction
         if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
-            target += 180;
+            delta += 180;
             isReversed = !isReversed;
         }
-        setRawAngle(ResourceFunctions.putAngleInRange(target));
+        setRawAngle(getRawAngle() + ResourceFunctions.putAngleInRange(delta));
     }
 
     /**
@@ -125,10 +126,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     @Override
     public double getOffsetAngle() {
         int offsetTicks = getOffsetPosition();
-        if (isReversed) {
-            offsetTicks += TICKS_PER_ROTATION / 2;
-        }
-        return ResourceFunctions.putAngleInRange(ticksToDegrees(offsetTicks));
+        var offsetAngle = ticksToDegrees(offsetTicks);
+        return ResourceFunctions.putAngleInRange(offsetAngle);
     }
 
     /**
@@ -142,11 +141,11 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     protected double ticksToDegrees(int ticks) {
-        return ticks * 360 / TICKS_PER_ROTATION;
+        return (double)(ticks) * 360d / (double)(TICKS_PER_ROTATION);
     }
 
     protected int degreesToTicks(double degrees) {
-        return (int) (degrees / 360 * TICKS_PER_ROTATION);
+        return (int) (degrees / 360d * (double)(TICKS_PER_ROTATION));
     }
 
 }
