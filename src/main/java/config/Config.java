@@ -46,20 +46,21 @@ public class Config {
 
         public static final boolean[] 
             TURN_INVERTED = new boolean[] { false, false, true, true },
-            DRIVE_INVERTED = new boolean[] { false, false, false, false },
+            DRIVE_INVERTED = new boolean[] { false, false, true, true },
             ENCODER_REVERSED = new boolean[] { false, false, true, true };
 
         public static final double[] 
-            X_OFF = new double[] { -21.5/2.0, 21.5/2.0 , 21.5/2.0 , -21.5/2.0 }, 
-            Y_OFF = new double[] { 21.938/2.0, 21.938/2.0 , -21.938/2.0 , -29.138/2.0 }, 
+            //X_OFF = new double[] { -21.5/2.0, 21.5/2.0 , 21.5/2.0 , -21.5/2.0 }, 
+            //Y_OFF = new double[] { 21.938/2.0, 21.938/2.0 , -21.938/2.0 , -29.138/2.0 }, 
+            X_OFF = new double[] { 21.5/2.0, 21.5/2.0 , -21.5/2.0 , -21.5/2.0 }, 
+            Y_OFF = new double[] { -21.938/2.0, 21.938/2.0 , 21.938/2.0 , -29.138/2.0 }, 
 
             ROTATION_P = new double[] { 1.0, 1.0, 1.0, 1.0 },
 			ROTATION_I = new double[] { 0.001, 0.001, 0.001, 0.001 },
 			ROTATION_D = new double[] { 0, 0, 0, 0 };
 
         public static final int[] 
-            // OFFSETS = new int[] { 2311, 125 , 899, 528 },
-            OFFSETS = new int[] { 2311, 125 , 3428, 2779 },
+            OFFSETS = new int[] { 2311, 125 , 3428, 2715 },
             ROTATION_IZONE = new int[] { 500, 500, 500, 500 }, 
             ROTATION_TOLERANCE = new int[] { 5, 5, 5, 5 };
 
