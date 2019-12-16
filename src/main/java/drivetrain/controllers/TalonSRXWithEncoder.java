@@ -35,7 +35,6 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         return talon.getClosedLoopTarget();
     }
 
-    // set raw/offset position
     public void setRawPosition(int ticks) {
         super.talon.set(ControlMode.Position, ticks);
     }
@@ -44,7 +43,6 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         super.talon.set(ControlMode.Position, ticks + offset);
     }
 
-    // get raw/offset position
     public int getRawPosition() {
         //do we need to adjust this to be degrees? what does the spark do?
         //if spark can give ticks, use ticks, o.w. use degrees
@@ -58,7 +56,6 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         //changed to subtract because adding the offset gives you a value greater than 4096
     }
 
-    // velocity
     public void setVelocity(double velocity) {
         super.talon.set(ControlMode.Velocity, velocity);
     }
@@ -69,6 +66,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
 
     /**
      * reverses the virtual front of the motor
+     * reversal effectively flips the front of the motor by adding 180 where it thinks it's current angle is
      * @param reversed the reversal of the motor
      */
     @Override
@@ -86,7 +84,9 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     /**
-     * sets the angle of the motor with respect to reversal and offset
+     * sets the angle of the motor
+     * takes into account motor offset
+     * includes optimization for the reversal of the turn
      * @param angle the desired position of the motor
      */
     @Override
@@ -111,7 +111,9 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     /**
-    * sets the absolute rotation of the motor
+    * sets the angle of the motor
+    * does not take into account motor offset
+    * includes optimization for direction of the turn
     * @param angle the desired position of the motor
     */
     @Override
@@ -124,7 +126,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         } else if (delta < -180) {
             delta += 360;
         }
-        
+
         setRawPosition(getRawPosition() + degreesToTicks(delta));
     }
 
@@ -143,7 +145,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     /**
-     * returns the motor's angle with respect to its reversal
+     * returns the current angle of the motor
+     * takes into account motor offset
      * @return the angle of the motor
      */
     @Override
@@ -154,7 +157,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     /**
-     * returns the motor's absolute rotation
+     * returns the current angle of the motor
+     * does not take into account motor offset
      * @return the absolute rotation of the motor
      */
     @Override
@@ -164,11 +168,11 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     protected double ticksToDegrees(int ticks) {
-        return (double)(ticks) * 360d / (double)(TICKS_PER_ROTATION);
+        return (double) (ticks) * 360d / (double) (TICKS_PER_ROTATION);
     }
 
     protected int degreesToTicks(double degrees) {
-        return (int) (degrees / 360d * (double)(TICKS_PER_ROTATION));
+        return (int) (degrees / 360d * (double) (TICKS_PER_ROTATION));
     }
 
 }
