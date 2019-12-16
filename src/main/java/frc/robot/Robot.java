@@ -173,9 +173,11 @@ public class Robot extends SampleRobot {
 			if (Config.RunConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
 					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getOutput());
-					SmartDashboard.putNumber("Current Offset Angle " + i, mTurn[i].getOffsetAngle());
+					SmartDashboard.putNumber("Current Offset Angle " + i, mTurn[i].getReversedOffsetAngle());
 					SmartDashboard.putBoolean("Wheel Reversed " + i, mTurn[i].getReversed());
 					SmartDashboard.putBoolean("Drive Inverted " + i, mDrive[i].getInverted());
+					SmartDashboard.putNumber("Raw Ticks " + i, mTurn[i].getRawPosition());
+					SmartDashboard.putNumber("Motor Output " + i, mDrive[i].getOutput());
 				}
 			}
 

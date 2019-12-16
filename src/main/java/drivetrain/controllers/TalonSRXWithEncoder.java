@@ -90,14 +90,23 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      * @param angle the desired position of the motor
      */
     @Override
-    public void setOffsetAngle(double angle) {
+    public void setReversedOffsetAngle(double angle) {
         double target = ResourceFunctions.putAngleInRange(angle);
-        double delta = target - getOffsetAngle();
+        double current = getReversedOffsetAngle();
+        double delta = target - current;
+        //TODO: need to set a flag to track the curent reversal target so we don't continuously flip
         // reverse the motor if turning more than 90 degrees away in either direction
         if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
             delta += 180;
             isReversed = !isReversed;
         }
+        setRawAngle(getRawAngle() + ResourceFunctions.putAngleInRange(delta));
+    }
+
+    @Override
+    public void setOffsetAngle(double value) {
+        double target = ResourceFunctions.putAngleInRange(value);
+        double delta = target - getOffsetAngle();
         setRawAngle(getRawAngle() + ResourceFunctions.putAngleInRange(delta));
     }
 
@@ -117,6 +126,20 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         }
         
         setRawPosition(getRawPosition() + degreesToTicks(delta));
+    }
+
+    @Override
+    public double getReversedOffsetAngle() {
+        var angle = getOffsetAngle();
+        if(isReversed) {
+            if(angle >= 180) {
+                angle -= 180;
+            }
+            else {
+                angle += 180;
+            }
+        }
+        return angle;
     }
 
     /**

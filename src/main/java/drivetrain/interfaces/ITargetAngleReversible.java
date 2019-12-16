@@ -1,9 +1,9 @@
 package drivetrain.interfaces;
 
-public interface ITargetAngleReversible extends ITargetAngle {
+public interface ITargetAngleReversible extends ITargetOffsetAngle {
     void setReversed(boolean inverted);
     boolean getReversed();
 
-    void setOffsetAngle(double value);
-    double getOffsetAngle();
+    void setReversedOffsetAngle(double value);
+    double getReversedOffsetAngle();
 }

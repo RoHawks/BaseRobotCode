@@ -53,7 +53,7 @@ public class Wheel {
 	public void setAngle(double pTarget) {
 		pTarget = ResourceFunctions.putAngleInRange(pTarget);
 		boolean reversed = mTurn.getReversed();
-		mTurn.setOffsetAngle(pTarget);
+		mTurn.setReversedOffsetAngle(pTarget);
 		if(reversed != mTurn.getReversed()) {
 			mDrive.setInverted(!mDrive.getInverted());
 		}
@@ -64,7 +64,7 @@ public class Wheel {
 	}
 
 	public double getAngle() {
-		return mTurn.getOffsetAngle();
+		return mTurn.getReversedOffsetAngle();
 	}
 
 	public boolean IsInRange(double pTarget) {

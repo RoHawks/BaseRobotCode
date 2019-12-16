@@ -85,6 +85,17 @@ public class SparkMax implements IMotorWithEncoder {
         return isReversed;
     }
 
+    @Override
+    public void setReversedOffsetAngle(double value) {
+        //TODO:
+    }
+
+    @Override
+    public double getReversedOffsetAngle() {
+        //TODO:
+        return 0;
+    }
+
     // set angle
     @Override
     public void setOffsetAngle(double angle) {
