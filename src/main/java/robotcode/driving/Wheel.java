@@ -18,10 +18,15 @@ public class Wheel {
 
 	private IMotorWithEncoder mTurn;
 	private IMotor mDrive;
+	private boolean initialDriveInverted;
 
 	public Wheel(IMotorWithEncoder pTurn, IMotor pDrive) {
 		mTurn = pTurn;
 		mDrive = pDrive;
+		if(mTurn.getReversed()) {
+			mDrive.setInverted(!mDrive.getInverted());
+		}
+		initialDriveInverted = pTurn.getReversed() ^ pDrive.getInverted();
 	}
 
 	/**
@@ -52,11 +57,8 @@ public class Wheel {
 
 	public void setAngle(double pTarget) {
 		pTarget = ResourceFunctions.putAngleInRange(pTarget);
-		boolean reversed = mTurn.getReversed();
 		mTurn.setReversedOffsetAngle(pTarget);
-		if(reversed != mTurn.getReversed()) {
-			mDrive.setInverted(!mDrive.getInverted());
-		}
+		mDrive.setInverted(mTurn.getReversed() ^ initialDriveInverted);
 	}
 
 	public void setTurnSpeed(double pSpeed) {

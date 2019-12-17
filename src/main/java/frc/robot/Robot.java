@@ -13,8 +13,6 @@ import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
 import config.Config;
 import config.Config.RunConstants;
-import config.TestChassis;
-import config.TestChassis.Ports;
 import drivetrain.controllers.SparkMax;
 import drivetrain.controllers.SparkMax;
 import drivetrain.controllers.SparkMax;
@@ -95,8 +93,8 @@ public class Robot extends SampleRobot {
 	@Override
 	public void robotInit() {
 
-		mController = new XboxController(TestChassis.Ports.XBOX);
-		mNavX = new AHRS(TestChassis.Ports.NAVX);
+		mController = new XboxController(Config.Ports.XBOX);
+		mNavX = new AHRS(Config.Ports.NAVX);
 		mPDP = new PowerDistributionPanel();
 
 		if (Config.RunConstants.RUNNING_DRIVE) {
@@ -104,7 +102,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if (Config.RunConstants.SECONDARY_JOYSTICK) {
-			mJoystick = new Joystick(TestChassis.Ports.JOYSTICK);
+			mJoystick = new Joystick(Config.Ports.JOYSTICK);
 		}
 
 		if (Config.RunConstants.RUNNING_CAMERA) {
@@ -114,7 +112,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if (Config.RunConstants.RUNNING_PNEUMATICS) {
-			mCompressor = new Compressor(TestChassis.Ports.COMPRESSOR);
+			mCompressor = new Compressor(Config.Ports.COMPRESSOR);
 		}
 	}
 
@@ -178,6 +176,7 @@ public class Robot extends SampleRobot {
 					SmartDashboard.putBoolean("Drive Inverted " + i, mDrive[i].getInverted());
 					SmartDashboard.putNumber("Raw Ticks " + i, mTurn[i].getRawPosition());
 					SmartDashboard.putNumber("Motor Output " + i, mDrive[i].getOutput());
+					SmartDashboard.putNumber("Gyro Raw Angle", mRobotAngle.getRawAngleDegrees());
 				}
 			}
 
@@ -263,10 +262,6 @@ public class Robot extends SampleRobot {
 			// initialize turn motors and set values:
 			mDrive[i] = new SparkMax(driveConfig);
 			mTurn[i] = new TalonSRXWithEncoder(turnConfig);
-			
-			if(mTurn[i].getReversed()) {
-				mDrive[i].setInverted(!mDrive[i].getInverted());
-			}
 
 			// how to determine IMotor type? reflection?
 			// OR maybe, enum for motors and types of motors, then add mappings in the config, then add switch statement to initlaize the wheels propperly?

@@ -3,7 +3,6 @@ package robotcode.driving;
 // import constants.DriveConstants;
 import config.Config;
 import config.Config.DriveConstants;
-import config.TestChassis;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.PIDController;
@@ -268,9 +267,9 @@ public class DriveTrain {
 	 */
 	private double nudgeTurn() {
 		if (mController.getBumper(Hand.kLeft)) {
-			return -TestChassis.SwerveSpeeds.NUDGE_TURN_SPEED;
+			return -Config.SwerveSpeeds.NUDGE_TURN_SPEED;
 		} else if (mController.getBumper(Hand.kRight)) {
-			return TestChassis.SwerveSpeeds.NUDGE_TURN_SPEED;
+			return Config.SwerveSpeeds.NUDGE_TURN_SPEED;
 		}
 
 		return 0;
@@ -299,7 +298,7 @@ public class DriveTrain {
 			newAngle -= robotAngle;
 		}
 
-		return Vector.createPolar(newAngle, TestChassis.SwerveSpeeds.NUDGE_MOVE_SPEED);
+		return Vector.createPolar(newAngle, Config.SwerveSpeeds.NUDGE_MOVE_SPEED);
 	}
 
 	/**
@@ -310,7 +309,7 @@ public class DriveTrain {
 	private double getStickLinearVel() {
 		double speed = mController.getTriggerAxis(Hand.kRight);
 		SmartDashboard.putNumber("Right Trigger Axis", speed);
-		speed = Math.pow(speed, 2) * TestChassis.SwerveSpeeds.SPEED_MULT;
+		speed = Math.pow(speed, 2) * Config.SwerveSpeeds.SPEED_MULT;
 		// quadratic control, finer control of lower speeds
 		return speed;
 	}
@@ -328,7 +327,7 @@ public class DriveTrain {
 			return 0;
 		}
 		double angularVel = joystickValue * Math.abs(joystickValue);
-		angularVel *= TestChassis.SwerveSpeeds.ANGULAR_SPEED_MULT;
+		angularVel *= Config.SwerveSpeeds.ANGULAR_SPEED_MULT;
 		SmartDashboard.putNumber("Angular Velocity", angularVel);
 		return angularVel; // quadratic control for finer movements
 	}
