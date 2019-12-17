@@ -76,7 +76,8 @@ public class Config {
     }
 
     public static class Ports {
-
+        public static final
+            SerialPort.Port NAVX = Port.kMXP;
         public static final int
             //Controllers
             XBOX = 0,
@@ -86,5 +87,13 @@ public class Config {
         public static final int[] 
             TURN = new int[] { 11, 1, 2, 10 },
             DRIVE = new int[] { 3, 4, 1, 2 }; // Right back, right front, left front, left back
+    }
+
+    public static class SwerveSpeeds {
+		public static final double 
+			SPEED_MULT = 1.0,
+			ANGULAR_SPEED_MULT = 1.0,
+			NUDGE_MOVE_SPEED = 0.2,
+			NUDGE_TURN_SPEED = 0.2;
     }
 }
