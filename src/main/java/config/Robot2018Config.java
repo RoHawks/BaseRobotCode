@@ -8,9 +8,9 @@ import drivetrain.swerve.wheels.configs.WheelConfig;
 
 public class Robot2018Config extends Config {
     public final boolean[] 
-        TURN_INVERTED = new boolean[] { false, false, false, false },
-        DRIVE_INVERTED = new boolean[] { false, false, true, true },
-        ENCODER_REVERSED = new boolean[] { false, false, false, false };
+        TURN_INVERTED = new boolean[] { true, true, true, true },
+        DRIVE_INVERTED = new boolean[] { false, true, false, false },
+        ENCODER_REVERSED = new boolean[] { true, true, true, true };
     public final double[] 
         X_OFF = new double[] { -29.0625/2.0, 29.0625/2.0 , 29.0625/2.0 , -29.0625/2.0 }, 
         Y_OFF = new double[] { 27.5/2.0, 27.5/2.0 , -27.5/2.0 , -27.5/2.0 }, 
@@ -18,13 +18,13 @@ public class Robot2018Config extends Config {
         ROTATION_I = new double[] { 0.001, 0.001, 0.001, 0.001 },
         ROTATION_D = new double[] { 0, 0, 0, 0 };
     public final int[] 
-        OFFSETS = new int[] { 480, 850 , 3000, 1850 },
+        OFFSETS = new int[] { 3630, 3270 , 1150, 2225 },
         TURN = new int[] { 1, 2, 3, 0 },
         DRIVE = new int[] { 10, 9, 7, 6 }; // Right back, right front, left front, left back
 
     public Robot2018Config() {
         runConstants.RUNNING_DRIVE = true;
-        runConstants.RUNNING_PNEUMATICS = true;
+        //runConstants.RUNNING_PNEUMATICS = true;
         for(int i = 0; i < wheelConfigs.length; i++) {
             wheelConfigs[i] = new WheelConfig(
                                 new TalonSRXConfig(DRIVE[i], DRIVE_INVERTED[i]),
