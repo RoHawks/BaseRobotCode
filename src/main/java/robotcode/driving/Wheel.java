@@ -1,8 +1,8 @@
 package robotcode.driving;
 
-import drivetrain.interfaces.IMotor;
-import drivetrain.interfaces.IMotorWithEncoder;
-import drivetrain.interfaces.IWheelConfig;
+import common.motors.interfaces.IMotor;
+import common.motors.interfaces.IMotorWithEncoder;
+import drivetrain.wheels.configs.interfaces.IWheelConfig;
 import resource.ResourceFunctions;
 import resource.Vector;
 
