@@ -3,8 +3,8 @@ package drivetrain.controllers;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
-import drivetrain.controllers.configs.TalonSRXWithEncoderConfig;
 import drivetrain.interfaces.IMotorWithEncoder;
+import drivetrain.interfaces.ITalonSRXWithEncoderConfig;
 import resource.ResourceFunctions;
 
 public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
@@ -14,17 +14,17 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected int offset; // offset in ticks
 
     // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
-    public TalonSRXWithEncoder(TalonSRXWithEncoderConfig config) {
-        super(config);
-        talon.setSensorPhase(config.reversed);
-        this.sensorPosition = config.sensorPosition;
-        this.offset = config.offset;
+    public TalonSRXWithEncoder(ITalonSRXWithEncoderConfig config) {
+        super(config.getMotorConfig());
+        talon.setSensorPhase(config.getEncoderConfig().getReversed());
+        this.sensorPosition = config.getSensorPosition();
+        this.offset = config.getEncoderConfig().getOffset();
         talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
-        talon.config_kP(0, config.p, 10);
-        talon.config_kI(0, config.i, 10);
-        talon.config_kD(0, config.d, 10);
-        talon.config_IntegralZone(0, config.iZone, 10);
-        talon.configAllowableClosedloopError(0, config.rotationTolerance, 10);
+        talon.config_kP(0, config.getPIDConfig().getP(), 10);
+        talon.config_kI(0, config.getPIDConfig().getI(), 10);
+        talon.config_kD(0, config.getPIDConfig().getD(), 10);
+        talon.config_IntegralZone(0, config.getIZone(), 10);
+        talon.configAllowableClosedloopError(0, config.getRotationTolerance(), 10);
         talon.configPeakOutputForward(1, 10);
         talon.configPeakOutputReverse(-1, 10);
         var startAngle = getOffsetAngle();

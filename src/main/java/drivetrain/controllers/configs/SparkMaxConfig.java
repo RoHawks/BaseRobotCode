@@ -1,8 +1,14 @@
 package drivetrain.controllers.configs;
 
-public class SparkMaxConfig {
-    public int port;
-    public int offset; 
-    public boolean inverted; //is the actual motor spinning clockwise (not inverted) or counterclockwise
-    public boolean reversed; //is the actual encoder reversed? 
+import drivetrain.controllers.SparkMax;
+
+public class SparkMaxConfig extends BaseMotorConfig {
+    public SparkMaxConfig(int port, boolean inverted) {
+        super(port,inverted);
+    }
+
+    @Override
+    public SparkMax build() {
+        return new SparkMax(this);
+    }
 }

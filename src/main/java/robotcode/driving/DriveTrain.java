@@ -2,7 +2,6 @@ package robotcode.driving;
 
 // import constants.DriveConstants;
 import config.Config;
-import config.Config.DriveConstants;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.PIDController;
@@ -42,10 +41,13 @@ public class DriveTrain {
 	private LinearVelocity mPrevLinearVel;
 	private RotationalVelocity mRotationalVel;
 
-	public DriveTrain(Wheel[] pWheels, XboxController pController, RobotAngle pRobotAngle) {
+	private final Config config;
+
+	public DriveTrain(Wheel[] pWheels, XboxController pController, RobotAngle pRobotAngle, Config config) {
 		mWheels = pWheels;
 		mController = pController;
-		mSwerveDrive = new SwerveDrive(mWheels);
+		this.config = config;
+		mSwerveDrive = new SwerveDrive(mWheels, config);
 
 		mRobotAngle = pRobotAngle;
 
@@ -241,7 +243,7 @@ public class DriveTrain {
 		double y = -mController.getY(h);
 		SmartDashboard.putNumber("X-Value " + h.toString() + ":", x);
 		SmartDashboard.putNumber("Y-Yalue " + h.toString() + ":", y);
-		if (Math.abs(y) >= Config.DriveConstants.MIN_DIRECTION_MAG || Math.abs(x) >= Config.DriveConstants.MIN_DIRECTION_MAG) {
+		if (Math.abs(y) >= config.driveConstants.MIN_DIRECTION_MAG || Math.abs(x) >= config.driveConstants.MIN_DIRECTION_MAG) {
 			mJoystickAngle = -Math.toDegrees(Math.atan2(y, x)) + 90;
 			mJoystickAngle = ResourceFunctions.putAngleInRange(mJoystickAngle); // puts angle between zero and 360
 		}
@@ -267,9 +269,9 @@ public class DriveTrain {
 	 */
 	private double nudgeTurn() {
 		if (mController.getBumper(Hand.kLeft)) {
-			return -Config.SwerveSpeeds.NUDGE_TURN_SPEED;
+			return -config.swerveSpeeds.NUDGE_TURN_SPEED;
 		} else if (mController.getBumper(Hand.kRight)) {
-			return Config.SwerveSpeeds.NUDGE_TURN_SPEED;
+			return config.swerveSpeeds.NUDGE_TURN_SPEED;
 		}
 
 		return 0;
@@ -298,7 +300,7 @@ public class DriveTrain {
 			newAngle -= robotAngle;
 		}
 
-		return Vector.createPolar(newAngle, Config.SwerveSpeeds.NUDGE_MOVE_SPEED);
+		return Vector.createPolar(newAngle, config.swerveSpeeds.NUDGE_MOVE_SPEED);
 	}
 
 	/**
@@ -309,7 +311,7 @@ public class DriveTrain {
 	private double getStickLinearVel() {
 		double speed = mController.getTriggerAxis(Hand.kRight);
 		SmartDashboard.putNumber("Right Trigger Axis", speed);
-		speed = Math.pow(speed, 2) * Config.SwerveSpeeds.SPEED_MULT;
+		speed = Math.pow(speed, 2) * config.swerveSpeeds.SPEED_MULT;
 		// quadratic control, finer control of lower speeds
 		return speed;
 	}
@@ -323,11 +325,11 @@ public class DriveTrain {
 		double joystickValue = mController.getX(Hand.kRight);
 		SmartDashboard.putNumber("Right Joystick X", joystickValue);
 
-		if (Math.abs(joystickValue) < Config.DriveConstants.MIN_DIRECTION_MAG) {
+		if (Math.abs(joystickValue) < config.driveConstants.MIN_DIRECTION_MAG) {
 			return 0;
 		}
 		double angularVel = joystickValue * Math.abs(joystickValue);
-		angularVel *= Config.SwerveSpeeds.ANGULAR_SPEED_MULT;
+		angularVel *= config.swerveSpeeds.ANGULAR_SPEED_MULT;
 		SmartDashboard.putNumber("Angular Velocity", angularVel);
 		return angularVel; // quadratic control for finer movements
 	}
@@ -351,9 +353,9 @@ public class DriveTrain {
 		LinearVelocity linVel = LinearVelocity.NONE;
 		if (getLetterPressed()) {
 			linVel = LinearVelocity.NUDGE;
-		} else if (getStickLinearVel() < Config.DriveConstants.MIN_LINEAR_VELOCITY && getStickMag(Hand.kLeft) > Config.DriveConstants.MIN_DIRECTION_MAG) {
+		} else if (getStickLinearVel() < config.driveConstants.MIN_LINEAR_VELOCITY && getStickMag(Hand.kLeft) > config.driveConstants.MIN_DIRECTION_MAG) {
 			linVel = LinearVelocity.ANGLE_ONLY;
-		} else if (getStickLinearVel() > Config.DriveConstants.MIN_LINEAR_VELOCITY) {
+		} else if (getStickLinearVel() > config.driveConstants.MIN_LINEAR_VELOCITY) {
 			linVel = LinearVelocity.NORMAL;
 		}
 
@@ -415,14 +417,14 @@ public class DriveTrain {
 
 	private void pidInit() {
 		mGyroOutput = new GenericPIDOutput();
-		mGyroPID = new PIDController(Config.DriveConstants.GYRO_P, Config.DriveConstants.GYRO_I, Config.DriveConstants.GYRO_D, mRobotAngle, mGyroOutput);
+		mGyroPID = new PIDController(config.driveConstants.GYRO_P, config.driveConstants.GYRO_I, config.driveConstants.GYRO_D, mRobotAngle, mGyroOutput);
 		mGyroPID.setInputRange(0, 360.0);
-		mGyroPID.setOutputRange(-Config.DriveConstants.GYRO_MAX_SPEED, Config.DriveConstants.GYRO_MAX_SPEED);
-		mGyroPID.setAbsoluteTolerance(Config.DriveConstants.GYRO_TOLERANCE);
+		mGyroPID.setOutputRange(-config.driveConstants.GYRO_MAX_SPEED, config.driveConstants.GYRO_MAX_SPEED);
+		mGyroPID.setAbsoluteTolerance(config.driveConstants.GYRO_TOLERANCE);
 		mGyroPID.setContinuous(true);
 
 		mDriftCompensationOutput = new GenericPIDOutput();
-		mDriftCompensationPID = new PIDController(Config.DriveConstants.DRIFT_COMP_P, Config.DriveConstants.DRIFT_COMP_I, Config.DriveConstants.DRIFT_COMP_D, mRobotAngle, mDriftCompensationOutput);
+		mDriftCompensationPID = new PIDController(config.driveConstants.DRIFT_COMP_P, config.driveConstants.DRIFT_COMP_I, config.driveConstants.DRIFT_COMP_D, mRobotAngle, mDriftCompensationOutput);
 		mDriftCompensationPID.setInputRange(0, 360);
 		mDriftCompensationPID.setContinuous(true);
 		mDriftCompensationPID.setSetpoint(0);

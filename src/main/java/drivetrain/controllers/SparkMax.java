@@ -1,7 +1,8 @@
 package drivetrain.controllers;
 
-import drivetrain.controllers.configs.SparkMaxConfig;
+import drivetrain.interfaces.IMotorConfig;
 import drivetrain.interfaces.IMotorWithEncoder;
+import drivetrain.interfaces.IMotorWithEncoderConfig;
 import resource.ResourceFunctions;
 
 import com.revrobotics.CANSparkMax;
@@ -18,11 +19,14 @@ public class SparkMax implements IMotorWithEncoder {
 
     protected static final int TICKS_PER_ROTATION = 1; // TODO: represent ticks as ints
 
-    public SparkMax(SparkMaxConfig config) {
-        spark = new CANSparkMax(config.port, MotorType.kBrushless);
+    public SparkMax(IMotorWithEncoderConfig config) {
+        this(config.getMotorConfig());
+        offset = config.getEncoderConfig().getOffset();
+    }
+    public SparkMax(IMotorConfig config) {
+        spark = new CANSparkMax(config.getPort(), MotorType.kBrushless);
         isReversed = false;
-        offset = config.offset;
-        spark.setInverted(config.inverted);
+        spark.setInverted(config.getInverted());
         spark.setIdleMode(IdleMode.kBrake);
         spark.setCANTimeout(10);
 		spark.setOpenLoopRampRate(0.35);

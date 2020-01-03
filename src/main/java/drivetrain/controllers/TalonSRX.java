@@ -3,17 +3,17 @@ package drivetrain.controllers;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import drivetrain.controllers.configs.TalonSRXConfig;
 import drivetrain.interfaces.IMotor;
+import drivetrain.interfaces.IMotorConfig;
 
 public class TalonSRX implements IMotor {
 
     protected WPI_TalonSRX talon;
 
-    public TalonSRX(TalonSRXConfig config) {
-        talon = new WPI_TalonSRX(config.port);
+    public TalonSRX(IMotorConfig config) {
+        talon = new WPI_TalonSRX(config.getPort());
+        talon.setInverted(config.getInverted());
         talon.setNeutralMode(NeutralMode.Brake);
-        talon.setInverted(config.inverted);
         talon.configPeakOutputForward(1, 10);
         talon.configPeakOutputReverse(-1, 10);
         talon.configPeakCurrentDuration(1000, 10);

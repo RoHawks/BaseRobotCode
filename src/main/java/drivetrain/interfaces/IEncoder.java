@@ -1,5 +1,5 @@
 package drivetrain.interfaces;
 
-public interface IEncoder extends ITargetPosition, ITargetVelocity, ITargetAngleReversible {
+public interface IEncoder extends ITargetPosition, ITargetVelocity {
 
 }

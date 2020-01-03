@@ -1,6 +1,14 @@
 package drivetrain.controllers.configs;
 
-public class TalonSRXConfig {
-    public int port;
-    public boolean inverted; //clockwise or counterclockwise
+import drivetrain.controllers.TalonSRX;
+
+public class TalonSRXConfig extends BaseMotorConfig {
+    public TalonSRXConfig(int port, boolean inverted) {
+        super(port, inverted);
+    }
+
+    @Override
+    public TalonSRX build() {
+		return new TalonSRX(this);
+	}
 }
