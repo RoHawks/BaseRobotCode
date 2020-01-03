@@ -2,7 +2,7 @@ package robotcode.driving;
 
 import common.motors.interfaces.IMotor;
 import common.motors.interfaces.IMotorWithEncoder;
-import drivetrain.wheels.configs.interfaces.IWheelConfig;
+import drivetrain.swerve.wheels.configs.interfaces.IWheelConfig;
 import resource.ResourceFunctions;
 import resource.Vector;
 

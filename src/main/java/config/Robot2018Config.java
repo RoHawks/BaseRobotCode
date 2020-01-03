@@ -1,10 +1,10 @@
 package config;
 
 import common.encoders.configs.BaseEncoderConfig;
-import common.pid.configs.PIDConfig;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.configs.TalonSRXWithEncoderConfig;
-import drivetrain.wheels.configs.WheelConfig;
+import common.pid.configs.PIDConfig;
+import drivetrain.swerve.wheels.configs.WheelConfig;
 
 public class Robot2018Config extends Config {
     public final boolean[] 

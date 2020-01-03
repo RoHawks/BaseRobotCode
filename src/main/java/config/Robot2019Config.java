@@ -5,7 +5,7 @@ import common.motors.configs.SparkMaxConfig;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.configs.TalonSRXWithEncoderConfig;
 import common.pid.configs.PIDConfig;
-import drivetrain.wheels.configs.WheelConfig;
+import drivetrain.swerve.wheels.configs.WheelConfig;
 
 public class Robot2019Config extends Config {
 

@@ -1,4 +1,4 @@
-package drivetrain.wheels.configs.interfaces;
+package drivetrain.swerve.wheels.configs.interfaces;
 
 import common.motors.configs.interfaces.IMotorConfig;
 import common.motors.configs.interfaces.IMotorWithEncoderConfig;

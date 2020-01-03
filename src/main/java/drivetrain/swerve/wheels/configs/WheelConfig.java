@@ -1,8 +1,8 @@
-package drivetrain.wheels.configs;
+package drivetrain.swerve.wheels.configs;
 
 import common.motors.configs.interfaces.IMotorConfig;
 import common.motors.configs.interfaces.IMotorWithEncoderConfig;
-import drivetrain.wheels.configs.interfaces.IWheelConfig;
+import drivetrain.swerve.wheels.configs.interfaces.IWheelConfig;
 
 public class WheelConfig implements IWheelConfig {
     protected final IMotorConfig driveConfig;

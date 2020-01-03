@@ -1,6 +1,6 @@
 package config;
 
-import drivetrain.wheels.configs.WheelConfig;
+import drivetrain.swerve.wheels.configs.WheelConfig;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
