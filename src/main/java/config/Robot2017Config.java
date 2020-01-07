@@ -5,25 +5,27 @@ import common.motors.configs.TalonSRXConfig;
 import common.motors.configs.TalonSRXWithEncoderConfig;
 import common.pid.configs.PIDConfig;
 import drivetrain.swerve.wheels.configs.WheelConfig;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 
-public class Robot2018Config extends Config {
+public class Robot2017Config extends Config {
     public final boolean[] 
-        TURN_INVERTED = new boolean[] { true, true, true, true },
-        DRIVE_INVERTED = new boolean[] { false, true, false, false },
-        ENCODER_REVERSED = new boolean[] { true, true, true, true };
-    public final double[] 
-        X_OFF = new double[] { -29.25/2.0, 29.25/2.0 , 29.25/2.0 , -29.25/2.0 }, 
-        Y_OFF = new double[] { 27.5/2.0, 27.5/2.0 , -27.5/2.0 , -27.5/2.0 }, 
+        TURN_INVERTED = new boolean[] { false, false, true, false },
+        DRIVE_INVERTED = new boolean[] { false, false, true, true },
+        ENCODER_REVERSED = new boolean[] { true, true, false, true };
+    public final double[]
+        X_OFF = new double[] { -23.125/2.0, 23.125/2.0 , 23.125/2.0 , -23.125/2.0 }, 
+        Y_OFF = new double[] { 22/2.0, 22/2.0 , -22/2.0 , -22/2.0 }, 
         ROTATION_P = new double[] { 1.0, 1.0, 1.0, 1.0 },
         ROTATION_I = new double[] { 0.001, 0.001, 0.001, 0.001 },
         ROTATION_D = new double[] { 0, 0, 0, 0 };
     public final int[] 
-        OFFSETS = new int[] { 3630, 3270 , 1150, 2225 },
-        TURN = new int[] { 1, 2, 3, 0 },
-        DRIVE = new int[] { 10, 9, 7, 6 }; // Right back, right front, left front, left back
+        OFFSETS = new int[] { 750, 3400 , 475, 1650 },
+        TURN = new int[] { 2,4,6,0},
+        DRIVE = new int[] { 3,5,7,1 }; // Right back, right front, left front, left back
 
-    public Robot2018Config() {
+    public Robot2017Config() {
         runConstants.RUNNING_DRIVE = true;
+        ports.NAVX = Port.kUSB;
         runConstants.RUNNING_PNEUMATICS = true;
         for(int i = 0; i < wheelConfigs.length; i++) {
             wheelConfigs[i] = new WheelConfig(

@@ -9,6 +9,7 @@ import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
 import config.Config;
+import config.Robot2017Config;
 import config.Robot2018Config;
 import config.Robot2019Config;
 
@@ -79,7 +80,8 @@ public class Robot extends SampleRobot {
 	@Override
 	public void robotInit() {
 		//mConfig = new Robot2019Config();
-		mConfig = new Robot2018Config();
+		//mConfig = new Robot2018Config();
+		mConfig = new Robot2017Config();
 		mController = new XboxController(mConfig.ports.XBOX);
 		mNavX = new AHRS(mConfig.ports.NAVX);
 		mPDP = new PowerDistributionPanel();
