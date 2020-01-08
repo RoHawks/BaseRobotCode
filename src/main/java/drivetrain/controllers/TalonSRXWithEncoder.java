@@ -9,9 +9,9 @@ import resource.ResourceFunctions;
 
 public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected int sensorPosition;
-    protected boolean isReversed; // TODO: Figure out if motor reversal reverses encoder
-    protected static final int TICKS_PER_ROTATION = 4096;
-    protected int offset; // offset in ticks
+    protected boolean isReversed;
+    protected static final double TICKS_PER_ROTATION = 4096;
+    protected double offset; // offset in ticks
 
     // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
     public TalonSRXWithEncoder(TalonSRXWithEncoderConfig config) {
@@ -35,21 +35,21 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         return talon.getClosedLoopTarget();
     }
 
-    public void setRawPosition(int ticks) {
+    public void setRawPosition(double ticks) {
         super.talon.set(ControlMode.Position, ticks);
     }
 
-    public void setOffsetPosition(int ticks) {
+    public void setOffsetPosition(double ticks) {
         super.talon.set(ControlMode.Position, ticks + offset);
     }
 
-    public int getRawPosition() {
+    public double getRawPosition() {
         //do we need to adjust this to be degrees? what does the spark do?
         //if spark can give ticks, use ticks, o.w. use degrees
         return super.talon.getSelectedSensorPosition(sensorPosition);
     }
 
-    public int getOffsetPosition() {
+    public double getOffsetPosition() {
         //do we need to adjust this to be degrees? what does the spark do?
         //if spark can give ticks, use ticks, o.w. use degrees
         return super.talon.getSelectedSensorPosition(sensorPosition) - offset;
@@ -104,8 +104,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     }
 
     @Override
-    public void setOffsetAngle(double value) {
-        double target = ResourceFunctions.putAngleInRange(value);
+    public void setOffsetAngle(double angle) {
+        double target = ResourceFunctions.putAngleInRange(angle);
         double delta = target - getOffsetAngle();
         setRawAngle(getRawAngle() + ResourceFunctions.putAngleInRange(delta));
     }
@@ -133,11 +133,10 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     @Override
     public double getReversedOffsetAngle() {
         var angle = getOffsetAngle();
-        if(isReversed) {
-            if(angle >= 180) {
+        if (isReversed) {
+            if (angle >= 180) {
                 angle -= 180;
-            }
-            else {
+            } else {
                 angle += 180;
             }
         }
@@ -151,7 +150,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      */
     @Override
     public double getOffsetAngle() {
-        int offsetTicks = getOffsetPosition();
+        double offsetTicks = getOffsetPosition();
         var offsetAngle = ticksToDegrees(offsetTicks);
         return ResourceFunctions.putAngleInRange(offsetAngle);
     }
@@ -167,12 +166,12 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         return ResourceFunctions.putAngleInRange(ticksToDegrees(getRawPosition()));
     }
 
-    protected double ticksToDegrees(int ticks) {
-        return (double) (ticks) * 360d / (double) (TICKS_PER_ROTATION);
+    protected double ticksToDegrees(double ticks) {
+        return (ticks / TICKS_PER_ROTATION) * 360D;
     }
 
-    protected int degreesToTicks(double degrees) {
-        return (int) (degrees / 360d * (double) (TICKS_PER_ROTATION));
+    protected double degreesToTicks(double degrees) {
+        return (degrees / 360D) * TICKS_PER_ROTATION;
     }
 
 }
