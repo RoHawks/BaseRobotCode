@@ -8,15 +8,15 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-//We need to change the ticks from int to double because sparks use revolutions instead of ticks
+// We need to change the ticks from int to double because sparks use revolutions instead of ticks
 
 public class SparkMax implements IMotorWithEncoder {
 
     private CANSparkMax spark;
     protected boolean isReversed;
-    protected int offset; // offset in ticks
+    protected double offset; // offset in ticks
 
-    protected static final int TICKS_PER_ROTATION = 1; // TODO: represent ticks as ints
+    protected static final double TICKS_PER_ROTATION = 1; // TODO: represent ticks as ints
 
     public SparkMax(SparkMaxConfig config) {
         spark = new CANSparkMax(config.port, MotorType.kBrushless);
@@ -25,7 +25,7 @@ public class SparkMax implements IMotorWithEncoder {
         spark.setInverted(config.inverted);
         spark.setIdleMode(IdleMode.kBrake);
         spark.setCANTimeout(10);
-		spark.setOpenLoopRampRate(0.35);
+        spark.setOpenLoopRampRate(0.35);
     }
 
     public void setOutput(double percentage) {
@@ -47,22 +47,22 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     // set position
-    public void setRawPosition(int position) { // rename to ticks
-        spark.getEncoder().setPosition(position);
+    public void setRawPosition(double ticks) { // rename to ticks
+        spark.getEncoder().setPosition(ticks);
     }
-    
+
     @Override
-    public void setOffsetPosition(int position) {
-        spark.getEncoder().setPosition(position - offset);
+    public void setOffsetPosition(double ticks) {
+        spark.getEncoder().setPosition(ticks - offset);
     }
 
     // get position
-    public int getRawPosition() {
-        return (int) spark.getEncoder().getPosition();
+    public double getRawPosition() {
+        return (double) spark.getEncoder().getPosition();
     }
 
-    public int getOffsetPosition() {
-        return (int) spark.getEncoder().getPosition() - offset;
+    public double getOffsetPosition() {
+        return (double) spark.getEncoder().getPosition() - offset;
     }
 
     @Override
@@ -114,7 +114,7 @@ public class SparkMax implements IMotorWithEncoder {
 
     @Override
     public double getOffsetAngle() {
-        int rawTicks = getOffsetPosition();
+        double rawTicks = getOffsetPosition();
         if (isReversed) {
             rawTicks += TICKS_PER_ROTATION / 2;
         }
@@ -123,8 +123,8 @@ public class SparkMax implements IMotorWithEncoder {
 
     @Override
     public void setRawAngle(double angle) {
-        int tickChange;
-        int tickTarget = degreesToTicks(angle);
+        double tickChange;
+        double tickTarget = degreesToTicks(angle);
         if (tickTarget > TICKS_PER_ROTATION / 2) {
             tickChange = TICKS_PER_ROTATION - tickTarget;
         } else {
@@ -138,13 +138,13 @@ public class SparkMax implements IMotorWithEncoder {
         return ResourceFunctions.putAngleInRange(ticksToDegrees(getOffsetPosition()));
     }
 
-    protected double ticksToDegrees(int ticks) {
-        return ticks * 360 / TICKS_PER_ROTATION;
+    protected double ticksToDegrees(double ticks) {
+        return (ticks / TICKS_PER_ROTATION) * 360;
     }
 
-    protected int degreesToTicks(double degrees) {
+    protected double degreesToTicks(double degrees) {
         degrees = ResourceFunctions.putAngleInRange(degrees);
-        return (int) degrees / 360 * TICKS_PER_ROTATION;
+        return (degrees / 360) * TICKS_PER_ROTATION;
     }
 
 }
