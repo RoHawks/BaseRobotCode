@@ -2,12 +2,15 @@ package frc.robot;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
+import common.motors.configs.TalonSRXConfig;
+import common.motors.interfaces.IMotor;
 import config.Config;
 import config.Robot2017Config;
 import config.Robot2018Config;
@@ -64,6 +67,9 @@ public class Robot extends SampleRobot {
 
 	private long mGameStartMillis;
 
+	//a test intake
+	private IMotor intakeMotor;
+
 	// ****************//
 	// GENERAL CODE //
 	// ****************//
@@ -79,15 +85,19 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-		//mConfig = new Robot2019Config();
+		mConfig = new Robot2019Config();
 		//mConfig = new Robot2018Config();
-		mConfig = new Robot2017Config();
+		// mConfig = new Robot2017Config();
 		mController = new XboxController(mConfig.ports.XBOX);
 		mNavX = new AHRS(mConfig.ports.NAVX);
 		mPDP = new PowerDistributionPanel();
 
 		if (mConfig.runConstants.RUNNING_DRIVE) {
 			driveInit();
+		}
+
+		if (mConfig.runConstants.RUNNING_INTAKE) {
+			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.intakeConstants.INTAKE_PORT, mConfig.intakeConstants.INTAKE_INVERTED);
 		}
 
 		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
@@ -156,6 +166,10 @@ public class Robot extends SampleRobot {
 				doWork();
 			}
 
+			if (mConfig.runConstants.RUNNING_INTAKE) {
+				runIntake();	
+			}
+
 			// put info on SmartDashboard
 			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
@@ -168,9 +182,14 @@ public class Robot extends SampleRobot {
 					SmartDashboard.putNumber("Gyro Raw Angle", mRobotAngle.getRawAngleDegrees());
 				}
 			}
+		
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
+	}
+
+	private void runIntake() {
+		intakeMotor.setOutput(mConfig.intakeConstants.INTAKE_POWER_OUTPUT);
 	}
 
 	private void doWork() {

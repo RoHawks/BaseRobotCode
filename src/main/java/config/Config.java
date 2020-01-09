@@ -10,13 +10,22 @@ public class Config {
     public Ports ports = new Ports();
     public SwerveSpeeds swerveSpeeds = new SwerveSpeeds();
     public WheelConfig[] wheelConfigs = new WheelConfig[4];
+    public IntakeConstants intakeConstants = new IntakeConstants(); 
+
+    //Constants for the intake test mechanism
+    public class IntakeConstants {    
+        public final int INTAKE_PORT = 5;
+        public final boolean INTAKE_INVERTED = false;
+        public final double INTAKE_POWER_OUTPUT = 0.5;
+    }
 
     // Constatnts from RunConstants
     public class RunConstants {  
         public boolean RUNNING_DRIVE,
             RUNNING_PNEUMATICS,
             RUNNING_CAMERA,
-            SECONDARY_JOYSTICK;
+            SECONDARY_JOYSTICK,
+            RUNNING_INTAKE;
 
         public final boolean RUNNING_EVERYTHING = RUNNING_DRIVE && RUNNING_PNEUMATICS && SECONDARY_JOYSTICK;
     }
