@@ -1,10 +1,12 @@
 package drivetrain.interfaces;
 
+import java.io.IOException;
+
 // position refers to the motor's tick value
 public interface ITargetPosition {
-    void setOffsetPosition(double ticks);
-    double getOffsetPosition();
+    void setOffsetPosition(double ticks) throws IOException;
+    double getOffsetPosition() throws IOException;
 
-    void setRawPosition(double ticks);
-    double getRawPosition();
+    void setRawPosition(double ticks) throws IOException;
+    double getRawPosition() throws IOException;
 }
