@@ -2,13 +2,13 @@ package frc.robot;
 
 import java.util.ArrayList;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
+import common.motors.TalonSRX;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.interfaces.IMotor;
 import config.Config;
@@ -97,7 +97,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if (mConfig.runConstants.RUNNING_INTAKE) {
-			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.intakeConstants.INTAKE_PORT, mConfig.intakeConstants.INTAKE_INVERTED);
+			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.intakeConstants.INTAKE_PORT, mConfig.intakeConstants.INTAKE_INVERTED));
 		}
 
 		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
