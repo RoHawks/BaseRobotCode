@@ -10,6 +10,8 @@ import resource.ResourceFunctions;
 public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     protected int sensorPosition;
     protected boolean isReversed; // TODO: Figure out if motor reversal reverses encoder
+    //Answer is no. Even if wheel is reversed, turning left stick clockwise increases the encoder
+    //tick count and turning left stick counterclockwise decreases
     protected static final int TICKS_PER_ROTATION = 4096;
     protected int offset; // offset in ticks
 
@@ -94,10 +96,10 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         double target = ResourceFunctions.putAngleInRange(angle);
         double current = getReversedOffsetAngle();
         double delta = target - current;
-        //TODO: need to set a flag to track the curent reversal target so we don't continuously flip
+        //TODO: need to set a flag to track the current reversal target so we don't continuously flip
         // reverse the motor if turning more than 90 degrees away in either direction
         if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
-            delta += 180;
+            delta -= 180;
             isReversed = !isReversed;
         }
         setRawAngle(getRawAngle() + ResourceFunctions.putAngleInRange(delta));
