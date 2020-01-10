@@ -99,7 +99,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         //TODO: need to set a flag to track the current reversal target so we don't continuously flip
         // reverse the motor if turning more than 90 degrees away in either direction
         if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
-            delta -= 180;
+            delta += 180;
             isReversed = !isReversed;
         }
         setRawAngle(getRawAngle() + ResourceFunctions.putAngleInRange(delta));
