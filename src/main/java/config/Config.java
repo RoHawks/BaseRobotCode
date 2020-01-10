@@ -18,7 +18,7 @@ public class Config {
             INTAKE_PORT = 5,
             SPEED_UP_BUTTON = 1, //A button
             SPEED_DOWN_BUTTON = 4; //Y button
-        public final boolean INTAKE_INVERTED = false;
+        public final boolean INTAKE_INVERTED = true;
         public final double 
             INTAKE_POWER_OUTPUT = 0.5,
             SPEED_INCREMENT = .1;
