@@ -14,9 +14,14 @@ public class Config {
 
     //Constants for the intake test mechanism
     public class IntakeConstants {    
-        public final int INTAKE_PORT = 5;
+        public final int 
+            INTAKE_PORT = 5,
+            SPEED_UP_BUTTON = 1,
+            SPEED_DOWN_BUTTON = 4;
         public final boolean INTAKE_INVERTED = false;
-        public final double INTAKE_POWER_OUTPUT = 0.5;
+        public final double 
+            INTAKE_POWER_OUTPUT = 0.5,
+            SPEED_INCREMENT = .1;
     }
 
     // Constatnts from RunConstants
@@ -26,8 +31,6 @@ public class Config {
             RUNNING_CAMERA,
             SECONDARY_JOYSTICK,
             RUNNING_INTAKE;
-
-        public final boolean RUNNING_EVERYTHING = RUNNING_DRIVE && RUNNING_PNEUMATICS && SECONDARY_JOYSTICK;
     }
 
     // Constants from DriveConstants

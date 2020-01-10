@@ -69,6 +69,7 @@ public class Robot extends SampleRobot {
 
 	//a test intake
 	private IMotor intakeMotor;
+	private double intakeOutput;
 
 	// ****************//
 	// GENERAL CODE //
@@ -98,6 +99,7 @@ public class Robot extends SampleRobot {
 
 		if (mConfig.runConstants.RUNNING_INTAKE) {
 			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.intakeConstants.INTAKE_PORT, mConfig.intakeConstants.INTAKE_INVERTED));
+			intakeOutput = mConfig.intakeConstants.INTAKE_POWER_OUTPUT;
 		}
 
 		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
@@ -162,11 +164,7 @@ public class Robot extends SampleRobot {
 
 			swerveDrive();
 
-			if (mConfig.runConstants.RUNNING_EVERYTHING) {
-				doWork();
-			}
-
-			if (mConfig.runConstants.RUNNING_INTAKE) {
+			if (mConfig.runConstants.RUNNING_INTAKE && mConfig.runConstants.SECONDARY_JOYSTICK) {
 				runIntake();	
 			}
 
@@ -189,15 +187,15 @@ public class Robot extends SampleRobot {
 	}
 
 	private void runIntake() {
-		intakeMotor.setOutput(mConfig.intakeConstants.INTAKE_POWER_OUTPUT);
-	}
-
-	private void doWork() {
-
-	}
-
-	private void doSomeAction() {
-		// Do some action... move to a different state?
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_UP_BUTTON)) {
+			intakeOutput += mConfig.intakeConstants.SPEED_INCREMENT;
+		}
+		else if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_DOWN_BUTTON)) {
+			intakeOutput -= mConfig.intakeConstants.SPEED_INCREMENT;
+		}
+		intakeMotor.setOutput(intakeOutput);
+		SmartDashboard.putNumber("Intake speed", intakeOutput);
 	}
 
 	public void startGame() {
