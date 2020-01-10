@@ -150,6 +150,7 @@ public class DriveTrain {
 			if (mLinearVel == LinearVelocity.ANGLE_ONLY) {
 				for (int i = 0; i < 4; i++) {
 					mWheels[i].set(robotDirectionAngle, 0);
+					SmartDashboard.putNumber("Joystick Angle " + i, robotDirectionAngle);
 				}
 				resetDriftCompensation();
 				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
