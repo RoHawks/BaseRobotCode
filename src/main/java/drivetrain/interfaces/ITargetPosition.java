@@ -7,4 +7,6 @@ public interface ITargetPosition {
 
     void setRawPosition(double ticks);
     double getRawPosition();
+
+    double getTicksPerRotation();
 }

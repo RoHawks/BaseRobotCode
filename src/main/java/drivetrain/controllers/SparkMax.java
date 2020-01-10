@@ -147,4 +147,9 @@ public class SparkMax implements IMotorWithEncoder {
         return (degrees / 360) * TICKS_PER_ROTATION;
     }
 
+    @Override
+    public double getTicksPerRotation() {
+        return TICKS_PER_ROTATION;
+    }
+
 }

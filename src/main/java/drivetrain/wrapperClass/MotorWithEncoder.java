@@ -1,19 +1,16 @@
 package drivetrain.wrapperClass;
 
-import java.io.IOException;
-import drivetrain.interfaces.IEncoder;
 import drivetrain.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
 public class MotorWithEncoder implements IMotorWithEncoder {
-    protected IMotorWithEncoder motorWithEncoder;
+    public IMotorWithEncoder motorWithEncoder;
 
-    // protected int sensorPosition = 0;
     protected double TICKS_PER_ROTATION = 0;
 
-    public MotorWithEncoder(IMotorWithEncoder motorWithEncoder, double ticksPerRotation) {
+    public MotorWithEncoder(IMotorWithEncoder motorWithEncoder) {
         this.motorWithEncoder = motorWithEncoder;
-        this.TICKS_PER_ROTATION = ticksPerRotation;
+        this.TICKS_PER_ROTATION = motorWithEncoder.getTicksPerRotation();
     }
 
     @Override
@@ -36,9 +33,9 @@ public class MotorWithEncoder implements IMotorWithEncoder {
         motorWithEncoder.setInverted(inverted);
     }
 
-    public double getPIDTarget() {
-        motorWithEncoder.getPIDTarget(); // should this be added to interface?
-    }
+    // public double getPIDTarget() {
+    //     motorWithEncoder.getPIDTarget(); // what do we do with motor-specific methods?
+    // }
 
     @Override
     public void setRawPosition(double ticks) {
@@ -78,6 +75,11 @@ public class MotorWithEncoder implements IMotorWithEncoder {
     @Override
     public boolean getReversed() {
         return motorWithEncoder.getReversed();
+    }
+
+    @Override
+    public double getTicksPerRotation() {
+        return motorWithEncoder.getTicksPerRotation();
     }
 
     /**
@@ -126,6 +128,12 @@ public class MotorWithEncoder implements IMotorWithEncoder {
         setRawPosition(getRawPosition() + degreesToTicks(delta));
     }
 
+    /**
+    * returns the current angle of the motor
+    * takes into account motor offset
+    * takes into account the reversal of the motor
+    * @param angle the desired position of the motor
+    */
     @Override
     public double getReversedOffsetAngle() {
         double angle = getOffsetAngle();
@@ -142,6 +150,7 @@ public class MotorWithEncoder implements IMotorWithEncoder {
     /**
      * returns the current angle of the motor
      * takes into account motor offset
+     * takes into account the reversal of the motor
      * @return the angle of the motor
      */
     @Override
