@@ -14,6 +14,8 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
     //tick count and turning left stick counterclockwise decreases
     protected static final int TICKS_PER_ROTATION = 4096;
     protected int offset; // offset in ticks
+    protected double previousTarget;
+    private final double TOLERANCE = 30;
 
     // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
     public TalonSRXWithEncoder(ITalonSRXWithEncoderConfig config) {
@@ -31,6 +33,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         talon.configPeakOutputReverse(-1, 10);
         var startAngle = getOffsetAngle();
         isReversed = startAngle > 90 && startAngle < 270 ? true : false;
+        previousTarget = startAngle;
     }
 
     public double getPIDTarget() {
@@ -99,9 +102,13 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         //TODO: need to set a flag to track the current reversal target so we don't continuously flip
         // reverse the motor if turning more than 90 degrees away in either direction
         if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
-            delta += 180;
+            //if difference between current and target is > 90
             isReversed = !isReversed;
+            if (Math.abs(previousTarget - target) > 90) {
+                delta += 180;
+            }
         }
+        previousTarget = target;
         setRawAngle(getRawAngle() + ResourceFunctions.putAngleInRange(delta));
     }
 
