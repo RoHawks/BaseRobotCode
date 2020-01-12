@@ -9,8 +9,11 @@ import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
 import common.motors.TalonSRX;
+import common.motors.TalonSRXWithLimitSwitch;
 import common.motors.configs.TalonSRXConfig;
+import common.motors.configs.TalonSRXWithLimitSwitchConfig;
 import common.motors.interfaces.IMotor;
+import common.motors.interfaces.IMotorWithLimitSwitch;
 import config.Config;
 import config.Robot2017Config;
 import config.Robot2018Config;
@@ -71,6 +74,10 @@ public class Robot extends SampleRobot {
 	private IMotor intakeMotor;
 	private double intakeOutput;
 
+	//a test lift
+	private IMotorWithLimitSwitch liftMotor;
+	private double liftOutput;
+
 	// ****************//
 	// GENERAL CODE //
 	// ****************//
@@ -104,6 +111,14 @@ public class Robot extends SampleRobot {
 
 		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
 			mJoystick = new Joystick(mConfig.ports.JOYSTICK);
+		}
+
+		if (mConfig.runConstants.RUNNING_LIFT) {
+			liftMotor = new TalonSRXWithLimitSwitch(new TalonSRXWithLimitSwitchConfig(new TalonSRXConfig(mConfig.liftConstants.LIFT_PORT, mConfig.liftConstants.LIFT_INVERTED),false, false));
+			liftOutput = mConfig.liftConstants.LIFT_POWER_OUTPUT;
+			if (mConfig.liftConstants.HAS_BOTTOM_LIMIT_SWITCH || mConfig.liftConstants.HAS_TOP_LIMIT_SWITCH) {
+				liftMotor.enableLimitSwitch();
+			}
 		}
 
 		if (mConfig.runConstants.RUNNING_CAMERA) {
@@ -168,6 +183,10 @@ public class Robot extends SampleRobot {
 				runIntake();	
 			}
 
+			if (mConfig.runConstants.RUNNING_LIFT && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runLift();	
+			}
+
 			// put info on SmartDashboard
 			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
@@ -196,6 +215,18 @@ public class Robot extends SampleRobot {
 		}
 		intakeMotor.setOutput(intakeOutput);
 		SmartDashboard.putNumber("Intake speed", intakeOutput);
+	}
+
+	private void runLift() {
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_UP_BUTTON)) {
+			liftOutput += mConfig.liftConstants.SPEED_INCREMENT;
+		}
+		else if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_DOWN_BUTTON)) {
+			liftOutput -= mConfig.liftConstants.SPEED_INCREMENT;
+		}
+		liftMotor.setOutput(liftOutput);
+		SmartDashboard.putNumber("Lift speed", liftOutput);
 	}
 
 	public void startGame() {
