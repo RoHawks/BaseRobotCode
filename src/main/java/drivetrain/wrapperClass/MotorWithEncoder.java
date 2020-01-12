@@ -38,13 +38,13 @@ public class MotorWithEncoder implements IMotorWithEncoder {
     // }
 
     @Override
-    public void setRawPosition(double ticks) {
-        motorWithEncoder.setRawPosition(ticks);
+    public void setRawPosition(double rawTicks) {
+        motorWithEncoder.setRawPosition(rawTicks);
     }
 
     @Override
-    public void setOffsetPosition(double ticks) {
-        motorWithEncoder.setOffsetPosition(ticks);
+    public void setOffsetPosition(double rawTicks) {
+        motorWithEncoder.setRawPosition(rawTicks + getOffset());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class MotorWithEncoder implements IMotorWithEncoder {
 
     @Override
     public double getOffsetPosition() {
-        return motorWithEncoder.getOffsetPosition();
+        return getRawPosition() - getOffset();
     }
 
     @Override
@@ -75,11 +75,6 @@ public class MotorWithEncoder implements IMotorWithEncoder {
     @Override
     public boolean getReversed() {
         return motorWithEncoder.getReversed();
-    }
-
-    @Override
-    public double getTicksPerRotation() {
-        return motorWithEncoder.getTicksPerRotation();
     }
 
     /**
@@ -178,4 +173,13 @@ public class MotorWithEncoder implements IMotorWithEncoder {
         return (degrees / 360D) * TICKS_PER_ROTATION;
     }
 
+    @Override
+    public double getOffset() {
+        return motorWithEncoder.getOffset();
+    }
+
+    @Override
+    public double getTicksPerRotation() {
+        return motorWithEncoder.getTicksPerRotation();
+    }
 }

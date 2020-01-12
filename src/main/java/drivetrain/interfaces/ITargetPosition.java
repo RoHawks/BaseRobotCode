@@ -9,4 +9,6 @@ public interface ITargetPosition {
     double getRawPosition();
 
     double getTicksPerRotation();
+
+    double getOffset();
 }

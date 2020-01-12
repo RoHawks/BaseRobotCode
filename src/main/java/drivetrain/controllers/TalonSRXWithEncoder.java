@@ -179,4 +179,9 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
         return TICKS_PER_ROTATION;
     }
 
+    @Override
+    public double getOffset() {
+        return offset;
+    }
+
 }
