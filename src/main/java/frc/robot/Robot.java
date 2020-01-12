@@ -254,7 +254,7 @@ public class Robot extends SampleRobot {
 
 			SmartDashboard.putString("AUTO ROUTINE:", mAutonomousRoutine.toString());
 
-			Timer.delay(0.005); // wait for a motor update time
+			Timer.delay(0.010); // wait for a motor update time
 		}
 	}
 
