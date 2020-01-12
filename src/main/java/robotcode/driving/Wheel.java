@@ -10,6 +10,7 @@ import drivetrain.controllers.TalonSRX;
 import drivetrain.controllers.TalonSRXWithEncoder;
 import drivetrain.interfaces.IMotor;
 import drivetrain.interfaces.IMotorWithEncoder;
+import drivetrain.wrapperClass.MotorWithEncoder;
 import resource.ResourceFunctions;
 import resource.Vector;
 import sensors.TalonAbsoluteEncoder;
@@ -21,9 +22,9 @@ public class Wheel {
 	private boolean initialDriveInverted;
 
 	public Wheel(IMotorWithEncoder pTurn, IMotor pDrive) {
-		mTurn = pTurn;
+		mTurn = new MotorWithEncoder(pTurn);
 		mDrive = pDrive;
-		if(mTurn.getReversed()) {
+		if (mTurn.getReversed()) {
 			mDrive.setInverted(!mDrive.getInverted());
 		}
 		initialDriveInverted = pTurn.getReversed() ^ pDrive.getInverted();

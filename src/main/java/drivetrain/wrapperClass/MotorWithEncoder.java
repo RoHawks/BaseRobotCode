@@ -6,11 +6,8 @@ import resource.ResourceFunctions;
 public class MotorWithEncoder implements IMotorWithEncoder {
     public IMotorWithEncoder motorWithEncoder;
 
-    protected double TICKS_PER_ROTATION = 0;
-
     public MotorWithEncoder(IMotorWithEncoder motorWithEncoder) {
         this.motorWithEncoder = motorWithEncoder;
-        this.TICKS_PER_ROTATION = motorWithEncoder.getTicksPerRotation();
     }
 
     @Override
@@ -166,11 +163,11 @@ public class MotorWithEncoder implements IMotorWithEncoder {
     }
 
     protected double ticksToDegrees(double ticks) {
-        return (ticks / TICKS_PER_ROTATION) * 360D;
+        return (ticks / getTicksPerRotation()) * 360D;
     }
 
     protected double degreesToTicks(double degrees) {
-        return (degrees / 360D) * TICKS_PER_ROTATION;
+        return (degrees / 360D) * getTicksPerRotation();
     }
 
     @Override
