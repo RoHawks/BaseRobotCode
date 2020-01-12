@@ -93,9 +93,9 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-		mConfig = new Robot2019Config();
+		// mConfig = new Robot2019Config();
 		//mConfig = new Robot2018Config();
-		// mConfig = new Robot2017Config();
+		mConfig = new Robot2017Config();
 		mController = new XboxController(mConfig.ports.XBOX);
 		mNavX = new AHRS(mConfig.ports.NAVX);
 		mPDP = new PowerDistributionPanel();
