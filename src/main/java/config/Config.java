@@ -27,7 +27,7 @@ public class Config {
 
     public class LiftConstants {    
         public final int 
-            LIFT_PORT = 37,
+            LIFT_PORT = 0,
             LIFT_UP_BUTTON = 4, //Y button
             LIFT_DOWN_BUTTON = 1; //A button
         public final boolean LIFT_INVERTED = true;
