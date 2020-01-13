@@ -114,12 +114,8 @@ public class Robot extends SampleRobot {
 		}
 
 		if (mConfig.runConstants.RUNNING_LIFT) {
-			// liftMotor = new TalonSRXWithLimitSwitch(new TalonSRXWithLimitSwitchConfig(new TalonSRXConfig(mConfig.liftConstants.LIFT_PORT, mConfig.liftConstants.LIFT_INVERTED),false, false));
 			liftMotor = new TalonSRX(new TalonSRXConfig(mConfig.liftConstants.LIFT_PORT, mConfig.liftConstants.LIFT_INVERTED));
 			liftOutput = mConfig.liftConstants.LIFT_POWER_OUTPUT;
-			// if (mConfig.liftConstants.HAS_BOTTOM_LIMIT_SWITCH || mConfig.liftConstants.HAS_TOP_LIMIT_SWITCH) {
-			// 	liftMotor.enableLimitSwitch();
-			// }
 		}
 
 		if (mConfig.runConstants.RUNNING_CAMERA) {
