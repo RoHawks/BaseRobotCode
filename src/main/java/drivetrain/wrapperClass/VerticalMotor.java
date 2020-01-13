@@ -1,18 +1,15 @@
-package robotcode.modules;
+package drivetrain.wrapperClass;
 
 import drivetrain.interfaces.IMotorWithEncoder;
 import drivetrain.wrapperClass.MotorWithEncoder;
 
-public class VerticalMotor {
-    MotorWithEncoder motorWithEncoder;
+public class VerticalMotor extends MotorWithEncoder {
     double ticksPerInch;
 
     public VerticalMotor(IMotorWithEncoder motorWithEncoder, double ticksPerInch) {
-        this.motorWithEncoder = new MotorWithEncoder(motorWithEncoder);
+        super(motorWithEncoder);
         this.ticksPerInch = ticksPerInch;
     }
-
-    VerticalMotor.motorWithEncoder.method()
 
     public double ticksToInches(double ticks) {
         return ticks / ticksPerInch;
@@ -23,11 +20,11 @@ public class VerticalMotor {
     }
     
     public void setHeight(double inches) {
-        motorWithEncoder.setOffsetPosition(inchesToTicks(inches));
+        super.setOffsetPosition(inchesToTicks(inches));
     }
 
     public double getHeight() {
-        return ticksToInches(motorWithEncoder.getOffsetPosition());
+        return ticksToInches(super.getOffsetPosition());
     }
 
 }
