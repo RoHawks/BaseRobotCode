@@ -1,9 +1,10 @@
 package drivetrain.wrapperClass;
 
 import drivetrain.interfaces.IMotorWithEncoder;
+import drivetrain.interfaces.ITargetHeight;
 import drivetrain.wrapperClass.MotorWithEncoder;
 
-public class TranslationalMotor extends MotorWithEncoder {
+public class TranslationalMotor extends MotorWithEncoder implements ITargetHeight {
     double ticksPerInch;
 
     public TranslationalMotor(IMotorWithEncoder motorWithEncoder, double ticksPerInch) {
@@ -19,10 +20,12 @@ public class TranslationalMotor extends MotorWithEncoder {
         return inches * ticksPerInch;
     }
     
+    @Override
     public void setHeight(double inches) {
         super.setOffsetPosition(inchesToTicks(inches));
     }
 
+    @Override
     public double getHeight() {
         return ticksToInches(super.getOffsetPosition());
     }
