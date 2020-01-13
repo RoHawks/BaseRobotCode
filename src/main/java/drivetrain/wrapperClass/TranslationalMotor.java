@@ -3,10 +3,10 @@ package drivetrain.wrapperClass;
 import drivetrain.interfaces.IMotorWithEncoder;
 import drivetrain.wrapperClass.MotorWithEncoder;
 
-public class VerticalMotor extends MotorWithEncoder {
+public class TranslationalMotor extends MotorWithEncoder {
     double ticksPerInch;
 
-    public VerticalMotor(IMotorWithEncoder motorWithEncoder, double ticksPerInch) {
+    public TranslationalMotor(IMotorWithEncoder motorWithEncoder, double ticksPerInch) {
         super(motorWithEncoder);
         this.ticksPerInch = ticksPerInch;
     }
