@@ -21,7 +21,7 @@ public class Config {
             SPEED_DOWN_BUTTON = 1; //A button
         public final boolean INTAKE_INVERTED = true;
         public final double 
-            INTAKE_POWER_OUTPUT = 0.5,
+            INTAKE_POWER_OUTPUT = 0,
             SPEED_INCREMENT = .1;
     }
 
@@ -29,13 +29,15 @@ public class Config {
         public final int 
             LIFT_PORT = 0,
             LIFT_UP_BUTTON = 4, //Y button
-            LIFT_DOWN_BUTTON = 1; //A button
+            LIFT_DOWN_BUTTON = 1, //A button
+            DRIVE_BUTTON = 6, //Right Trigger button
+            REVERSE_BUTTON = 5; //Left Trigger button
         public final boolean LIFT_INVERTED = true;
         public final boolean HAS_TOP_LIMIT_SWITCH = true;
         public final boolean HAS_BOTTOM_LIMIT_SWITCH = true;
         public final double 
-            LIFT_POWER_OUTPUT = 0.5,
-            SPEED_INCREMENT = .1;
+            LIFT_POWER_OUTPUT = 0,
+            SPEED_INCREMENT = .05;
     }
 
     // Constatnts from RunConstants
@@ -45,6 +47,7 @@ public class Config {
             RUNNING_CAMERA,
             SECONDARY_JOYSTICK,
             RUNNING_INTAKE, 
+            RUNNING_GYRO,
             RUNNING_LIFT;
     }
 
