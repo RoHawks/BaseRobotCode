@@ -28,6 +28,8 @@ public class Robot2017Config extends Config {
         ports.NAVX = Port.kUSB;
         runConstants.RUNNING_PNEUMATICS = false;
         runConstants.RUNNING_INTAKE = false;
+        runConstants.RUNNING_LIFT = true;
+        runConstants.SECONDARY_JOYSTICK = true;
         for(int i = 0; i < wheelConfigs.length; i++) {
             wheelConfigs[i] = new WheelConfig(
                                 new TalonSRXConfig(DRIVE[i], DRIVE_INVERTED[i]),

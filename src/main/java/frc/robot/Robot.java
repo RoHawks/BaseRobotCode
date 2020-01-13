@@ -12,6 +12,7 @@ import common.motors.TalonSRX;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.interfaces.IMotor;
 import config.Config;
+import config.LiftTestConfig;
 import config.Robot2017Config;
 import config.Robot2018Config;
 import config.Robot2019Config;
@@ -71,6 +72,10 @@ public class Robot extends SampleRobot {
 	private IMotor intakeMotor;
 	private double intakeOutput;
 
+	//a test lift
+	private IMotor liftMotor;
+	private double liftOutput;
+
 	// ****************//
 	// GENERAL CODE //
 	// ****************//
@@ -86,14 +91,16 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-		mConfig = new Robot2019Config();
+		// mConfig = new Robot2019Config();
 		//mConfig = new Robot2018Config();
-		// mConfig = new Robot2017Config();
+		mConfig = new LiftTestConfig();
 		mController = new XboxController(mConfig.ports.XBOX);
-		mNavX = new AHRS(mConfig.ports.NAVX);
+		if (mConfig.runConstants.RUNNING_GYRO) {
+			mNavX = new AHRS(mConfig.ports.NAVX); 
+		}
 		mPDP = new PowerDistributionPanel();
 
-		if (mConfig.runConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE && mConfig.runConstants.RUNNING_GYRO) {
 			driveInit();
 		}
 
@@ -104,6 +111,11 @@ public class Robot extends SampleRobot {
 
 		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
 			mJoystick = new Joystick(mConfig.ports.JOYSTICK);
+		}
+
+		if (mConfig.runConstants.RUNNING_LIFT) {
+			liftMotor = new TalonSRX(new TalonSRXConfig(mConfig.liftConstants.LIFT_PORT, mConfig.liftConstants.LIFT_INVERTED));
+			liftOutput = mConfig.liftConstants.LIFT_POWER_OUTPUT;
 		}
 
 		if (mConfig.runConstants.RUNNING_CAMERA) {
@@ -168,6 +180,10 @@ public class Robot extends SampleRobot {
 				runIntake();	
 			}
 
+			if (mConfig.runConstants.RUNNING_LIFT && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runLift();	
+			}
+
 			// put info on SmartDashboard
 			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
@@ -198,6 +214,28 @@ public class Robot extends SampleRobot {
 		SmartDashboard.putNumber("Intake speed", intakeOutput);
 	}
 
+	private void runLift() {
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_UP_BUTTON)) {
+			liftOutput += mConfig.liftConstants.SPEED_INCREMENT;
+		}
+		else if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_DOWN_BUTTON)) {
+			liftOutput -= mConfig.liftConstants.SPEED_INCREMENT;
+		}
+ 
+		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
+			liftMotor.setOutput(liftOutput);	
+		}
+		else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
+			liftMotor.setOutput(-liftOutput);
+			
+		} else {
+			liftMotor.setOutput(0);
+		}
+		SmartDashboard.putNumber("Lift speed", liftMotor.getOutput());
+		SmartDashboard.putNumber("Lift speed we will set it to", liftOutput);
+	}
+
 	public void startGame() {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
@@ -223,7 +261,7 @@ public class Robot extends SampleRobot {
 
 			SmartDashboard.putString("AUTO ROUTINE:", mAutonomousRoutine.toString());
 
-			Timer.delay(0.005); // wait for a motor update time
+			Timer.delay(0.010); // wait for a motor update time
 		}
 	}
 
