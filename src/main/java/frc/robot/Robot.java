@@ -226,7 +226,7 @@ public class Robot extends SampleRobot {
 			liftOutput -= mConfig.liftConstants.SPEED_INCREMENT;
 		}
 		liftMotor.setOutput(liftOutput);
-		SmartDashboard.putNumber("Lift speed", liftOutput);
+		SmartDashboard.putNumber("Lift speed", liftMotor.getOutput());
 	}
 
 	public void startGame() {

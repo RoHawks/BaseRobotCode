@@ -27,14 +27,14 @@ public class Config {
 
     public class LiftConstants {    
         public final int 
-            LIFT_PORT = 5,
+            LIFT_PORT = 37,
             LIFT_UP_BUTTON = 4, //Y button
             LIFT_DOWN_BUTTON = 1; //A button
         public final boolean LIFT_INVERTED = true;
         public final boolean HAS_TOP_LIMIT_SWITCH = true;
         public final boolean HAS_BOTTOM_LIMIT_SWITCH = true;
         public final double 
-            LIFT_POWER_OUTPUT = 0,
+            LIFT_POWER_OUTPUT = 0.5,
             SPEED_INCREMENT = .1;
     }
 
