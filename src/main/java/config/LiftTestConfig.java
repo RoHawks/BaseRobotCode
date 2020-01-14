@@ -8,5 +8,9 @@ public class LiftTestConfig extends Config {
         runConstants.RUNNING_INTAKE = false;
         runConstants.RUNNING_LIFT = true;
         runConstants.SECONDARY_JOYSTICK = true;
+        liftConstants.MOTOR_CONFIG = new TalonSRXConfig(liftConstants.LIFT_PORT, liftConstants.LIFT_INVERTED)
+                                         .setContinuousCurrentLimit(42)
+                                         .setPeakCurrentDuration(1000)
+                                         .setPeakCurrentLimit(45);
     }
 }
