@@ -50,6 +50,6 @@ public class Robot2017Config extends Config {
         liftConstants.MOTOR_CONFIG = new TalonSRXConfig(liftConstants.LIFT_PORT, liftConstants.LIFT_INVERTED)
                                          .setContinuousCurrentLimit(42)
                                          .setPeakCurrentDuration(1000)
-                                         .setPeakCurrentLimit(45);
+                                         .setPeakCurrentLimit(45); //TODO: Check these values with Adam
     }
 }
