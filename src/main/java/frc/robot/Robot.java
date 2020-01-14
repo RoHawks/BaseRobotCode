@@ -2,35 +2,31 @@ package frc.robot;
 
 import java.util.ArrayList;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
+import common.motors.TalonSRX;
+import common.motors.configs.TalonSRXConfig;
+import common.motors.interfaces.IMotor;
 import config.Config;
-import config.Config.RunConstants;
-import config.TestChassis;
-import config.TestChassis.Ports;
-// import constants.DriveConstants;
-// import constants.Ports;
-// import constants.RunConstants;
-// import constants.RobotState;
+import config.LiftTestConfig;
+import config.Robot2017Config;
+import config.Robot2018Config;
+import config.Robot2019Config;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import resource.ResourceFunctions;
 import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
 import robotcode.systems.CompressorWrapper;
@@ -44,6 +40,9 @@ public class Robot extends SampleRobot {
 	// VARIABLES //
 	// *************//
 
+	//config
+	private Config mConfig;
+
 	// controllers
 	private XboxController mController;
 	private Joystick mJoystick;
@@ -51,8 +50,6 @@ public class Robot extends SampleRobot {
 	// drive train
 	private DriveTrain mDriveTrain;
 	private Wheel[] mWheel = new Wheel[4];
-	private WPI_TalonSRX[] mTurn = new WPI_TalonSRX[4];
-	private WPI_TalonSRX[] mDrive = new WPI_TalonSRX[4];
 	private TalonAbsoluteEncoder[] mEncoder = new TalonAbsoluteEncoder[4];
 
 	// gyro
@@ -70,7 +67,14 @@ public class Robot extends SampleRobot {
 	private boolean mInGame = false;
 
 	private long mGameStartMillis;
-	RobotState mCurrentState = RobotState.DEFAULT;
+
+	//a test intake
+	private IMotor intakeMotor;
+	private double intakeOutput;
+
+	//a test lift
+	private IMotor liftMotor;
+	private double liftOutput;
 
 	// ****************//
 	// GENERAL CODE //
@@ -87,27 +91,41 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-
-		mController = new XboxController(TestChassis.Ports.XBOX);
-		mNavX = new AHRS(TestChassis.Ports.NAVX);
+		mConfig = new Robot2019Config();
+		//mConfig = new Robot2018Config();
+		//mConfig = new LiftTestConfig();
+		mController = new XboxController(mConfig.ports.XBOX);
+		if (mConfig.runConstants.RUNNING_GYRO) {
+			mNavX = new AHRS(mConfig.ports.NAVX); 
+		}
 		mPDP = new PowerDistributionPanel();
 
-		if (Config.RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE && mConfig.runConstants.RUNNING_GYRO) {
 			driveInit();
 		}
 
-		if (Config.RunConstants.SECONDARY_JOYSTICK) {
-			mJoystick = new Joystick(TestChassis.Ports.JOYSTICK);
+		if (mConfig.runConstants.RUNNING_INTAKE) {
+			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.intakeConstants.INTAKE_PORT, mConfig.intakeConstants.INTAKE_INVERTED));
+			intakeOutput = mConfig.intakeConstants.INTAKE_POWER_OUTPUT;
 		}
 
-		if (Config.RunConstants.RUNNING_CAMERA) {
+		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
+			mJoystick = new Joystick(mConfig.ports.JOYSTICK);
+		}
+
+		if (mConfig.runConstants.RUNNING_LIFT) {
+			liftMotor = new TalonSRX(new TalonSRXConfig(mConfig.liftConstants.LIFT_PORT, mConfig.liftConstants.LIFT_INVERTED));
+			liftOutput = mConfig.liftConstants.LIFT_POWER_OUTPUT;
+		}
+
+		if (mConfig.runConstants.RUNNING_CAMERA) {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			camera.setResolution(240, 180);
 			camera.setFPS(30);
 		}
 
-		if (Config.RunConstants.RUNNING_PNEUMATICS) {
-			mCompressor = new Compressor(TestChassis.Ports.COMPRESSOR);
+		if (mConfig.runConstants.RUNNING_PNEUMATICS) {
+			mCompressor = new Compressor(mConfig.ports.COMPRESSOR);
 		}
 	}
 
@@ -158,43 +176,71 @@ public class Robot extends SampleRobot {
 
 			swerveDrive();
 
-			if (Config.RunConstants.RUNNING_EVERYTHING) {
-				doWork();
+			if (mConfig.runConstants.RUNNING_INTAKE && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runIntake();	
+			}
+
+			if (mConfig.runConstants.RUNNING_LIFT && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runLift();	
 			}
 
 			// put info on SmartDashboard
-			SmartDashboard.putString("Current State", mCurrentState.toString());
-			if (Config.RunConstants.RUNNING_DRIVE) {
+			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
-					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getMotorOutputPercent());
+					SmartDashboard.putNumber("Motor Current " + i, mWheel[i].Drive.getOutput());
+					SmartDashboard.putNumber("Current Offset Angle " + i, mWheel[i].Turn.getReversedOffsetAngle());
+					SmartDashboard.putBoolean("Wheel Reversed " + i, mWheel[i].Turn.getReversed());
+					SmartDashboard.putBoolean("Drive Inverted " + i, mWheel[i].Drive.getInverted());
+					SmartDashboard.putNumber("Raw Ticks " + i, mWheel[i].Turn.getRawPosition());
+					SmartDashboard.putNumber("Motor Output " + i, mWheel[i].Drive.getOutput());
+					SmartDashboard.putNumber("Gyro Raw Angle", mRobotAngle.getRawAngleDegrees());
 				}
 			}
+		
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
 
-	private void doWork() {
-		switch (mCurrentState) {
-		case DEFAULT:
-			doSomeAction();
-			break;
-		default:
-			throw new RuntimeException("Unknown state");
+	private void runIntake() {
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_UP_BUTTON)) {
+			intakeOutput += mConfig.intakeConstants.SPEED_INCREMENT;
 		}
-
-		SmartDashboard.putString("Current State", mCurrentState.name());
+		else if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_DOWN_BUTTON)) {
+			intakeOutput -= mConfig.intakeConstants.SPEED_INCREMENT;
+		}
+		intakeMotor.setOutput(intakeOutput);
+		SmartDashboard.putNumber("Intake speed", intakeOutput);
 	}
 
-	private void doSomeAction() {
-		// Do some action... move to a different state?
+	private void runLift() {
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_UP_BUTTON)) {
+			liftOutput += mConfig.liftConstants.SPEED_INCREMENT;
+		}
+		else if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_DOWN_BUTTON)) {
+			liftOutput -= mConfig.liftConstants.SPEED_INCREMENT;
+		}
+ 
+		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
+			liftMotor.setOutput(liftOutput);	
+		}
+		else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
+			liftMotor.setOutput(-liftOutput);
+			
+		} else {
+			liftMotor.setOutput(0);
+		}
+		SmartDashboard.putNumber("Lift speed", liftMotor.getOutput());
+		SmartDashboard.putNumber("Lift speed we will set it to", liftOutput);
 	}
 
 	public void startGame() {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
 
-			CompressorWrapper.action(mCompressor);
+			CompressorWrapper.action(mCompressor, mConfig);
 			mInGame = true;
 		}
 	}
@@ -204,7 +250,7 @@ public class Robot extends SampleRobot {
 		endGame();
 
 		while (this.isDisabled()) {
-			if (Config.RunConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
+			if (mConfig.runConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
 				// rotate autonomous routines to select which one to start with:
 				if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
 					mAutonomousRoutine = AutonomousRoutineType.DO_NOTHING;
@@ -215,78 +261,34 @@ public class Robot extends SampleRobot {
 
 			SmartDashboard.putString("AUTO ROUTINE:", mAutonomousRoutine.toString());
 
-			Timer.delay(0.005); // wait for a motor update time
+			Timer.delay(0.010); // wait for a motor update time
 		}
 	}
 
 	private void tankDrive() {
-		if (RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveTank();
 		}
 	}
 
 	private void crabDrive() {
-		if (RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveCrab();
 		}
 	}
 
 	private void swerveDrive() {
-		if (RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveSwerve();
 		}
 	}
 
 	public void driveInit() {
-		int turnPort, turnOffset, drivePort, iZone, rotTol;
-		double P_PID, I_PID, D_PID;
-		boolean turnEncoderReversed, turnReversed, driveReversed;
-
 		for (int i = 0; i < 4; i++) {
-				turnPort = Config.Ports.TURN[i];
-				turnEncoderReversed = Config.DriveConstants.ENCODER_REVERSED[i];
-				turnReversed = Config.DriveConstants.TURN_INVERTED[i];
-				turnOffset = Config.DriveConstants.OFFSETS[i];
-				driveReversed = Config.DriveConstants.DRIVE_INVERTED[i];
-				drivePort = Config.Ports.DRIVE[i];
-				P_PID = Config.DriveConstants.ROTATION_P[i];
-				I_PID = Config.DriveConstants.ROTATION_I[i];
-				D_PID = Config.DriveConstants.ROTATION_D[i];
-				iZone = Config.DriveConstants.ROTATION_IZONE[i];
-				rotTol = Config.DriveConstants.ROTATION_TOLERANCE[i];
-
-			// initialize turn motors and set values:
-			mTurn[i] = new WPI_TalonSRX(turnPort);
-			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
-			mTurn[i].setNeutralMode(NeutralMode.Brake);
-			mTurn[i].setSensorPhase(turnEncoderReversed);
-			mTurn[i].setInverted(turnReversed);
-			mTurn[i].config_kP(0, P_PID, 10);
-			mTurn[i].config_kI(0, I_PID, 10);
-			mTurn[i].config_kD(0, D_PID, 10);
-			mTurn[i].config_IntegralZone(0, iZone, 10);
-			mTurn[i].configAllowableClosedloopError(0, rotTol, 10);
-			mTurn[i].configPeakOutputForward(1, 10);
-			mTurn[i].configPeakOutputReverse(-1, 10);
-
-			// initialize drive motors and set values:
-			mDrive[i] = new WPI_TalonSRX(drivePort);
-			mDrive[i].setInverted(driveReversed);
-			mDrive[i].setNeutralMode(NeutralMode.Brake);
-			mDrive[i].configPeakOutputForward(1, 10);
-			mDrive[i].configPeakOutputReverse(-1, 10);
-			mDrive[i].configPeakCurrentDuration(1000, 10);
-			mDrive[i].configPeakCurrentLimit(150, 10);
-			mDrive[i].configContinuousCurrentLimit(80, 10);
-			mDrive[i].enableCurrentLimit(true);
-
-			// initialize turn motors' encoders, as well as wheels:
-			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], ResourceFunctions.tickToAngle(turnOffset));
-			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i]);
+			mWheel[i] = new Wheel(mConfig.wheelConfigs[i]);
 		}
-
 		mRobotAngle = new RobotAngle(mNavX, false, 0);
-		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle);
+		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle, mConfig);
 	}
 
 	public DriveTrain getDriveTrain() {
@@ -372,19 +374,20 @@ public class Robot extends SampleRobot {
 		addLogValueDouble(logString, mController.getX(Hand.kRight));
 		addLogValueDouble(logString, mController.getY(Hand.kRight));
 
-		if (Config.RunConstants.SECONDARY_JOYSTICK) {
+		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
 			for (int i = 1; i < 12; i++) {
 				addLogValueBoolean(logString, mJoystick.getRawButton(i));
 			}
 		}
 
-		if (Config.RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			for (int i = 0; i < 4; i++) {
-				addLogValueDouble(logString, mTurn[i].getOutputCurrent());
-				addLogValueDouble(logString, mDrive[i].getOutputCurrent());
+				//TODO: put these back
+				// addLogValueDouble(logString, mTurn[i].getOutputCurrent());
+				// addLogValueDouble(logString, mDrive[i].getOutputCurrent());
 
-				addLogValueDouble(logString, mTurn[i].getMotorOutputVoltage());
-				addLogValueDouble(logString, mDrive[i].getMotorOutputVoltage());
+				// addLogValueDouble(logString, mTurn[i].getMotorOutputVoltage());
+				// addLogValueDouble(logString, mDrive[i].getMotorOutputVoltage());
 
 				addLogValueDouble(logString, mEncoder[i].getAngleDegrees());
 			}
@@ -394,13 +397,11 @@ public class Robot extends SampleRobot {
 			addLogValueDouble(logString, mDriveTrain.getDesiredAngularVel());
 		}
 
-		if (Config.RunConstants.RUNNING_PNEUMATICS) {
+		if (mConfig.runConstants.RUNNING_PNEUMATICS) {
 			addLogValueDouble(logString, mCompressor.getCompressorCurrent());
 		}
 		addLogValueDouble(logString, mPDP.getTotalCurrent());
 		addLogValueDouble(logString, mPDP.getVoltage());
-
-		addLogValueString(logString, mCurrentState.toString());
 
 		addLogValueEndDouble(logString, mRobotAngle.getAngleDegrees());
 

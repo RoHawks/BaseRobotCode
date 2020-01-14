@@ -22,7 +22,11 @@ public class ResourceFunctions {
 	 * @return 0 <= angle < 360
 	 */
 	public static double putAngleInRange(double angle) {
-		return (angle + 36000) % 360;
+		double ang = angle % 360;
+		if (ang < 0) { 
+			ang += 360;
+		}
+		return ang;
 	}
 
 	/**
