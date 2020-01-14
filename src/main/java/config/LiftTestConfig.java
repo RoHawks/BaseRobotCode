@@ -1,5 +1,7 @@
 package config;
 
+import common.motors.configs.TalonSRXConfig;
+
 public class LiftTestConfig extends Config {
     public LiftTestConfig() {
         runConstants.RUNNING_DRIVE = false;
