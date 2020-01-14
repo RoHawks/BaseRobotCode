@@ -20,7 +20,7 @@ public class Robot2017Config extends Config {
         ROTATION_D = new double[] { 0, 0, 0, 0 };
     public final int[] 
         OFFSETS = new int[] { 750, 3400 , 475, 1650 },
-        TURN = new int[] { 2,4,6,0},
+        TURN = new int[] { 2,4,6,0 },
         DRIVE = new int[] { 3,5,7,1 }; // Right back, right front, left front, left back
 
     public Robot2017Config() {
@@ -47,5 +47,9 @@ public class Robot2017Config extends Config {
                                 driveConstants.ROTATIONAL_TOLERANCE
             );
         }
+        liftConstants.MOTOR_CONFIG = new TalonSRXConfig(liftConstants.LIFT_PORT, liftConstants.LIFT_INVERTED)
+                                         .setContinuousCurrentLimit(42)
+                                         .setPeakCurrentDuration(1000)
+                                         .setPeakCurrentLimit(45);
     }
 }

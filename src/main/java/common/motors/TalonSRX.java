@@ -1,25 +1,24 @@
 package common.motors;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import common.motors.configs.interfaces.IMotorConfig;
+import common.motors.configs.interfaces.ITalonSRXConfig;
 import common.motors.interfaces.IMotor;
 
 public class TalonSRX implements IMotor {
 
     protected WPI_TalonSRX talon;
 
-    public TalonSRX(IMotorConfig config) {
+    public TalonSRX(ITalonSRXConfig config) {
         talon = new WPI_TalonSRX(config.getPort());
         talon.setInverted(config.getInverted());
-        talon.setNeutralMode(NeutralMode.Brake);
-        talon.configPeakOutputForward(1, 10);
-        talon.configPeakOutputReverse(-1, 10);
-        talon.configPeakCurrentDuration(1000, 10);
-        talon.configPeakCurrentLimit(150, 10);
-        talon.configContinuousCurrentLimit(80, 10);
-        talon.enableCurrentLimit(true);
+        talon.setNeutralMode(config.getNeutralMode());
+        talon.configPeakOutputForward(config.getPeakForwardOutput(), config.getTimeout());
+        talon.configPeakOutputReverse(config.getPeakReverseOutput(), config.getTimeout());
+        talon.configPeakCurrentDuration(config.getPeakCurrentDuration(), config.getTimeout());
+        talon.configPeakCurrentLimit(config.getPeakCurrentLimit(), config.getTimeout());
+        talon.configContinuousCurrentLimit(config.getContinuousCurrentLimit(), config.getTimeout());
+        talon.enableCurrentLimit(config.getCurrentLimitEnabled());
     }
 
     @Override

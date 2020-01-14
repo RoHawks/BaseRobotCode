@@ -1,5 +1,7 @@
 package config;
 
+import common.motors.configs.TalonSRXConfig;
+import common.motors.configs.interfaces.ITalonSRXConfig;
 import drivetrain.swerve.wheels.configs.WheelConfig;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
@@ -15,29 +17,30 @@ public class Config {
 
     //Constants for the intake test mechanism
     public class IntakeConstants {    
-        public final int 
+        public int 
             INTAKE_PORT = 5,
             SPEED_UP_BUTTON = 4, //Y button
             SPEED_DOWN_BUTTON = 1; //A button
-        public final boolean INTAKE_INVERTED = true;
-        public final double 
+        public boolean INTAKE_INVERTED = true;
+        public double 
             INTAKE_POWER_OUTPUT = 0,
             SPEED_INCREMENT = .1;
     }
 
     public class LiftConstants {    
-        public final int 
+        public int 
             LIFT_PORT = 0,
             LIFT_UP_BUTTON = 4, //Y button
             LIFT_DOWN_BUTTON = 1, //A button
             DRIVE_BUTTON = 6, //Right Trigger button
             REVERSE_BUTTON = 5; //Left Trigger button
-        public final boolean LIFT_INVERTED = true;
-        public final boolean HAS_TOP_LIMIT_SWITCH = true;
-        public final boolean HAS_BOTTOM_LIMIT_SWITCH = true;
-        public final double 
+        public boolean LIFT_INVERTED = true;
+        public boolean HAS_TOP_LIMIT_SWITCH = true;
+        public boolean HAS_BOTTOM_LIMIT_SWITCH = true;
+        public double 
             LIFT_POWER_OUTPUT = 0,
             SPEED_INCREMENT = .05;
+        public ITalonSRXConfig MOTOR_CONFIG = new TalonSRXConfig(LIFT_PORT, LIFT_INVERTED);
     }
 
     // Constatnts from RunConstants

@@ -15,7 +15,7 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
 
     // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
     public TalonSRXWithEncoder(ITalonSRXWithEncoderConfig config) {
-        super(config.getMotorConfig());
+        super(config);
         talon.setSensorPhase(config.getEncoderConfig().getReversed());
         this.sensorPosition = config.getSensorPosition();
         this.offset = config.getEncoderConfig().getOffset();
