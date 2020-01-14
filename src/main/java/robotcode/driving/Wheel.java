@@ -1,32 +1,25 @@
 package robotcode.driving;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-// import constants.DriveConstants;
-import config.Config;
-import drivetrain.controllers.SparkMax;
-import drivetrain.controllers.TalonSRX;
-import drivetrain.controllers.TalonSRXWithEncoder;
-import drivetrain.interfaces.IMotor;
-import drivetrain.interfaces.IMotorWithEncoder;
+import common.motors.interfaces.IMotor;
+import common.motors.interfaces.IMotorWithEncoder;
+import drivetrain.swerve.wheels.configs.interfaces.IWheelConfig;
 import resource.ResourceFunctions;
 import resource.Vector;
-import sensors.TalonAbsoluteEncoder;
 
 public class Wheel {
-
-	private IMotorWithEncoder mTurn;
-	private IMotor mDrive;
+	public final IWheelConfig config;
+	public IMotorWithEncoder Turn;
+	public IMotor Drive;
 	private boolean initialDriveInverted;
 
-	public Wheel(IMotorWithEncoder pTurn, IMotor pDrive) {
-		mTurn = pTurn;
-		mDrive = pDrive;
-		if(mTurn.getReversed()) {
-			mDrive.setInverted(!mDrive.getInverted());
+	public Wheel(IWheelConfig config) {
+		this.config = config;
+		Turn = config.getTurnConfig().build();
+		Drive = config.getDriveConfig().build();
+		if(Turn.getReversed()) {
+			Drive.setInverted(!Drive.getInverted());
 		}
-		initialDriveInverted = pTurn.getReversed() ^ pDrive.getInverted();
+		initialDriveInverted = Turn.getReversed() ^ Drive.getInverted();
 	}
 
 	/**
@@ -51,28 +44,28 @@ public class Wheel {
 	}
 
 	public void setLinearVelocity(double pSpeed) {
-		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), Config.DriveConstants.MAX_LINEAR_VELOCITY);
-		mDrive.setOutput(speed);
+		double speed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), config.getMaxLinearVelocity());
+		Drive.setOutput(speed);
 	}
 
 	public void setAngle(double pTarget) {
 		pTarget = ResourceFunctions.putAngleInRange(pTarget);
-		mTurn.setReversedOffsetAngle(pTarget);
-		mDrive.setInverted(mTurn.getReversed() ^ initialDriveInverted);
+		Turn.setReversedOffsetAngle(pTarget);
+		Drive.setInverted(Turn.getReversed() ^ initialDriveInverted);
 	}
 
 	public void setTurnSpeed(double pSpeed) {
-		mTurn.setOutput(pSpeed);
+		Turn.setOutput(pSpeed);
 	}
 
 	public double getAngle() {
-		return mTurn.getReversedOffsetAngle();
+		return Turn.getReversedOffsetAngle();
 	}
 
 	public boolean IsInRange(double pTarget) {
-		double realCurrent = mTurn.getOffsetAngle();
+		double realCurrent = Turn.getOffsetAngle();
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
-		return Math.abs(error) < Config.DriveConstants.ROTATION_TOLERANCE[0];
+		return Math.abs(error) < config.getRotationTolerance();
 	}
 
 	/*

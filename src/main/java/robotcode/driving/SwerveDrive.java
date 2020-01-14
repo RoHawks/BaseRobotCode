@@ -16,7 +16,7 @@ import resource.Vector;
 public class SwerveDrive {
 	private Vector[] mOffsets;
 	private Vector[] mOutputs;
-
+	private final Config config;
 	/**
 	 * Initializes a swerve drive calculator
 	 * 
@@ -24,12 +24,13 @@ public class SwerveDrive {
 	 *            wheels to initialize with; used to compute distances relative to
 	 *            robot center
 	 */
-	public SwerveDrive(final Wheel[] wheels) {
+	public SwerveDrive(final Wheel[] wheels, Config config) {
 		mOffsets = new Vector[4];
 		mOutputs = new Vector[4];
+		this.config = config;
 		double sumDistFromCenter = 0;
 		for (int i = 0; i < 4; i++) {
-			mOffsets[i] = new Vector(Config.DriveConstants.X_OFF[i], Config.DriveConstants.Y_OFF[i]);
+			mOffsets[i] = new Vector(wheels[i].config.getXOffset(), wheels[i].config.getYOffset());
 			mOutputs[i] = new Vector();
 			sumDistFromCenter += mOffsets[i].getMagnitude();
 		}
@@ -72,8 +73,8 @@ public class SwerveDrive {
 		}
 
 		// if our maximum empirical length is too big, scale it all down
-		if (maximumLength > Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY) {
-			double velScale = Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
+		if (maximumLength > config.driveConstants.MAX_INDIVIDUAL_VELOCITY) {
+			double velScale = config.driveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
 			for (int i = 0; i < 4; i++) {
 				velocities[i].scaleTotal(velScale);
 			}
@@ -123,8 +124,8 @@ public class SwerveDrive {
 		}
 
 		// if our maximum empirical length is too big, scale it all down
-		if (maximumLength > Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY) {
-			double velScale = Config.DriveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
+		if (maximumLength > config.driveConstants.MAX_INDIVIDUAL_VELOCITY) {
+			double velScale = config.driveConstants.MAX_INDIVIDUAL_VELOCITY / maximumLength;
 			for (int i = 0; i < 4; i++) {
 				velocities[i].scaleTotal(velScale);
 			}

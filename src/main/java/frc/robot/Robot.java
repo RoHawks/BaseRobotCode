@@ -2,41 +2,31 @@ package frc.robot;
 
 import java.util.ArrayList;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
+import common.motors.TalonSRX;
+import common.motors.configs.TalonSRXConfig;
+import common.motors.interfaces.IMotor;
 import config.Config;
-import config.Config.RunConstants;
-import drivetrain.controllers.SparkMax;
-import drivetrain.controllers.SparkMax;
-import drivetrain.controllers.SparkMax;
-import drivetrain.controllers.TalonSRX;
-import drivetrain.controllers.TalonSRXWithEncoder;
-import drivetrain.controllers.configs.TalonSRXConfig;
-import drivetrain.controllers.configs.TalonSRXWithEncoderConfig;
-import drivetrain.controllers.configs.SparkMaxConfig;
-// import constants.DriveConstants;
-// import constants.Ports;
-// import constants.RunConstants;
-// import constants.RobotState;
+import config.LiftTestConfig;
+import config.Robot2017Config;
+import config.Robot2018Config;
+import config.Robot2019Config;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import resource.ResourceFunctions;
 import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
 import robotcode.systems.CompressorWrapper;
@@ -50,6 +40,9 @@ public class Robot extends SampleRobot {
 	// VARIABLES //
 	// *************//
 
+	//config
+	private Config mConfig;
+
 	// controllers
 	private XboxController mController;
 	private Joystick mJoystick;
@@ -57,8 +50,6 @@ public class Robot extends SampleRobot {
 	// drive train
 	private DriveTrain mDriveTrain;
 	private Wheel[] mWheel = new Wheel[4];
-	private TalonSRXWithEncoder[] mTurn = new TalonSRXWithEncoder[4];
-	private SparkMax[] mDrive = new SparkMax[4];
 	private TalonAbsoluteEncoder[] mEncoder = new TalonAbsoluteEncoder[4];
 
 	// gyro
@@ -77,6 +68,14 @@ public class Robot extends SampleRobot {
 
 	private long mGameStartMillis;
 
+	//a test intake
+	private IMotor intakeMotor;
+	private double intakeOutput;
+
+	//a test lift
+	private IMotor liftMotor;
+	private double liftOutput;
+
 	// ****************//
 	// GENERAL CODE //
 	// ****************//
@@ -92,27 +91,41 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-
-		mController = new XboxController(Config.Ports.XBOX);
-		mNavX = new AHRS(Config.Ports.NAVX);
+		mConfig = new Robot2019Config();
+		//mConfig = new Robot2018Config();
+		//mConfig = new LiftTestConfig();
+		mController = new XboxController(mConfig.ports.XBOX);
+		if (mConfig.runConstants.RUNNING_GYRO) {
+			mNavX = new AHRS(mConfig.ports.NAVX); 
+		}
 		mPDP = new PowerDistributionPanel();
 
-		if (Config.RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE && mConfig.runConstants.RUNNING_GYRO) {
 			driveInit();
 		}
 
-		if (Config.RunConstants.SECONDARY_JOYSTICK) {
-			mJoystick = new Joystick(Config.Ports.JOYSTICK);
+		if (mConfig.runConstants.RUNNING_INTAKE) {
+			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.intakeConstants.INTAKE_PORT, mConfig.intakeConstants.INTAKE_INVERTED));
+			intakeOutput = mConfig.intakeConstants.INTAKE_POWER_OUTPUT;
 		}
 
-		if (Config.RunConstants.RUNNING_CAMERA) {
+		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
+			mJoystick = new Joystick(mConfig.ports.JOYSTICK);
+		}
+
+		if (mConfig.runConstants.RUNNING_LIFT) {
+			liftMotor = new TalonSRX(new TalonSRXConfig(mConfig.liftConstants.LIFT_PORT, mConfig.liftConstants.LIFT_INVERTED));
+			liftOutput = mConfig.liftConstants.LIFT_POWER_OUTPUT;
+		}
+
+		if (mConfig.runConstants.RUNNING_CAMERA) {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			camera.setResolution(240, 180);
 			camera.setFPS(30);
 		}
 
-		if (Config.RunConstants.RUNNING_PNEUMATICS) {
-			mCompressor = new Compressor(Config.Ports.COMPRESSOR);
+		if (mConfig.runConstants.RUNNING_PNEUMATICS) {
+			mCompressor = new Compressor(mConfig.ports.COMPRESSOR);
 		}
 	}
 
@@ -163,40 +176,71 @@ public class Robot extends SampleRobot {
 
 			swerveDrive();
 
-			if (Config.RunConstants.RUNNING_EVERYTHING) {
-				doWork();
+			if (mConfig.runConstants.RUNNING_INTAKE && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runIntake();	
+			}
+
+			if (mConfig.runConstants.RUNNING_LIFT && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runLift();	
 			}
 
 			// put info on SmartDashboard
-			if (Config.RunConstants.RUNNING_DRIVE) {
+			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
-					SmartDashboard.putNumber("Motor Current " + i, mDrive[i].getOutput());
-					SmartDashboard.putNumber("Current Offset Angle " + i, mTurn[i].getReversedOffsetAngle());
-					SmartDashboard.putBoolean("Wheel Reversed " + i, mTurn[i].getReversed());
-					SmartDashboard.putBoolean("Drive Inverted " + i, mDrive[i].getInverted());
-					SmartDashboard.putNumber("Raw Ticks " + i, mTurn[i].getRawPosition());
-					SmartDashboard.putNumber("Motor Output " + i, mDrive[i].getOutput());
+					SmartDashboard.putNumber("Motor Current " + i, mWheel[i].Drive.getOutput());
+					SmartDashboard.putNumber("Current Offset Angle " + i, mWheel[i].Turn.getReversedOffsetAngle());
+					SmartDashboard.putBoolean("Wheel Reversed " + i, mWheel[i].Turn.getReversed());
+					SmartDashboard.putBoolean("Drive Inverted " + i, mWheel[i].Drive.getInverted());
+					SmartDashboard.putNumber("Raw Ticks " + i, mWheel[i].Turn.getRawPosition());
+					SmartDashboard.putNumber("Motor Output " + i, mWheel[i].Drive.getOutput());
 					SmartDashboard.putNumber("Gyro Raw Angle", mRobotAngle.getRawAngleDegrees());
 				}
 			}
+		
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
 
-	private void doWork() {
-
+	private void runIntake() {
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_UP_BUTTON)) {
+			intakeOutput += mConfig.intakeConstants.SPEED_INCREMENT;
+		}
+		else if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_DOWN_BUTTON)) {
+			intakeOutput -= mConfig.intakeConstants.SPEED_INCREMENT;
+		}
+		intakeMotor.setOutput(intakeOutput);
+		SmartDashboard.putNumber("Intake speed", intakeOutput);
 	}
 
-	private void doSomeAction() {
-		// Do some action... move to a different state?
+	private void runLift() {
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_UP_BUTTON)) {
+			liftOutput += mConfig.liftConstants.SPEED_INCREMENT;
+		}
+		else if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_DOWN_BUTTON)) {
+			liftOutput -= mConfig.liftConstants.SPEED_INCREMENT;
+		}
+ 
+		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
+			liftMotor.setOutput(liftOutput);	
+		}
+		else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
+			liftMotor.setOutput(-liftOutput);
+			
+		} else {
+			liftMotor.setOutput(0);
+		}
+		SmartDashboard.putNumber("Lift speed", liftMotor.getOutput());
+		SmartDashboard.putNumber("Lift speed we will set it to", liftOutput);
 	}
 
 	public void startGame() {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
 
-			CompressorWrapper.action(mCompressor);
+			CompressorWrapper.action(mCompressor, mConfig);
 			mInGame = true;
 		}
 	}
@@ -206,7 +250,7 @@ public class Robot extends SampleRobot {
 		endGame();
 
 		while (this.isDisabled()) {
-			if (Config.RunConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
+			if (mConfig.runConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
 				// rotate autonomous routines to select which one to start with:
 				if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
 					mAutonomousRoutine = AutonomousRoutineType.DO_NOTHING;
@@ -217,61 +261,34 @@ public class Robot extends SampleRobot {
 
 			SmartDashboard.putString("AUTO ROUTINE:", mAutonomousRoutine.toString());
 
-			Timer.delay(0.005); // wait for a motor update time
+			Timer.delay(0.010); // wait for a motor update time
 		}
 	}
 
 	private void tankDrive() {
-		if (RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveTank();
 		}
 	}
 
 	private void crabDrive() {
-		if (RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveCrab();
 		}
 	}
 
 	private void swerveDrive() {
-		if (RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveSwerve();
 		}
 	}
 
 	public void driveInit() {
-		SparkMaxConfig driveConfig;
-		TalonSRXWithEncoderConfig turnConfig;
 		for (int i = 0; i < 4; i++) {
-			driveConfig = new SparkMaxConfig();
-			turnConfig = new TalonSRXWithEncoderConfig();
-			
-			driveConfig.inverted = Config.DriveConstants.DRIVE_INVERTED[i];
-			driveConfig.port = Config.Ports.DRIVE[i];
-
-			turnConfig.port = Config.Ports.TURN[i];
-			turnConfig.reversed = Config.DriveConstants.ENCODER_REVERSED[i];
-			turnConfig.inverted = Config.DriveConstants.TURN_INVERTED[i];
-			turnConfig.offset = Config.DriveConstants.OFFSETS[i];
-			turnConfig.p = Config.DriveConstants.ROTATION_P[i];
-			turnConfig.i = Config.DriveConstants.ROTATION_I[i];
-			turnConfig.d = Config.DriveConstants.ROTATION_D[i];
-			turnConfig.iZone = Config.DriveConstants.ROTATION_IZONE[i];
-			turnConfig.rotationTolerance = Config.DriveConstants.ROTATION_TOLERANCE[i];
-
-			// initialize turn motors and set values:
-			mDrive[i] = new SparkMax(driveConfig);
-			mTurn[i] = new TalonSRXWithEncoder(turnConfig);
-
-			// how to determine IMotor type? reflection?
-			// OR maybe, enum for motors and types of motors, then add mappings in the config, then add switch statement to initlaize the wheels propperly?
-			// mTurn = new TalonSRXWithEncoder(turnMotorPort, turnEncoderPort, offset);
-			// mDrive = new SparkMax(driveMotorPort);
-			mWheel[i] = new Wheel(mTurn[i], mDrive[i]);
+			mWheel[i] = new Wheel(mConfig.wheelConfigs[i]);
 		}
-
 		mRobotAngle = new RobotAngle(mNavX, false, 0);
-		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle);
+		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle, mConfig);
 	}
 
 	public DriveTrain getDriveTrain() {
@@ -357,13 +374,13 @@ public class Robot extends SampleRobot {
 		addLogValueDouble(logString, mController.getX(Hand.kRight));
 		addLogValueDouble(logString, mController.getY(Hand.kRight));
 
-		if (Config.RunConstants.SECONDARY_JOYSTICK) {
+		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
 			for (int i = 1; i < 12; i++) {
 				addLogValueBoolean(logString, mJoystick.getRawButton(i));
 			}
 		}
 
-		if (Config.RunConstants.RUNNING_DRIVE) {
+		if (mConfig.runConstants.RUNNING_DRIVE) {
 			for (int i = 0; i < 4; i++) {
 				//TODO: put these back
 				// addLogValueDouble(logString, mTurn[i].getOutputCurrent());
@@ -380,7 +397,7 @@ public class Robot extends SampleRobot {
 			addLogValueDouble(logString, mDriveTrain.getDesiredAngularVel());
 		}
 
-		if (Config.RunConstants.RUNNING_PNEUMATICS) {
+		if (mConfig.runConstants.RUNNING_PNEUMATICS) {
 			addLogValueDouble(logString, mCompressor.getCompressorCurrent());
 		}
 		addLogValueDouble(logString, mPDP.getTotalCurrent());
