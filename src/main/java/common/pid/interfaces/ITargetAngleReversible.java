@@ -1,9 +1,9 @@
 package common.pid.interfaces;
 
 public interface ITargetAngleReversible extends ITargetOffsetAngle {
-    void setReversed(boolean inverted);
+    void setReversed(boolean reversed);
     boolean getReversed();
 
-    void setReversedOffsetAngle(double value);
+    void setReversedOffsetAngle(double angle);
     double getReversedOffsetAngle();
 }
