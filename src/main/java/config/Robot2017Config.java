@@ -47,7 +47,7 @@ public class Robot2017Config extends Config {
                                 driveConstants.ROTATIONAL_TOLERANCE
             );
         }
-        liftConstants.MOTOR_CONFIG = new TalonSRXConfig(liftConstants.LIFT_PORT, liftConstants.LIFT_INVERTED)
+        liftConstants.MOTOR_CONFIG = new TalonSRXConfig(liftConstants.MOTOR_CONFIG)
                                          .setContinuousCurrentLimit(42)
                                          .setPeakCurrentDuration(1000)
                                          .setPeakCurrentLimit(45);
