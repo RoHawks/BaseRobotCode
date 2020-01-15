@@ -29,11 +29,11 @@ public class Config {
 
     public class LiftConstants {    
         public int 
-            LIFT_PORT = 0,
+            LIFT_PORT = 11,
             LIFT_UP_BUTTON = 4, //Y button
             LIFT_DOWN_BUTTON = 1, //A button
-            DRIVE_BUTTON = 6, //Right Trigger button
-            REVERSE_BUTTON = 5; //Left Trigger button
+            DRIVE_BUTTON = 6, //Right shoulder button
+            REVERSE_BUTTON = 5; //Left shoulder button
         public boolean LIFT_INVERTED = true;
         public boolean HAS_TOP_LIMIT_SWITCH = true;
         public boolean HAS_BOTTOM_LIMIT_SWITCH = true;
