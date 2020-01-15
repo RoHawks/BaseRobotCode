@@ -5,7 +5,6 @@ import common.motors.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
 public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWithEncoder {
-    boolean[] config;
     boolean isReversed;
     double offset;
     double TICKS_PER_ROTATION;
