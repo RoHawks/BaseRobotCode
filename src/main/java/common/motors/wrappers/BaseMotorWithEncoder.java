@@ -5,12 +5,19 @@ import resource.ResourceFunctions;
 
 public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWithEncoder {
     boolean[] config;
+    boolean isReversed;
+    double offset;
+    double TICKS_PER_ROTATION;
 
     // override this with propper config type for specific motor
     public BaseMotorWithEncoder(boolean[] config) {
         super(config);
         this.config = config;
     }
+
+    public abstract void setVelocity(double velocity);
+
+    public abstract double getVelocity();
 
     public abstract void setRawPosition(double rawTicks);
 
@@ -22,17 +29,21 @@ public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWi
         return getRawPosition() - getOffset();
     }
 
-    public abstract void setVelocity(double velocity);
+    public void setReversed(boolean reversed) {
+        isReversed = reversed;
+    }
 
-    public abstract double getVelocity();
+    public boolean getReversed() {
+        return isReversed;
+    }
 
-    public abstract void setReversed();
+    public double getOffset() {
+        return offset;
+    }
 
-    public abstract boolean getReversed();
-
-    public abstract double getOffset();
-
-    public abstract double getTicksPerRotation();
+    public double getTicksPerRotation() {
+        return TICKS_PER_ROTATION;
+    }
 
     protected double ticksToDegrees(double ticks) {
         return (ticks / getTicksPerRotation()) * 360D;
@@ -48,6 +59,7 @@ public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWi
      * includes optimization for the reversal of the turn
      * @param angle the desired position of the motor
      */
+    @Override
     public void setReversedOffsetAngle(double angle) {
         double target = ResourceFunctions.putAngleInRange(angle);
         double current = getReversedOffsetAngle();
