@@ -23,7 +23,6 @@ public class SparkMaxDeriv extends BaseMotorWithEncoder { // implements IMotorWi
     public SparkMaxDeriv(IMotorWithEncoderConfig config) {
         super(config);
         spark = new CANSparkMax(config.getPort(), MotorType.kBrushless);
-        isReversed = false;
         spark.setIdleMode(IdleMode.kBrake);
         spark.setCANTimeout(10);
         spark.setOpenLoopRampRate(0.35);

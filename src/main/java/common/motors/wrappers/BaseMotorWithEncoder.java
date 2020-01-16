@@ -5,14 +5,15 @@ import common.motors.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
 public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWithEncoder {
-    boolean isReversed;
     double offset;
+    boolean isReversed;
     double TICKS_PER_ROTATION;
 
     // override this with propper config type for specific motor
     public BaseMotorWithEncoder(IMotorWithEncoderConfig config) {
         super(config.getMotorConfig());
         offset = config.getEncoderConfig().getOffset();
+        isReversed = false;
     }
 
     public abstract void setVelocity(double velocity);
