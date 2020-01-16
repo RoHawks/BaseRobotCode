@@ -16,6 +16,7 @@ public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWi
         isReversed = false;
     }
 
+    // would be nice to add some simple documentation to every method now we have a good place to
     public abstract void setVelocity(double velocity);
 
     public abstract double getVelocity();
@@ -49,11 +50,11 @@ public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWi
     }
 
     protected double ticksToDegrees(double ticks) {
-        return (ticks / getTicksPerRotation()) * 360D;
+        return (ticks / getTicksPerRotation()) * 360.0;
     }
 
     protected double degreesToTicks(double degrees) {
-        return (degrees / 360D) * getTicksPerRotation();
+        return (degrees / 360.0) * getTicksPerRotation();
     }
 
     /**
