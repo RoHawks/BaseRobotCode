@@ -12,7 +12,7 @@ import resource.ResourceFunctions;
 public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWithEncoder {
     private double offset;
     private boolean isReversed;
-    private double TICKS_PER_ROTATION; // must be initialized by inheriting classes
+    protected double TICKS_PER_ROTATION; // must be initialized by inheriting classes
 
     public BaseMotorWithEncoder(IMotorWithEncoderConfig config) {
         this(config.getMotorConfig());

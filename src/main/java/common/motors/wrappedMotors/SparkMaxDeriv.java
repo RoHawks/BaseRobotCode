@@ -10,12 +10,12 @@ import common.motors.wrappers.BaseMotorWithEncoder;
 public class SparkMaxDeriv extends BaseMotorWithEncoder { // ? should this implement IMotorWithEncoder
 
     private CANSparkMax spark;
-    protected boolean isReversed;
 
     protected static final double TICKS_PER_ROTATION = 1;
 
     public SparkMaxDeriv(IMotorWithEncoderConfig config) {
         super(config);
+        super.TICKS_PER_ROTATION = TICKS_PER_ROTATION; // ? is there a better way to do this?
         spark = new CANSparkMax(config.getPort(), MotorType.kBrushless);
         spark.setIdleMode(IdleMode.kBrake);
         spark.setCANTimeout(10);
