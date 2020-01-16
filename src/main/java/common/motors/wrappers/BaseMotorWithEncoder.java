@@ -1,5 +1,6 @@
 package common.motors.wrappers;
 
+import common.motors.configs.interfaces.IMotorConfig;
 import common.motors.configs.interfaces.IMotorWithEncoderConfig;
 import common.motors.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
@@ -9,11 +10,14 @@ public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWi
     boolean isReversed;
     double TICKS_PER_ROTATION;
 
-    // override this with propper config type for specific motor
     public BaseMotorWithEncoder(IMotorWithEncoderConfig config) {
-        super(config.getMotorConfig());
+        this(config.getMotorConfig());
         offset = config.getEncoderConfig().getOffset();
         isReversed = false;
+    }
+
+    public BaseMotorWithEncoder(IMotorConfig config) {
+        super(config);
     }
 
     // would be nice to add some simple documentation to every method now we have a good place to
