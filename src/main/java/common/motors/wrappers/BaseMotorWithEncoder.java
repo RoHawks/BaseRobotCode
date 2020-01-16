@@ -5,6 +5,10 @@ import common.motors.configs.interfaces.IMotorWithEncoderConfig;
 import common.motors.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
+/**
+ * Base class that preforms generalized calculations for all motors
+ * Inheriting classes must implement motor-specifc setters and getters for output, velocity, position, and inversion with motor-specific library calls. In addition inheriting classes must initialize TICKS_PER_ROTATION to the motor's corresponding
+ */
 public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWithEncoder {
     private double offset;
     private boolean isReversed;
