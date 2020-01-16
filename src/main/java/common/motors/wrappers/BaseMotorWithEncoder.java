@@ -21,9 +21,11 @@ public abstract class BaseMotorWithEncoder extends BaseMotor implements IMotorWi
 
     public abstract void setRawPosition(double rawTicks);
 
-    public abstract void setOffsetPosition(double rawTicks);
-
     public abstract double getRawPosition();
+
+    public void setOffsetPosition(double rawTicks) {
+        setRawPosition(rawTicks - offset);
+    }
 
     public double getOffsetPosition() {
         return getRawPosition() - getOffset();
