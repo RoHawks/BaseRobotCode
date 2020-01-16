@@ -12,7 +12,7 @@ import resource.ResourceFunctions;
 
 // We need to change the ticks from int to double because sparks use revolutions instead of ticks
 
-public class SparkMax extends BaseMotorWithEncoder implements IMotorWithEncoder {
+public class SparkMaxDeriv extends BaseMotorWithEncoder { // implements IMotorWithEncoder
 
     private CANSparkMax spark;
     protected boolean isReversed;
@@ -20,18 +20,12 @@ public class SparkMax extends BaseMotorWithEncoder implements IMotorWithEncoder 
 
     protected static final double TICKS_PER_ROTATION = 1;
 
-    public SparkMax(IMotorWithEncoderConfig config) {
-        this(config.getMotorConfig());
-        offset = config.getEncoderConfig().getOffset();
-    }
-
-    public SparkMax(IMotorConfig config) {
+    public SparkMaxDeriv(IMotorWithEncoderConfig config) {
         super(config);
-        spark = new CANSparkMax(config.getPort(), MotorType.kBrushless);
         isReversed = false;
-        spark.setInverted(config.getInverted());
         spark.setIdleMode(IdleMode.kBrake);
         spark.setCANTimeout(10);
         spark.setOpenLoopRampRate(0.35);
     }
+
 }
