@@ -33,6 +33,16 @@ public class SparkMaxDeriv extends BaseMotorWithEncoder { // ? should this imple
     }
 
     @Override
+    public boolean getInverted() {
+        return spark.getInverted();
+    }
+
+    @Override
+    public void setInverted(boolean inverted) {
+        spark.setInverted(inverted);
+    }
+
+    @Override
     public void setVelocity(double velocity) {
         double speed = Math.signum(velocity) * Math.abs(velocity);
         spark.set(speed);
