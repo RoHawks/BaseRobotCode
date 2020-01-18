@@ -31,6 +31,11 @@ public class SparkMax extends BaseMotorWithEncoder<SparkMax, SparkMaxConfig> {
         spark.setIdleMode(IdleMode.kBrake);
         spark.setCANTimeout(10);
         spark.setOpenLoopRampRate(0.35);
+        var pid = spark.getPIDController();
+        pid.setP(1);
+        pid.setI(.001);
+        pid.setD(0);
+        pid.setIZone(500);
     }
 
     @Override
