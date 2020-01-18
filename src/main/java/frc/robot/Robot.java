@@ -97,7 +97,7 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-		//mConfig = new Robot2019Config();
+		// mConfig = new Robot2019Config();
 		//mConfig = new Robot2018Config();
 		//mConfig = new Robot2017Config();
 		//mConfig = new LiftTestConfig();

@@ -27,9 +27,10 @@ public class Robot2019Config extends Config {
     public Robot2019Config() {
         runConstants.RUNNING_DRIVE = true;
         runConstants.RUNNING_PNEUMATICS = false;
-        runConstants.RUNNING_INTAKE = true;
+        runConstants.RUNNING_INTAKE = false;
         runConstants.SECONDARY_JOYSTICK = true;
         runConstants.RUNNING_LIFT = false;
+        runConstants.RUNNING_SHOOTER = false;
         runConstants.RUNNING_GYRO = true;
         ports.JOYSTICK = 1;
         for(int i = 0; i < wheelConfigs.length; i++) {
