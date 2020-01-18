@@ -8,15 +8,17 @@ import autonomous.AutonomousRoutineType;
 import autonomous.commands.AutonomousCommand;
 import autonomous.routines.DefaultRoutine;
 import autonomous.routines.DoNothingRoutine;
+import common.motors.SparkMax;
 import common.motors.TalonSRX;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.interfaces.IMotor;
+import common.motors.interfaces.IMotorWithEncoder;
 import config.Config;
 import config.LiftTestConfig;
 import config.Robot2017Config;
 import config.Robot2018Config;
 import config.Robot2019Config;
-
+import config.ShooterTestConfig;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
@@ -76,6 +78,10 @@ public class Robot extends SampleRobot {
 	private IMotor liftMotor;
 	private double liftOutput;
 
+	//a test shooter
+	private IMotorWithEncoder shooterMotor;
+	private double shooterRPM;
+
 	// ****************//
 	// GENERAL CODE //
 	// ****************//
@@ -93,8 +99,9 @@ public class Robot extends SampleRobot {
 	public void robotInit() {
 		//mConfig = new Robot2019Config();
 		//mConfig = new Robot2018Config();
-		// mConfig = new Robot2017Config();
-		mConfig = new LiftTestConfig();
+		//mConfig = new Robot2017Config();
+		//mConfig = new LiftTestConfig();
+		mConfig = new ShooterTestConfig();
 		mController = new XboxController(mConfig.ports.XBOX);
 		if (mConfig.runConstants.RUNNING_GYRO) {
 			mNavX = new AHRS(mConfig.ports.NAVX); 
@@ -117,6 +124,11 @@ public class Robot extends SampleRobot {
 		if (mConfig.runConstants.RUNNING_LIFT) {
 			liftMotor = new TalonSRX(mConfig.liftConstants.MOTOR_CONFIG);
 			liftOutput = mConfig.liftConstants.LIFT_POWER_OUTPUT;
+		}
+
+		if(mConfig.runConstants.RUNNING_SHOOTER) {
+			shooterMotor = new SparkMax(mConfig.shooterConstants.MOTOR_CONFIG);
+			shooterRPM = mConfig.shooterConstants.SHOOTER_RPM;
 		}
 
 		if (mConfig.runConstants.RUNNING_CAMERA) {
@@ -185,6 +197,10 @@ public class Robot extends SampleRobot {
 				runLift();	
 			}
 
+			if(mConfig.runConstants.RUNNING_SHOOTER && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runShooter();
+			}
+
 			// put info on SmartDashboard
 			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
@@ -203,6 +219,30 @@ public class Robot extends SampleRobot {
 		}
 	}
 
+	private void runShooter() {
+		//check secondary for speed change
+		if(mJoystick.getRawButtonReleased(mConfig.shooterConstants.SPEED_UP_BUTTON)) {
+			shooterRPM += mConfig.shooterConstants.RPM_INCREMENT;
+		}
+		else if(mJoystick.getRawButtonReleased(mConfig.shooterConstants.SPEED_DOWN_BUTTON)) {
+			shooterRPM -= mConfig.shooterConstants.RPM_INCREMENT;
+		}
+ 
+		if (mJoystick.getRawButton(mConfig.shooterConstants.DRIVE_BUTTON)) {
+			shooterMotor.setOutput(shooterRPM/shooterRPM);	
+		}
+		else if (mJoystick.getRawButton(mConfig.shooterConstants.REVERSE_BUTTON)) {
+			shooterMotor.setVelocity(-shooterRPM);
+			
+		} else {
+			shooterMotor.setOutput(0);
+		}
+		SmartDashboard.putNumber("Shooter RPM", shooterMotor.getVelocity());
+		SmartDashboard.putNumber("Shooter RPM Target", shooterRPM);
+		SmartDashboard.putNumber("Shooter motor current draw", shooterMotor.getCurrent());
+		SmartDashboard.putNumber("Shooter motor percent output", shooterMotor.getOutput());
+	}
+
 	private void runIntake() {
 		//check secondary for speed change
 		if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_UP_BUTTON)) {
@@ -217,10 +257,10 @@ public class Robot extends SampleRobot {
 
 	private void runLift() {
 		//check secondary for speed change
-		if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_UP_BUTTON)) {
+		if(mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_UP_BUTTON)) {
 			liftOutput += mConfig.liftConstants.SPEED_INCREMENT;
 		}
-		else if(mJoystick.getRawButtonReleased(mConfig.liftConstants.LIFT_DOWN_BUTTON)) {
+		else if(mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_DOWN_BUTTON)) {
 			liftOutput -= mConfig.liftConstants.SPEED_INCREMENT;
 		}
  
@@ -235,6 +275,7 @@ public class Robot extends SampleRobot {
 		}
 		SmartDashboard.putNumber("Lift speed", liftMotor.getOutput());
 		SmartDashboard.putNumber("Lift speed we will set it to", liftOutput);
+		SmartDashboard.putNumber("Lift motor current draw", liftMotor.getCurrent());
 	}
 
 	public void startGame() {

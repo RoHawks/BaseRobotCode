@@ -2,7 +2,9 @@ package common.motors.configs.interfaces;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-public interface ITalonSRXConfig extends IMotorConfig {
+import common.motors.TalonSRX;
+
+public interface ITalonSRXConfig extends IMotorConfig<TalonSRX> {
     int getTimeout();
     NeutralMode getNeutralMode();
     int getPeakForwardOutput();

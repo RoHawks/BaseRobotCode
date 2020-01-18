@@ -1,26 +1,29 @@
 package common.motors.configs;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+
 import common.encoders.configs.interfaces.IEncoderConfig;
-import common.motors.TalonSRXWithEncoder;
-import common.motors.configs.interfaces.IMotorConfig;
+import common.motors.TalonSRX;
 import common.motors.configs.interfaces.ITalonSRXConfig;
 import common.motors.configs.interfaces.ITalonSRXWithEncoderConfig;
 import common.pid.configs.interfaces.IPIDConfig;
 
 public class TalonSRXWithEncoderConfig extends TalonSRXConfig implements ITalonSRXWithEncoderConfig {
     protected final int sensorPosition;
-    protected final int iZone;
     protected final int rotationTolerance;
+    protected final int pidIndex;
+    protected final FeedbackDevice sensorType;
     protected final IEncoderConfig encoderConfig;
     protected final IPIDConfig pidConfig;
 
-    public TalonSRXWithEncoderConfig(ITalonSRXConfig motorConfig, IEncoderConfig encoderConfig, IPIDConfig pidConfig, int sensorPosition, int iZone, int rotationTolerance) {
+    public TalonSRXWithEncoderConfig(ITalonSRXConfig motorConfig, IEncoderConfig encoderConfig, IPIDConfig pidConfig, int sensorPosition, int pidIndex, int rotationTolerance, FeedbackDevice sensorType) {
         super(motorConfig);
         this.encoderConfig = encoderConfig;
         this.pidConfig = pidConfig;
         this.sensorPosition = sensorPosition;
-        this.iZone = iZone;
         this.rotationTolerance = rotationTolerance;
+        this.pidIndex = pidIndex;
+        this.sensorType = sensorType;
     }
 
     @Override
@@ -29,22 +32,17 @@ public class TalonSRXWithEncoderConfig extends TalonSRXConfig implements ITalonS
     }
 
     @Override
-    public int getIZone() {
-        return iZone;
-    }
-
-    @Override
     public int getRotationTolerance() {
         return rotationTolerance;
     }
 
     @Override
-    public TalonSRXWithEncoder build() {
-        return new TalonSRXWithEncoder(this);
+    public TalonSRX build() {
+        return new TalonSRX(this);
     }
 
     @Override
-    public IMotorConfig getMotorConfig() {
+    public TalonSRXConfig getMotorConfig() {
         return this;
     }
 
@@ -57,5 +55,15 @@ public class TalonSRXWithEncoderConfig extends TalonSRXConfig implements ITalonS
     public IPIDConfig getPIDConfig() {
         return pidConfig;
     }
+
+    @Override
+    public int getPIDIndex() {
+        return pidIndex;
+    }
+
+    @Override
+    public FeedbackDevice getSensorType() {
+		return sensorType;
+	}
 
 }

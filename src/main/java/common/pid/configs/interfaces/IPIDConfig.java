@@ -4,4 +4,5 @@ public interface IPIDConfig {
     double getP();
     double getI();
     double getD();
+    double getIZone();
 }

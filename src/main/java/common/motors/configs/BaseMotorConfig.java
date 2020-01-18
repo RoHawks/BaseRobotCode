@@ -1,8 +1,9 @@
 package common.motors.configs;
 
 import common.motors.configs.interfaces.IMotorConfig;
+import common.motors.interfaces.IMotor;
 
-public abstract class BaseMotorConfig implements IMotorConfig {
+public abstract class BaseMotorConfig<TMotor extends IMotor> implements IMotorConfig<TMotor> {
     protected final boolean inverted;
     protected final int port;
 
@@ -10,7 +11,7 @@ public abstract class BaseMotorConfig implements IMotorConfig {
         this.port = port;
         this.inverted = inverted;
     }
-    public BaseMotorConfig(IMotorConfig config) {
+    public BaseMotorConfig(IMotorConfig<TMotor> config) {
         this.port = config.getPort();
         this.inverted = config.getInverted();
     }

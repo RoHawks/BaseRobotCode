@@ -5,7 +5,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import common.motors.TalonSRX;
 import common.motors.configs.interfaces.ITalonSRXConfig;
 
-public class TalonSRXConfig extends BaseMotorConfig implements ITalonSRXConfig {
+public class TalonSRXConfig extends BaseMotorConfig<TalonSRX> implements ITalonSRXConfig {
     //These are the default values.  Default current limits are taken from Talon documentation here: http://www.ctr-electronics.com/downloads/pdf/Victor-SP-Talon-SRX-Info-Sheet.pdf
     protected boolean currentLimitEnabled = true;
     protected NeutralMode neutralMode = NeutralMode.Brake;

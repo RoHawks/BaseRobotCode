@@ -1,68 +1,27 @@
 package common.motors;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-
-import common.motors.configs.interfaces.ITalonSRXWithEncoderConfig;
+import common.motors.configs.interfaces.IMotorConfig;
+import common.motors.configs.interfaces.IMotorWithEncoderConfig;
 import common.motors.interfaces.IMotorWithEncoder;
 import resource.ResourceFunctions;
 
-public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
-    protected int sensorPosition;
+public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, 
+                                           TMotorConfig extends IMotorConfig<TMotor>> 
+                                           implements IMotorWithEncoder {
     protected boolean isReversed;
-    protected static final double TICKS_PER_ROTATION = 4096;
-    protected double offset; // offset in ticks
+    protected double offset;
 
-    // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
-    public TalonSRXWithEncoder(ITalonSRXWithEncoderConfig config) {
-        super(config);
-        talon.setSensorPhase(config.getEncoderConfig().getReversed());
-        this.sensorPosition = config.getSensorPosition();
-        this.offset = config.getEncoderConfig().getOffset();
-        talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
-        talon.config_kP(0, config.getPIDConfig().getP(), 10);
-        talon.config_kI(0, config.getPIDConfig().getI(), 10);
-        talon.config_kD(0, config.getPIDConfig().getD(), 10);
-        talon.config_IntegralZone(0, config.getIZone(), 10);
-        talon.configAllowableClosedloopError(0, config.getRotationTolerance(), 10);
-        talon.configPeakOutputForward(1, 10);
-        talon.configPeakOutputReverse(-1, 10);
+    protected BaseMotorWithEncoder(IMotorWithEncoderConfig<TMotor, TMotorConfig> config) {
+        offset = config.getEncoderConfig().getOffset();
+
         var startAngle = getOffsetAngle();
         isReversed = startAngle > 90 && startAngle < 270 ? true : false;
     }
-
-    public double getPIDTarget() {
-        return talon.getClosedLoopTarget();
+    protected BaseMotorWithEncoder(IMotorConfig<TMotor> config) {
+        //this only exists so that child classes can create non-encoder instances
     }
-
-    public void setRawPosition(double ticks) {
-        super.talon.set(ControlMode.Position, ticks);
-    }
-
-    public void setOffsetPosition(double ticks) {
-        super.talon.set(ControlMode.Position, ticks + offset);
-    }
-
-    public double getRawPosition() {
-        //do we need to adjust this to be degrees? what does the spark do?
-        //if spark can give ticks, use ticks, o.w. use degrees
-        return super.talon.getSelectedSensorPosition(sensorPosition);
-    }
-
-    public double getOffsetPosition() {
-        //do we need to adjust this to be degrees? what does the spark do?
-        //if spark can give ticks, use ticks, o.w. use degrees
-        return super.talon.getSelectedSensorPosition(sensorPosition) - offset;
-        //changed to subtract because adding the offset gives you a value greater than 4096
-    }
-
-    public void setVelocity(double velocity) {
-        super.talon.set(ControlMode.Velocity, velocity);
-    }
-
-    public double getVelocity() {
-        return super.talon.getSelectedSensorVelocity(sensorPosition);
-    }
+    
+    protected abstract double getTicksPerRotation();
 
     /**
      * reverses the virtual front of the motor
@@ -163,17 +122,15 @@ public class TalonSRXWithEncoder extends TalonSRX implements IMotorWithEncoder {
      * @return the absolute rotation of the motor
      */
     @Override
-
     public double getRawAngle() {
         return ResourceFunctions.putAngleInRange(ticksToDegrees(getRawPosition()));
     }
 
     protected double ticksToDegrees(double ticks) {
-        return (ticks / TICKS_PER_ROTATION) * 360D;
+        return (ticks / getTicksPerRotation()) * 360D;
     }
 
     protected double degreesToTicks(double degrees) {
-        return (degrees / 360D) * TICKS_PER_ROTATION;
+        return (degrees / 360D) * getTicksPerRotation();
     }
-
 }

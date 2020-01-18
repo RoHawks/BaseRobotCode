@@ -1,9 +1,9 @@
 package common.motors.interfaces;
 
-public interface IMotor {
-    void setOutput(double value);
-    double getOutput();
+import common.pid.interfaces.IInvertible;
+import common.pid.interfaces.ITargetCurrent;
+import common.pid.interfaces.ITargetPercentOutput;
 
-    void setInverted(boolean inverted);
-    boolean getInverted();
+public interface IMotor extends IInvertible, ITargetPercentOutput, ITargetCurrent {
+    
 }

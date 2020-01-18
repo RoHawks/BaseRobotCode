@@ -1,19 +1,37 @@
 package config;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+
+import common.encoders.configs.BaseEncoderConfig;
+import common.motors.configs.SparkMaxConfig;
+import common.motors.configs.SparkMaxWithEncoderConfig;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.configs.interfaces.ITalonSRXConfig;
+import common.pid.configs.PIDConfig;
 import drivetrain.swerve.wheels.configs.WheelConfig;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
 public class Config {
-    public RunConstants runConstants = new RunConstants();
-    public DriveConstants driveConstants = new DriveConstants();
-    public Ports ports = new Ports();
-    public SwerveSpeeds swerveSpeeds = new SwerveSpeeds();
-    public WheelConfig[] wheelConfigs = new WheelConfig[4];
-    public IntakeConstants intakeConstants = new IntakeConstants(); 
-    public LiftConstants liftConstants = new LiftConstants(); 
+    public RunConstants runConstants;
+    public DriveConstants driveConstants;
+    public Ports ports;
+    public SwerveSpeeds swerveSpeeds;
+    public WheelConfig[] wheelConfigs;
+    public IntakeConstants intakeConstants; 
+    public LiftConstants liftConstants; 
+    public ShooterConstants shooterConstants;
+
+    public Config() {
+        runConstants = new RunConstants();
+        driveConstants = new DriveConstants();
+        ports = new Ports();
+        swerveSpeeds = new SwerveSpeeds();
+        wheelConfigs = new WheelConfig[4];
+        intakeConstants = new IntakeConstants(); 
+        liftConstants = new LiftConstants(); 
+        shooterConstants = new ShooterConstants();
+    }
 
     //Constants for the intake test mechanism
     public class IntakeConstants {    
@@ -30,8 +48,8 @@ public class Config {
     public class LiftConstants {    
         public int 
             LIFT_PORT = 11,
-            LIFT_UP_BUTTON = 4, //Y button
-            LIFT_DOWN_BUTTON = 1, //A button
+            SPEED_UP_BUTTON = 4, //Y button
+            SPEED_DOWN_BUTTON = 1, //A button
             DRIVE_BUTTON = 6, //Right shoulder button
             REVERSE_BUTTON = 5; //Left shoulder button
         public boolean LIFT_INVERTED = true;
@@ -43,6 +61,26 @@ public class Config {
         public ITalonSRXConfig MOTOR_CONFIG = new TalonSRXConfig(LIFT_PORT, LIFT_INVERTED);
     }
 
+    public class ShooterConstants {
+        public int 
+            SHOOTER_PORT = 54,
+            SPEED_UP_BUTTON = 4, //Y button
+            SPEED_DOWN_BUTTON = 1, //A button
+            DRIVE_BUTTON = 6, //Right shoulder button
+            REVERSE_BUTTON = 5; //Left shoulder button
+        public boolean SHOOTER_INVERTED = true;
+        public double 
+            SHOOTER_RPM = 0,
+            RPM_INCREMENT = 100,
+            P = 1,
+            I = .001,
+            D = 0,
+            iZone = 500;
+        public SparkMaxWithEncoderConfig MOTOR_CONFIG = new SparkMaxWithEncoderConfig(new SparkMaxConfig(SHOOTER_PORT, SHOOTER_INVERTED), 
+                                                                                      new BaseEncoderConfig(0, false), 
+                                                                                      new PIDConfig(P, I, D, iZone));
+    }
+
     // Constatnts from RunConstants
     public class RunConstants {  
         public boolean RUNNING_DRIVE,
@@ -51,7 +89,8 @@ public class Config {
             SECONDARY_JOYSTICK,
             RUNNING_INTAKE, 
             RUNNING_GYRO,
-            RUNNING_LIFT;
+            RUNNING_LIFT,
+            RUNNING_SHOOTER;
     }
 
     // Constants from DriveConstants
@@ -69,7 +108,9 @@ public class Config {
         public double 
             MAX_ANGULAR_VELOCITY = 1.0, 
             MAX_LINEAR_VELOCITY = 0.5;
-        public int 
+
+        public int
+            PID_INDEX = 0, 
             ROTATIONAL_TOLERANCE = 5,
             ROTATION_IZONE = 500,
             SENSOR_POSITION = 0;
@@ -85,6 +126,8 @@ public class Config {
             DRIFT_COMP_I = 0, 
             DRIFT_COMP_D = 0, 
             DRIFT_COMP_MAX = 0.3;
+
+        public FeedbackDevice SENSOR_TYPE = FeedbackDevice.CTRE_MagEncoder_Absolute;
     }
 
     public class Ports {

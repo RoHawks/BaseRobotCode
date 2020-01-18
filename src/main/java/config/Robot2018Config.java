@@ -31,10 +31,11 @@ public class Robot2018Config extends Config {
                                 new TalonSRXWithEncoderConfig(
                                     new TalonSRXConfig(TURN[i], TURN_INVERTED[i]), 
                                     new BaseEncoderConfig(OFFSETS[i], ENCODER_REVERSED[i]), 
-                                    new PIDConfig(ROTATION_P[i], ROTATION_I[i], ROTATION_D[i]),
+                                    new PIDConfig(ROTATION_P[i], ROTATION_I[i], ROTATION_D[i], driveConstants.ROTATION_IZONE),
                                     driveConstants.SENSOR_POSITION,
-                                    driveConstants.ROTATION_IZONE,
-                                    driveConstants.ROTATIONAL_TOLERANCE
+                                    driveConstants.PID_INDEX,
+                                    driveConstants.ROTATIONAL_TOLERANCE,
+                                    driveConstants.SENSOR_TYPE
                                 ),
                                 X_OFF[i],
                                 Y_OFF[i],

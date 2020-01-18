@@ -1,29 +1,31 @@
 package common.motors;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import common.motors.configs.SparkMaxConfig;
 import common.motors.configs.interfaces.IMotorConfig;
 import common.motors.configs.interfaces.IMotorWithEncoderConfig;
-import common.motors.interfaces.IMotorWithEncoder;
-import resource.ResourceFunctions;
 
 //We need to change the ticks from int to double because sparks use revolutions instead of ticks
 
-public class SparkMax implements IMotorWithEncoder {
+public class SparkMax extends BaseMotorWithEncoder<SparkMax, SparkMaxConfig> {
 
     private CANSparkMax spark;
-    protected boolean isReversed;
-    protected double offset; // offset in ticks
 
-    protected static final double TICKS_PER_ROTATION = 1; // TODO: represent ticks as ints
-
-    public SparkMax(IMotorWithEncoderConfig config) {
-        this(config.getMotorConfig());
+    public SparkMax(IMotorWithEncoderConfig<SparkMax, IMotorConfig<SparkMax>> config) {
+        super(config);
         offset = config.getEncoderConfig().getOffset();
+        var pid = spark.getPIDController();
+        pid.setP(config.getPIDConfig().getP());
+        pid.setI(config.getPIDConfig().getI());
+        pid.setD(config.getPIDConfig().getD());
+        pid.setIZone(config.getPIDConfig().getIZone());
     }
-    public SparkMax(IMotorConfig config) {
+    public SparkMax(IMotorConfig<SparkMax> config) {
+        super(config);
         spark = new CANSparkMax(config.getPort(), MotorType.kBrushless);
         isReversed = false;
         spark.setInverted(config.getInverted());
@@ -32,6 +34,7 @@ public class SparkMax implements IMotorWithEncoder {
         spark.setOpenLoopRampRate(0.35);
     }
 
+    @Override
     public void setOutput(double percentage) {
         spark.set(percentage);
     }
@@ -41,30 +44,32 @@ public class SparkMax implements IMotorWithEncoder {
         return spark.get();
     }
 
+    @Override
     public double getVelocity() {
         return spark.getEncoder().getVelocity();
     }
 
+    @Override
     public void setVelocity(double velocity) {
-        double speed = Math.signum(velocity) * Math.abs(velocity);
-        spark.set(speed);
+        spark.getPIDController().setReference(velocity, ControlType.kVelocity);
     }
 
-    // set position
-    public void setRawPosition(double ticks) { // rename to ticks
-        spark.getEncoder().setPosition(ticks);
+    @Override
+    public void setRawPosition(double ticks) {
+        spark.getPIDController().setReference(ticks, ControlType.kPosition);
     }
 
     @Override
     public void setOffsetPosition(double ticks) {
-        spark.getEncoder().setPosition(ticks - offset);
+        spark.getPIDController().setReference(ticks - offset, ControlType.kPosition);
     }
 
-    // get position
+    @Override
     public double getRawPosition() {
         return (double) spark.getEncoder().getPosition();
     }
 
+    @Override
     public double getOffsetPosition() {
         return (double) spark.getEncoder().getPosition() - offset;
     }
@@ -80,75 +85,17 @@ public class SparkMax implements IMotorWithEncoder {
     }
 
     @Override
-    public void setReversed(boolean reversed) {
-        isReversed = reversed;
+    public double getCurrent() {
+        return spark.getOutputCurrent();
     }
 
     @Override
-    public boolean getReversed() {
-        return isReversed;
+    public void setCurrent(double amps) {
+        spark.getPIDController().setReference(amps, ControlType.kCurrent);
     }
 
     @Override
-    public void setReversedOffsetAngle(double value) {
-        //TODO:
+    protected double getTicksPerRotation() {
+        return 1;
     }
-
-    @Override
-    public double getReversedOffsetAngle() {
-        //TODO:
-        return 0;
-    }
-
-    // set angle
-    @Override
-    public void setOffsetAngle(double angle) {
-        double angleTarget = ResourceFunctions.putAngleInRange(angle);
-        double delta = getOffsetAngle() - angleTarget;
-        // reverse the motor if |delta| > 90 
-        if (delta > 90) {
-            delta -= 180;
-            isReversed = !isReversed;
-        } else if (delta < -90) {
-            delta += 180;
-            isReversed = !isReversed;
-        }
-        setRawAngle(delta);
-    }
-
-    @Override
-    public double getOffsetAngle() {
-        double rawTicks = getOffsetPosition();
-        if (isReversed) {
-            rawTicks += TICKS_PER_ROTATION / 2;
-        }
-        return ResourceFunctions.putAngleInRange(ticksToDegrees(rawTicks));
-    }
-
-    @Override
-    public void setRawAngle(double angle) {
-        double tickChange;
-        double tickTarget = degreesToTicks(angle);
-        if (tickTarget > TICKS_PER_ROTATION / 2) {
-            tickChange = TICKS_PER_ROTATION - tickTarget;
-        } else {
-            tickChange = tickTarget - TICKS_PER_ROTATION;
-        }
-        setOffsetPosition(getOffsetPosition() + tickChange);
-    }
-
-    @Override
-    public double getRawAngle() {
-        return ResourceFunctions.putAngleInRange(ticksToDegrees(getOffsetPosition()));
-    }
-
-    protected double ticksToDegrees(double ticks) {
-        return (ticks / TICKS_PER_ROTATION) * 360;
-    }
-
-    protected double degreesToTicks(double degrees) {
-        degrees = ResourceFunctions.putAngleInRange(degrees);
-        return (degrees / 360) * TICKS_PER_ROTATION;
-    }
-
 }

@@ -1,6 +1,5 @@
 package common.pid.interfaces;
 
-// position refers to the motor's tick value
 public interface ITargetPosition {
     void setOffsetPosition(double ticks);
     double getOffsetPosition();

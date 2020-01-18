@@ -4,12 +4,12 @@ import common.encoders.configs.interfaces.IEncoderConfig;
 import common.motors.interfaces.IMotorWithEncoder;
 import common.pid.configs.interfaces.IPIDConfig;
 
-public interface IMotorWithEncoderConfig extends IMotorConfig {
-    IMotorConfig getMotorConfig();
+public interface IMotorWithEncoderConfig<TMotor extends IMotorWithEncoder, TMotorConfig extends IMotorConfig<TMotor>> extends IMotorConfig<TMotor> {
+    TMotorConfig getMotorConfig();
 
     IEncoderConfig getEncoderConfig();
 
     IPIDConfig getPIDConfig();
 
-    IMotorWithEncoder build();
+    TMotor build();
 }
