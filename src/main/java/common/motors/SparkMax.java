@@ -9,8 +9,6 @@ import common.motors.configs.SparkMaxConfig;
 import common.motors.configs.interfaces.IMotorConfig;
 import common.motors.configs.interfaces.IMotorWithEncoderConfig;
 
-//We need to change the ticks from int to double because sparks use revolutions instead of ticks
-
 public class SparkMax extends BaseMotorWithEncoder<SparkMax, SparkMaxConfig> {
 
     private CANSparkMax spark;
@@ -24,6 +22,7 @@ public class SparkMax extends BaseMotorWithEncoder<SparkMax, SparkMaxConfig> {
         pid.setD(config.getPIDConfig().getD());
         pid.setIZone(config.getPIDConfig().getIZone());
     }
+
     public SparkMax(IMotorConfig<SparkMax> config) {
         super(config);
         spark = new CANSparkMax(config.getPort(), MotorType.kBrushless);
