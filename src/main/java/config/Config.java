@@ -21,6 +21,7 @@ public class Config {
     public IntakeConstants intakeConstants; 
     public LiftConstants liftConstants; 
     public ShooterConstants shooterConstants;
+    public ServoConstants servoConstants;
 
     public Config() {
         runConstants = new RunConstants();
@@ -90,7 +91,8 @@ public class Config {
             RUNNING_INTAKE, 
             RUNNING_GYRO,
             RUNNING_LIFT,
-            RUNNING_SHOOTER;
+            RUNNING_SHOOTER,
+            RUNNING_SERVO;
     }
 
     // Constants from DriveConstants
@@ -144,5 +146,14 @@ public class Config {
 			ANGULAR_SPEED_MULT = 1.0,
 			NUDGE_MOVE_SPEED = 0.2,
 			NUDGE_TURN_SPEED = 0.2;
+    }
+
+    public class ServoConstants {    
+        // public int channel = 9;
+        public double
+            // MAX_ANGLE = 0,
+            // MIN_ANGLE = 180,
+            MAX_PERIOD = 2.5,
+            MIN_PERIOD = 0.5;
     }
 }

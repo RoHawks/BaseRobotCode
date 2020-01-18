@@ -13,6 +13,7 @@ import common.motors.TalonSRX;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.interfaces.IMotor;
 import common.motors.interfaces.IMotorWithEncoder;
+import common.servos.RevSRS;
 import config.Config;
 import config.LiftTestConfig;
 import config.Robot2017Config;
@@ -82,6 +83,9 @@ public class Robot extends SampleRobot {
 	private IMotorWithEncoder shooterMotor;
 	private double shooterRPM;
 
+	private RevSRS rsrs;
+	private double rsrsOutput = 0;
+
 	// ****************//
 	// GENERAL CODE //
 	// ****************//
@@ -101,12 +105,15 @@ public class Robot extends SampleRobot {
 		//mConfig = new Robot2018Config();
 		//mConfig = new Robot2017Config();
 		//mConfig = new LiftTestConfig();
-		mConfig = new ShooterTestConfig();
+		mConfig = new Robot2019Config();
 		mController = new XboxController(mConfig.ports.XBOX);
 		if (mConfig.runConstants.RUNNING_GYRO) {
 			mNavX = new AHRS(mConfig.ports.NAVX); 
 		}
 		mPDP = new PowerDistributionPanel();
+
+		rsrs = new RevSRS(9, 0, 180); // TODO: make servo configs 
+
 
 		if (mConfig.runConstants.RUNNING_DRIVE && mConfig.runConstants.RUNNING_GYRO) {
 			driveInit();
@@ -201,6 +208,10 @@ public class Robot extends SampleRobot {
 				runShooter();
 			}
 
+			if (mConfig.runConstants.RUNNING_SERVO && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runServo();
+			}
+
 			// put info on SmartDashboard
 			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
@@ -212,8 +223,7 @@ public class Robot extends SampleRobot {
 					SmartDashboard.putNumber("Motor Output " + i, mWheel[i].Drive.getOutput());
 					SmartDashboard.putNumber("Gyro Raw Angle", mRobotAngle.getRawAngleDegrees());
 				}
-			}
-		
+			}		
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
@@ -276,6 +286,26 @@ public class Robot extends SampleRobot {
 		SmartDashboard.putNumber("Lift speed", liftMotor.getOutput());
 		SmartDashboard.putNumber("Lift speed we will set it to", liftOutput);
 		SmartDashboard.putNumber("Lift motor current draw", liftMotor.getCurrent());
+	}
+
+	// TODO: make propper servo constants
+	public void runServo() {
+		if (mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_UP_BUTTON)) {
+			rsrsOutput += 0.05;
+		} else if (mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_DOWN_BUTTON)) {
+			rsrsOutput -= 0.05;
+		}
+
+		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
+			rsrs.setOutput(rsrsOutput);
+		} else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
+			rsrs.setOutput(-rsrsOutput);
+
+		} else {
+			rsrs.setOutput(0);
+		}
+		SmartDashboard.putNumber("rsrs speed", rsrs.getOutput());
+		SmartDashboard.putNumber("rsrs speed we will set it to", rsrsOutput);
 	}
 
 	public void startGame() {
