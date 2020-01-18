@@ -2,6 +2,7 @@ package logging;
 
 import logging.configs.interfaces.ILoggerConfig;
 import logging.enums.LogLevel;
+import logging.interfaces.ILogDestination;
 import logging.interfaces.ILogMessage;
 import logging.interfaces.ILogger;
 
@@ -13,35 +14,35 @@ public class Logger implements ILogger {
     }
 
     @Override
-    public void log(LogLevel level, ILogMessage message) {
+    public void log(LogLevel level, ILogDestination destination, ILogMessage message) {
         if(level.compareTo(config.getMinLogLevel()) >= 0) {
             //TODO: log it somewhere!!
         }
     }
 
     @Override
-    public void trace(ILogMessage message) {
-        log(LogLevel.Trace, message);
+    public void trace(ILogDestination destination, ILogMessage message) {
+        log(LogLevel.Trace, destination, message);
     }
 
     @Override
-    public void debug(ILogMessage message) {
-        log(LogLevel.Debug, message);
+    public void debug(ILogDestination destination, ILogMessage message) {
+        log(LogLevel.Debug, destination, message);
     }
 
     @Override
-    public void info(ILogMessage message) {
-        log(LogLevel.Info, message);
+    public void info(ILogDestination destination, ILogMessage message) {
+        log(LogLevel.Info, destination, message);
     }
 
     @Override
-    public void warning(ILogMessage message) {
-        log(LogLevel.Warning, message);
+    public void warning(ILogDestination destination, ILogMessage message) {
+        log(LogLevel.Warning, destination, message);
     }
 
     @Override
-    public void error(ILogMessage message) {
-        log(LogLevel.Error, message);
+    public void error(ILogDestination destination, ILogMessage message) {
+        log(LogLevel.Error, destination, message);
 	}
 
 }
