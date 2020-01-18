@@ -9,6 +9,7 @@ public class LogLevel implements Comparable<LogLevel> {
 
     private int level;
 
+
     private LogLevel(int level) {
         this.level = level;
     }
@@ -17,4 +18,6 @@ public class LogLevel implements Comparable<LogLevel> {
     public int compareTo(LogLevel other) {
         return level - other.level;
     }
+
 }
+
