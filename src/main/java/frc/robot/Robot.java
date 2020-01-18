@@ -127,7 +127,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if(mConfig.runConstants.RUNNING_SHOOTER) {
-			shooterMotor = new SparkMax(mConfig.shooterCons gtants.MOTOR_CONFIG);
+			shooterMotor = new SparkMax(mConfig.shooterConstants.MOTOR_CONFIG);
 			shooterRPM = mConfig.shooterConstants.SHOOTER_RPM;
 		}
 

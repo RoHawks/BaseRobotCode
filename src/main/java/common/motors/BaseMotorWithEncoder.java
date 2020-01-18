@@ -17,6 +17,7 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder,
         var startAngle = getOffsetAngle();
         isReversed = startAngle > 90 && startAngle < 270 ? true : false;
     }
+    
     protected BaseMotorWithEncoder(IMotorConfig<TMotor> config) {
         //this only exists so that child classes can create non-encoder instances
     }
