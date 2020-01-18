@@ -127,7 +127,7 @@ public class Robot extends SampleRobot {
 		}
 
 		if(mConfig.runConstants.RUNNING_SHOOTER) {
-			shooterMotor = new SparkMax(mConfig.shooterConstants.MOTOR_CONFIG);
+			shooterMotor = new SparkMax(mConfig.shooterCons gtants.MOTOR_CONFIG);
 			shooterRPM = mConfig.shooterConstants.SHOOTER_RPM;
 		}
 
@@ -229,7 +229,7 @@ public class Robot extends SampleRobot {
 		}
  
 		if (mJoystick.getRawButton(mConfig.shooterConstants.DRIVE_BUTTON)) {
-			shooterMotor.setOutput(shooterRPM/shooterRPM);	
+			shooterMotor.setVelocity(shooterRPM/shooterRPM);	
 		}
 		else if (mJoystick.getRawButton(mConfig.shooterConstants.REVERSE_BUTTON)) {
 			shooterMotor.setVelocity(-shooterRPM);
