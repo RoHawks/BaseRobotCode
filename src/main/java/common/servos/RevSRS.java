@@ -2,14 +2,14 @@ package common.servos;
 
 import edu.wpi.first.wpilibj.PWM;
 
-public class REVSmartRobotServo extends PWM implements IServo {
+public class RevSRS extends PWM implements IServo {
     private double maxAngle = 0;
     private double minAngle = 180;
 
     private double maxPeriod = 2.5; // milisecconds
     private double minPeriod = 0.5;
 
-    public REVSmartRobotServo(int channel) {
+    public RevSRS(int channel) {
         super(channel);
         setBounds(maxPeriod, 0, 0, 0, minPeriod);
         setPeriodMultiplier(PeriodMultiplier.k4X);
