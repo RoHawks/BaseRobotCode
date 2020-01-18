@@ -127,6 +127,8 @@ public class Robot extends SampleRobot {
 		}
 
 		if(mConfig.runConstants.RUNNING_SHOOTER) {
+			String superClass = mConfig.shooterConstants.MOTOR_CONFIG.getClass().getSuperclass().getName();
+			SmartDashboard.putString("class: ", superClass);
 			shooterMotor = new SparkMax(mConfig.shooterConstants.MOTOR_CONFIG);
 			shooterRPM = mConfig.shooterConstants.SHOOTER_RPM;
 		}
@@ -229,7 +231,7 @@ public class Robot extends SampleRobot {
 		}
  
 		if (mJoystick.getRawButton(mConfig.shooterConstants.DRIVE_BUTTON)) {
-			shooterMotor.setVelocity(shooterRPM/shooterRPM);	
+			shooterMotor.setVelocity(shooterRPM);	
 		}
 		else if (mJoystick.getRawButton(mConfig.shooterConstants.REVERSE_BUTTON)) {
 			shooterMotor.setVelocity(-shooterRPM);
