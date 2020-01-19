@@ -3,8 +3,10 @@ package common.servos;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.Servo;
 
+/**
+ * REV Robotics Smart Robot Servo.
+ */
 public class RevSRS extends PWM implements IServo {
     private double maxAngle;
     private double minAngle;
