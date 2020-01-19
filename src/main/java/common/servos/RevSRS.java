@@ -58,7 +58,7 @@ public class RevSRS extends PWM implements IServo {
     // TODO: abstract servo things
     @Override
     public void setOutput(double output) {
-        setSpeed(output);
+        setSpeed(output); // TODO: how the heck does this method work? its definitley not -1 to 1 like the documentation says
     }
 
     @Override
