@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
 import robotcode.systems.CompressorWrapper;
+import robotcode.systems.SingleSolenoidReal;
 import sensors.RobotAngle;
 import sensors.TalonAbsoluteEncoder;
 
@@ -83,8 +84,11 @@ public class Robot extends SampleRobot {
 	private IMotorWithEncoder shooterMotor;
 	private double shooterRPM;
 
-	private RevSRS rsrs;
-	private double rsrsOutput = 0;
+	private RevSRS adjustableHoodServo;
+	private double adjustableHoodSerOutput = 0;
+
+	private SingleSolenoidReal rotaryPistonSolenoid;
+	
 
 	// ****************//
 	// GENERAL CODE //
@@ -112,8 +116,7 @@ public class Robot extends SampleRobot {
 		}
 		mPDP = new PowerDistributionPanel();
 
-		rsrs = new RevSRS(9, 0, 180); // TODO: make servo configs 
-
+		adjustableHoodServo = new RevSRS(9, -360, 360); // TODO: make servo configs 
 
 		if (mConfig.runConstants.RUNNING_DRIVE && mConfig.runConstants.RUNNING_GYRO) {
 			driveInit();
@@ -146,6 +149,7 @@ public class Robot extends SampleRobot {
 
 		if (mConfig.runConstants.RUNNING_PNEUMATICS) {
 			mCompressor = new Compressor(mConfig.ports.COMPRESSOR);
+			rotaryPistonSolenoid = new SingleSolenoidReal(1); // TODO: add port to configs
 		}
 	}
 
@@ -212,6 +216,10 @@ public class Robot extends SampleRobot {
 				runServo();
 			}
 
+			if (mConfig.runConstants.RUNNING_PNEUMATICS && mConfig.runConstants.SECONDARY_JOYSTICK) {
+				runSolenoid();
+			}
+
 			// put info on SmartDashboard
 			if (mConfig.runConstants.RUNNING_DRIVE) {
 				for (int i = 0; i < 4; i++) {
@@ -232,21 +240,26 @@ public class Robot extends SampleRobot {
 	private void runShooter() {
 		//check secondary for speed change
 		if(mJoystick.getRawButtonReleased(mConfig.shooterConstants.SPEED_UP_BUTTON)) {
-			shooterRPM += mConfig.shooterConstants.RPM_INCREMENT;
+			// shooterRPM += mConfig.shooterConstants.RPM_INCREMENT;
+			shooterRPM += 1;
 		}
 		else if(mJoystick.getRawButtonReleased(mConfig.shooterConstants.SPEED_DOWN_BUTTON)) {
-			shooterRPM -= mConfig.shooterConstants.RPM_INCREMENT;
+			// shooterRPM -= mConfig.shooterConstants.RPM_INCREMENT;
+			shooterRPM -= 1;
 		}
  
-		if (mJoystick.getRawButton(mConfig.shooterConstants.DRIVE_BUTTON)) {
-			shooterMotor.setVelocity(shooterRPM/shooterRPM);	
-		}
-		else if (mJoystick.getRawButton(mConfig.shooterConstants.REVERSE_BUTTON)) {
-			shooterMotor.setVelocity(-shooterRPM);
+		// if (mJoystick.getRawButton(mConfig.shooterConstants.DRIVE_BUTTON)) {
+		// 	shooterMotor.setVelocity(shooterRPM/shooterRPM);	
+		// }
+		// else if (mJoystick.getRawButton(mConfig.shooterConstants.REVERSE_BUTTON)) {
+		// 	shooterMotor.setVelocity(-shooterRPM);
 			
-		} else {
-			shooterMotor.setOutput(0);
-		}
+		// } else {
+		// 	shooterMotor.setOutput(0);
+		// }
+
+		shooterMotor.setOutput(shooterRPM);
+
 		SmartDashboard.putNumber("Shooter RPM", shooterMotor.getVelocity());
 		SmartDashboard.putNumber("Shooter RPM Target", shooterRPM);
 		SmartDashboard.putNumber("Shooter motor current draw", shooterMotor.getCurrent());
@@ -290,22 +303,22 @@ public class Robot extends SampleRobot {
 
 	// TODO: make propper servo constants
 	public void runServo() {
-		if (mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_UP_BUTTON)) {
-			rsrsOutput += 0.05;
-		} else if (mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_DOWN_BUTTON)) {
-			rsrsOutput -= 0.05;
-		}
-
 		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
-			rsrs.setOutput(rsrsOutput);
+			adjustableHoodServo.setOutput(0.3);
 		} else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
-			rsrs.setOutput(-rsrsOutput);
-
+			adjustableHoodServo.setOutput(1.20);
 		} else {
-			rsrs.setOutput(0);
-		}
-		SmartDashboard.putNumber("rsrs speed", rsrs.getOutput());
-		SmartDashboard.putNumber("rsrs speed we will set it to", rsrsOutput);
+			adjustableHoodServo.setOutput(0.75);
+		} 
+
+		SmartDashboard.putNumber("adjustableHoodServo speed", adjustableHoodServo.getOutput());
+		SmartDashboard.putNumber("adjustableHoodServo speed we will set it to", adjustableHoodSerOutput);
+	}
+
+	public void runSolenoid() {
+		if (mJoystick.getRawButtonPressed(2)) { //TODO: put button in config
+			rotaryPistonSolenoid.setOpposite();
+		}	
 	}
 
 	public void startGame() {
