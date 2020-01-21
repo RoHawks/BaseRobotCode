@@ -11,19 +11,19 @@ public class RevSRS extends PWM implements IServo {
     private double maxAngle;
     private double minAngle;
 
-    private double maxPeriod = 2500 / 1000; // milisecconds
-    private double minPeriod = 500 / 1000;
+    private double maxPeriod = 2500; // in microsecconds
+    private double minPeriod = 500;
 
     public RevSRS(int channel, double maxAngle, double minAngle) {
         super(channel);
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
-        setBounds(maxPeriod, 0, 0, 0, minPeriod);
+        setBounds(maxPeriod / 1000.0, 0, 0, 0, minPeriod / 1000.0);
         setPeriodMultiplier(PeriodMultiplier.k4X);
 
         // idk if these do anything
         HAL.report(tResourceType.kResourceType_Servo, getChannel());
-        setName("Servo", getChannel()); 
+        setName("Servo", getChannel());
 
     }
 
