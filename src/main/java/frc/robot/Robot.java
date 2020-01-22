@@ -99,9 +99,9 @@ public class Robot extends SampleRobot {
 	public void robotInit() {
 		//mConfig = new Robot2019Config();
 		//mConfig = new Robot2018Config();
-		//mConfig = new Robot2017Config();
+		mConfig = new Robot2017Config();
 		//mConfig = new LiftTestConfig();
-		mConfig = new ShooterTestConfig();
+		//mConfig = new ShooterTestConfig();
 		mController = new XboxController(mConfig.ports.XBOX);
 		if (mConfig.runConstants.RUNNING_GYRO) {
 			mNavX = new AHRS(mConfig.ports.NAVX); 

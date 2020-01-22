@@ -13,7 +13,7 @@ public class Robot2017Config extends Config {
         DRIVE_INVERTED = new boolean[] { false, false, true, true },
         ENCODER_REVERSED = new boolean[] { true, true, false, true };
     public final double[]
-        X_OFF = new double[] { -23.125/2.0, 23.125/2.0 , 23.125/2.0 , -23.125/2.0 }, 
+        X_OFF = new double[] { -23.25/2.0, 23.25/2.0 , 23.25/2.0 , -23.25/2.0 }, 
         Y_OFF = new double[] { 22/2.0, 22/2.0 , -22/2.0 , -22/2.0 }, 
         ROTATION_P = new double[] { 1.0, 1.0, 1.0, 1.0 },
         ROTATION_I = new double[] { 0.001, 0.001, 0.001, 0.001 },
@@ -25,6 +25,7 @@ public class Robot2017Config extends Config {
 
     public Robot2017Config() {
         runConstants.RUNNING_DRIVE = true;
+        runConstants.RUNNING_GYRO = true;
         ports.NAVX = Port.kUSB;
         runConstants.RUNNING_PNEUMATICS = false;
         runConstants.RUNNING_INTAKE = false;
