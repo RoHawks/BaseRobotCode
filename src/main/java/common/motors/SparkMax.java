@@ -13,18 +13,24 @@ public class SparkMax extends BaseMotorWithEncoder<SparkMax, SparkMaxConfig> {
 
     private CANSparkMax spark;
 
-    public SparkMax(IMotorWithEncoderConfig<SparkMax, IMotorConfig<SparkMax>> config) {
+    public SparkMax(IMotorWithEncoderConfig<SparkMax, SparkMaxConfig> config) {
         super(config);
+        baseConfig(config.getMotorConfig());
         offset = config.getEncoderConfig().getOffset();
         var pid = spark.getPIDController();
         pid.setP(config.getPIDConfig().getP());
         pid.setI(config.getPIDConfig().getI());
         pid.setD(config.getPIDConfig().getD());
         pid.setIZone(config.getPIDConfig().getIZone());
+        initAngle();
     }
 
     public SparkMax(IMotorConfig<SparkMax> config) {
         super(config);
+        baseConfig(config);
+    }
+
+    private void baseConfig(IMotorConfig<SparkMax> config) {
         spark = new CANSparkMax(config.getPort(), MotorType.kBrushless);
         isReversed = false;
         spark.setInverted(config.getInverted());

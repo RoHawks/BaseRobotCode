@@ -6,27 +6,30 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import common.motors.configs.interfaces.ITalonSRXConfig;
 import common.motors.configs.interfaces.ITalonSRXWithEncoderConfig;
 
-public class TalonSRX extends BaseMotorWithEncoder<TalonSRX, ITalonSRXWithEncoderConfig> {
+public class TalonSRX extends BaseMotorWithEncoder<TalonSRX, ITalonSRXConfig> {
     protected int sensorPosition;
     protected WPI_TalonSRX talon;
     
     // could potentially make sensor position an optional parameter because getSelectedSensorPosition/Velocity have parameterless overloads
     public TalonSRX(ITalonSRXWithEncoderConfig config) {
-        this(config.getMotorConfig());
+        super(config);
+        baseConfig(config.getMotorConfig());
         talon.setSensorPhase(config.getEncoderConfig().getReversed());
         this.sensorPosition = config.getSensorPosition();
-        talon.configSelectedFeedbackSensor(config.getSensorType(), config.getPIDIndex(), config.getTimeout());
-        talon.config_kP(0, config.getPIDConfig().getP(), config.getTimeout());
-        talon.config_kI(0, config.getPIDConfig().getI(), config.getTimeout());
-        talon.config_kD(0, config.getPIDConfig().getD(), config.getTimeout());
-        talon.config_IntegralZone(0, (int)config.getPIDConfig().getIZone(), config.getTimeout());
-        talon.configAllowableClosedloopError(0, config.getRotationTolerance(), config.getTimeout());
-
-        var startAngle = getOffsetAngle();
-        isReversed = startAngle > 90 && startAngle < 270 ? true : false;
+        talon.configSelectedFeedbackSensor(config.getSensorType(), config.getPIDIndex(), config.getMotorConfig().getTimeout());
+        talon.config_kP(0, config.getPIDConfig().getP(), config.getMotorConfig().getTimeout());
+        talon.config_kI(0, config.getPIDConfig().getI(), config.getMotorConfig().getTimeout());
+        talon.config_kD(0, config.getPIDConfig().getD(), config.getMotorConfig().getTimeout());
+        talon.config_IntegralZone(0, (int)config.getPIDConfig().getIZone(), config.getMotorConfig().getTimeout());
+        talon.configAllowableClosedloopError(0, config.getRotationTolerance(), config.getMotorConfig().getTimeout());
+        initAngle();
     }
     public TalonSRX(ITalonSRXConfig config) {
         super(config);
+        baseConfig(config);
+    }
+
+    private void baseConfig(ITalonSRXConfig config) {
         talon = new WPI_TalonSRX(config.getPort());
         talon.setInverted(config.getInverted());
         talon.setNeutralMode(config.getNeutralMode());

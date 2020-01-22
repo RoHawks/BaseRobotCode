@@ -13,13 +13,15 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder,
 
     protected BaseMotorWithEncoder(IMotorWithEncoderConfig<TMotor, TMotorConfig> config) {
         offset = config.getEncoderConfig().getOffset();
-
-        var startAngle = getOffsetAngle();
-        isReversed = startAngle > 90 && startAngle < 270 ? true : false;
     }
     
     protected BaseMotorWithEncoder(IMotorConfig<TMotor> config) {
         //this only exists so that child classes can create non-encoder instances
+    }
+    
+    protected void initAngle() {
+        var startAngle = getOffsetAngle();
+        isReversed = startAngle > 90 && startAngle < 270 ? true : false;
     }
     
     protected abstract double getTicksPerRotation();
