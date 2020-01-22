@@ -14,6 +14,7 @@ import common.motors.configs.TalonSRXConfig;
 import common.motors.interfaces.IMotor;
 import common.motors.interfaces.IMotorWithEncoder;
 import common.servos.RevSRS;
+import common.servos.configs.BasePWMConfig;
 import config.Config;
 import config.LiftTestConfig;
 import config.Robot2017Config;
@@ -109,14 +110,13 @@ public class Robot extends SampleRobot {
 		//mConfig = new Robot2018Config();
 		//mConfig = new Robot2017Config();
 		//mConfig = new LiftTestConfig();
-		mConfig = new Robot2019Config();
 		mController = new XboxController(mConfig.ports.XBOX);
 		if (mConfig.runConstants.RUNNING_GYRO) {
 			mNavX = new AHRS(mConfig.ports.NAVX); 
 		}
 		mPDP = new PowerDistributionPanel();
 
-		adjustableHoodServo = new RevSRS(9, -360, 360); // TODO: make servo configs 
+		adjustableHoodServo = new RevSRS(new BasePWMConfig(9), RevSRS.Mode.Continuous);
 
 		if (mConfig.runConstants.RUNNING_DRIVE && mConfig.runConstants.RUNNING_GYRO) {
 			driveInit();
@@ -304,11 +304,11 @@ public class Robot extends SampleRobot {
 	// TODO: make propper servo constants
 	public void runServo() {
 		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
-			adjustableHoodServo.setOutput(0.3);
+			adjustableHoodServo.setOutput(1);
 		} else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
-			adjustableHoodServo.setOutput(1.20);
+			adjustableHoodServo.setOutput(-1);
 		} else {
-			adjustableHoodServo.setOutput(0.75);
+			adjustableHoodServo.setOutput(0);
 		} 
 
 		SmartDashboard.putNumber("adjustableHoodServo speed", adjustableHoodServo.getOutput());

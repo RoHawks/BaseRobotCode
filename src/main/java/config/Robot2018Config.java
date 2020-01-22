@@ -23,8 +23,11 @@ public class Robot2018Config extends Config {
         DRIVE = new int[] { 10, 9, 7, 6 }; // Right back, right front, left front, left back
 
     public Robot2018Config() {
-        runConstants.RUNNING_DRIVE = true;
-        runConstants.RUNNING_PNEUMATICS = true;
+        runConstants.RUNNING_DRIVE = false;
+        runConstants.RUNNING_GYRO = false;
+        runConstants.RUNNING_PNEUMATICS = false;
+        runConstants.RUNNING_SERVO = true;
+        runConstants.RUNNING_SHOOTER = false;
         for(int i = 0; i < wheelConfigs.length; i++) {
             wheelConfigs[i] = new WheelConfig(
                                 new TalonSRXConfig(DRIVE[i], DRIVE_INVERTED[i]),
