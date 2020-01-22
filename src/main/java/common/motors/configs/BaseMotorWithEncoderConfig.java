@@ -7,7 +7,6 @@ import common.motors.interfaces.IMotorWithEncoder;
 import common.pid.configs.interfaces.IPIDConfig;
 
 public abstract class BaseMotorWithEncoderConfig<TMotor extends IMotorWithEncoder, TMotorConfig extends IMotorConfig<TMotor>>
-                      extends BaseMotorConfig<TMotor> 
                       implements IMotorWithEncoderConfig<TMotor, TMotorConfig> {
     
     protected final TMotorConfig motorConfig;
@@ -15,7 +14,6 @@ public abstract class BaseMotorWithEncoderConfig<TMotor extends IMotorWithEncode
     protected final IPIDConfig pidConfig;
 
     public BaseMotorWithEncoderConfig(TMotorConfig motorConfig, IEncoderConfig encoderConfig, IPIDConfig pidConfig) {
-        super(motorConfig);
         this.motorConfig = motorConfig;
         this.encoderConfig = encoderConfig;
         this.pidConfig = pidConfig;

@@ -8,16 +8,17 @@ import common.motors.configs.interfaces.ITalonSRXConfig;
 import common.motors.configs.interfaces.ITalonSRXWithEncoderConfig;
 import common.pid.configs.interfaces.IPIDConfig;
 
-public class TalonSRXWithEncoderConfig extends TalonSRXConfig implements ITalonSRXWithEncoderConfig {
+public class TalonSRXWithEncoderConfig implements ITalonSRXWithEncoderConfig {
     protected final int sensorPosition;
     protected final int rotationTolerance;
     protected final int pidIndex;
     protected final FeedbackDevice sensorType;
+    protected final ITalonSRXConfig motorConfig;
     protected final IEncoderConfig encoderConfig;
     protected final IPIDConfig pidConfig;
 
     public TalonSRXWithEncoderConfig(ITalonSRXConfig motorConfig, IEncoderConfig encoderConfig, IPIDConfig pidConfig, int sensorPosition, int pidIndex, int rotationTolerance, FeedbackDevice sensorType) {
-        super(motorConfig);
+        this.motorConfig = motorConfig;
         this.encoderConfig = encoderConfig;
         this.pidConfig = pidConfig;
         this.sensorPosition = sensorPosition;
@@ -42,8 +43,8 @@ public class TalonSRXWithEncoderConfig extends TalonSRXConfig implements ITalonS
     }
 
     @Override
-    public TalonSRXConfig getMotorConfig() {
-        return this;
+    public ITalonSRXConfig getMotorConfig() {
+        return motorConfig;
     }
 
     @Override
