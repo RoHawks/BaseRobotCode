@@ -18,10 +18,9 @@ public class Config {
     public Ports ports;
     public SwerveSpeeds swerveSpeeds;
     public WheelConfig[] wheelConfigs;
-    public IntakeConstants intakeConstants; 
-    public LiftConstants liftConstants; 
-    public ShooterConstants shooterConstants;
-    public ServoConstants servoConstants;
+    public IntakeConstants INTAKE; 
+    public LiftConstants LIFTER; 
+    public ShooterConstants SHOOTER;
 
     public Config() {
         runConstants = new RunConstants();
@@ -29,9 +28,9 @@ public class Config {
         ports = new Ports();
         swerveSpeeds = new SwerveSpeeds();
         wheelConfigs = new WheelConfig[4];
-        intakeConstants = new IntakeConstants(); 
-        liftConstants = new LiftConstants(); 
-        shooterConstants = new ShooterConstants();
+        INTAKE = new IntakeConstants(); 
+        LIFTER = new LiftConstants(); 
+        SHOOTER = new ShooterConstants();
     }
 
     //Constants for the intake test mechanism
@@ -63,24 +62,39 @@ public class Config {
     }
 
     public class ShooterConstants {
-        public int 
-            SHOOTER_PORT = 54,
-            SPEED_UP_BUTTON = 4, //Y button
-            SPEED_DOWN_BUTTON = 1, //A button
-            DRIVE_BUTTON = 6, //Right shoulder button
-            REVERSE_BUTTON = 5; //Left shoulder button
-        public boolean SHOOTER_INVERTED = true;
-        public double 
-            SHOOTER_RPM = 0,
-            RPM_INCREMENT = 100,
-            P = 1,
-            I = .001,
-            D = 0,
-            iZone = 500;
-        public SparkMaxWithEncoderConfig MOTOR_CONFIG = new SparkMaxWithEncoderConfig(new SparkMaxConfig(SHOOTER_PORT, SHOOTER_INVERTED), 
-                                                                                      new BaseEncoderConfig(0, false), 
-                                                                                      new PIDConfig(P, I, D, iZone));
+        public Flywheel FLYWHEEL = new Flywheel();
+        public Hood HOOD = new Hood();
+
+        public class Flywheel {
+            public int 
+                SHOOTER_PORT = 54,
+                SPEED_UP_BUTTON = 4, //Y button
+                SPEED_DOWN_BUTTON = 1; //A button
+
+            public boolean SHOOTER_INVERTED = true;
+
+            public double 
+                RPM_INCREMENT = 100, 
+                P = 1, 
+                I = .001, 
+                D = 0, 
+                iZone = 500;
+
+            public SparkMaxWithEncoderConfig MOTOR_CONFIG = new SparkMaxWithEncoderConfig(
+                new SparkMaxConfig(SHOOTER_PORT, SHOOTER_INVERTED),
+                new BaseEncoderConfig(0, false),
+                new PIDConfig(P, I, D, iZone)
+            );
+        }
+
+        public class Hood {
+            public int
+                CHANNEL = 9,
+                CLOCKWISE_BUTTON = 6, //Right shoulder button
+                COUNTERCLOCKWISE_BUTTON = 5; //Left shoulder button
+        }
     }
+
 
     // Constatnts from RunConstants
     public class RunConstants {  
@@ -148,12 +162,7 @@ public class Config {
 			NUDGE_TURN_SPEED = 0.2;
     }
 
-    public class ServoConstants {    
-        // public int channel = 9;
-        public double
-            // MAX_ANGLE = 0,
-            // MIN_ANGLE = 180,
-            MAX_PERIOD = 2.5,
-            MIN_PERIOD = 0.5;
+    public class ShooterHoodConstants {    
+
     }
 }

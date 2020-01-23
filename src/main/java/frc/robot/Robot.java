@@ -88,7 +88,6 @@ public class Robot extends SampleRobot {
 	private double adjustableHoodSerOutput = 0;
 
 	private SingleSolenoidReal rotaryPistonSolenoid;
-	
 
 	// ****************//
 	// GENERAL CODE //
@@ -112,7 +111,7 @@ public class Robot extends SampleRobot {
 		mConfig = new Robot2019Config();
 		mController = new XboxController(mConfig.ports.XBOX);
 		if (mConfig.runConstants.RUNNING_GYRO) {
-			mNavX = new AHRS(mConfig.ports.NAVX); 
+			mNavX = new AHRS(mConfig.ports.NAVX);
 		}
 		mPDP = new PowerDistributionPanel();
 
@@ -123,8 +122,8 @@ public class Robot extends SampleRobot {
 		}
 
 		if (mConfig.runConstants.RUNNING_INTAKE) {
-			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.intakeConstants.INTAKE_PORT, mConfig.intakeConstants.INTAKE_INVERTED));
-			intakeOutput = mConfig.intakeConstants.INTAKE_POWER_OUTPUT;
+			intakeMotor = new TalonSRX(new TalonSRXConfig(mConfig.INTAKE.INTAKE_PORT, mConfig.INTAKE.INTAKE_INVERTED));
+			intakeOutput = mConfig.INTAKE.INTAKE_POWER_OUTPUT;
 		}
 
 		if (mConfig.runConstants.SECONDARY_JOYSTICK) {
@@ -132,13 +131,13 @@ public class Robot extends SampleRobot {
 		}
 
 		if (mConfig.runConstants.RUNNING_LIFT) {
-			liftMotor = new TalonSRX(mConfig.liftConstants.MOTOR_CONFIG);
-			liftOutput = mConfig.liftConstants.LIFT_POWER_OUTPUT;
+			liftMotor = new TalonSRX(mConfig.LIFTER.MOTOR_CONFIG);
+			liftOutput = mConfig.LIFTER.LIFT_POWER_OUTPUT;
 		}
 
-		if(mConfig.runConstants.RUNNING_SHOOTER) {
-			shooterMotor = new SparkMax(mConfig.shooterConstants.MOTOR_CONFIG);
-			shooterRPM = mConfig.shooterConstants.SHOOTER_RPM;
+		if (mConfig.runConstants.RUNNING_SHOOTER) {
+			shooterMotor = new SparkMax(mConfig.SHOOTER.FLYWHEEL.MOTOR_CONFIG);
+			shooterRPM = 0;
 		}
 
 		if (mConfig.runConstants.RUNNING_CAMERA) {
@@ -201,14 +200,14 @@ public class Robot extends SampleRobot {
 			swerveDrive();
 
 			if (mConfig.runConstants.RUNNING_INTAKE && mConfig.runConstants.SECONDARY_JOYSTICK) {
-				runIntake();	
+				runIntake();
 			}
 
 			if (mConfig.runConstants.RUNNING_LIFT && mConfig.runConstants.SECONDARY_JOYSTICK) {
-				runLift();	
+				runLift();
 			}
 
-			if(mConfig.runConstants.RUNNING_SHOOTER && mConfig.runConstants.SECONDARY_JOYSTICK) {
+			if (mConfig.runConstants.RUNNING_SHOOTER && mConfig.runConstants.SECONDARY_JOYSTICK) {
 				runShooter();
 			}
 
@@ -231,7 +230,7 @@ public class Robot extends SampleRobot {
 					SmartDashboard.putNumber("Motor Output " + i, mWheel[i].Drive.getOutput());
 					SmartDashboard.putNumber("Gyro Raw Angle", mRobotAngle.getRawAngleDegrees());
 				}
-			}		
+			}
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
@@ -239,24 +238,11 @@ public class Robot extends SampleRobot {
 
 	private void runShooter() {
 		//check secondary for speed change
-		if(mJoystick.getRawButtonReleased(mConfig.shooterConstants.SPEED_UP_BUTTON)) {
-			// shooterRPM += mConfig.shooterConstants.RPM_INCREMENT;
-			shooterRPM += 1;
+		if (mJoystick.getRawButtonReleased(mConfig.SHOOTER.FLYWHEEL.SPEED_UP_BUTTON)) {
+			shooterRPM += mConfig.SHOOTER.FLYWHEEL.RPM_INCREMENT;
+		} else if (mJoystick.getRawButtonReleased(mConfig.SHOOTER.FLYWHEEL.SPEED_DOWN_BUTTON)) {
+			shooterRPM -= mConfig.SHOOTER.FLYWHEEL.RPM_INCREMENT;
 		}
-		else if(mJoystick.getRawButtonReleased(mConfig.shooterConstants.SPEED_DOWN_BUTTON)) {
-			// shooterRPM -= mConfig.shooterConstants.RPM_INCREMENT;
-			shooterRPM -= 1;
-		}
- 
-		// if (mJoystick.getRawButton(mConfig.shooterConstants.DRIVE_BUTTON)) {
-		// 	shooterMotor.setVelocity(shooterRPM/shooterRPM);	
-		// }
-		// else if (mJoystick.getRawButton(mConfig.shooterConstants.REVERSE_BUTTON)) {
-		// 	shooterMotor.setVelocity(-shooterRPM);
-			
-		// } else {
-		// 	shooterMotor.setOutput(0);
-		// }
 
 		shooterMotor.setOutput(shooterRPM);
 
@@ -268,11 +254,10 @@ public class Robot extends SampleRobot {
 
 	private void runIntake() {
 		//check secondary for speed change
-		if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_UP_BUTTON)) {
-			intakeOutput += mConfig.intakeConstants.SPEED_INCREMENT;
-		}
-		else if(mJoystick.getRawButtonReleased(mConfig.intakeConstants.SPEED_DOWN_BUTTON)) {
-			intakeOutput -= mConfig.intakeConstants.SPEED_INCREMENT;
+		if (mJoystick.getRawButtonReleased(mConfig.INTAKE.SPEED_UP_BUTTON)) {
+			intakeOutput += mConfig.INTAKE.SPEED_INCREMENT;
+		} else if (mJoystick.getRawButtonReleased(mConfig.INTAKE.SPEED_DOWN_BUTTON)) {
+			intakeOutput -= mConfig.INTAKE.SPEED_INCREMENT;
 		}
 		intakeMotor.setOutput(intakeOutput);
 		SmartDashboard.putNumber("Intake speed", intakeOutput);
@@ -280,19 +265,17 @@ public class Robot extends SampleRobot {
 
 	private void runLift() {
 		//check secondary for speed change
-		if(mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_UP_BUTTON)) {
-			liftOutput += mConfig.liftConstants.SPEED_INCREMENT;
+		if (mJoystick.getRawButtonReleased(mConfig.LIFTER.SPEED_UP_BUTTON)) {
+			liftOutput += mConfig.LIFTER.SPEED_INCREMENT;
+		} else if (mJoystick.getRawButtonReleased(mConfig.LIFTER.SPEED_DOWN_BUTTON)) {
+			liftOutput -= mConfig.LIFTER.SPEED_INCREMENT;
 		}
-		else if(mJoystick.getRawButtonReleased(mConfig.liftConstants.SPEED_DOWN_BUTTON)) {
-			liftOutput -= mConfig.liftConstants.SPEED_INCREMENT;
-		}
- 
-		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
-			liftMotor.setOutput(liftOutput);	
-		}
-		else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
+
+		if (mJoystick.getRawButton(mConfig.LIFTER.DRIVE_BUTTON)) {
+			liftMotor.setOutput(liftOutput);
+		} else if (mJoystick.getRawButton(mConfig.LIFTER.REVERSE_BUTTON)) {
 			liftMotor.setOutput(-liftOutput);
-			
+
 		} else {
 			liftMotor.setOutput(0);
 		}
@@ -303,13 +286,13 @@ public class Robot extends SampleRobot {
 
 	// TODO: make propper servo constants
 	public void runServo() {
-		if (mJoystick.getRawButton(mConfig.liftConstants.DRIVE_BUTTON)) {
+		if (mJoystick.getRawButton(mConfig.SHOOTER.HOOD.CLOCKWISE_BUTTON)) {
 			adjustableHoodServo.setOutput(0.3);
-		} else if (mJoystick.getRawButton(mConfig.liftConstants.REVERSE_BUTTON)) {
+		} else if (mJoystick.getRawButton(mConfig.SHOOTER.HOOD.COUNTERCLOCKWISE_BUTTON)) {
 			adjustableHoodServo.setOutput(1.20);
 		} else {
 			adjustableHoodServo.setOutput(0.75);
-		} 
+		}
 
 		SmartDashboard.putNumber("adjustableHoodServo speed", adjustableHoodServo.getOutput());
 		SmartDashboard.putNumber("adjustableHoodServo speed we will set it to", adjustableHoodSerOutput);
@@ -318,7 +301,7 @@ public class Robot extends SampleRobot {
 	public void runSolenoid() {
 		if (mJoystick.getRawButtonPressed(2)) { //TODO: put button in config
 			rotaryPistonSolenoid.setOpposite();
-		}	
+		}
 	}
 
 	public void startGame() {
