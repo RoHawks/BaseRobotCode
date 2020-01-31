@@ -1,68 +1,54 @@
 package common.servos;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import common.servos.configs.interfaces.IPWMConfig;
+import common.servos.interfaces.IAngularServo;
+import common.servos.interfaces.IContinuousServo;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
  * REV Robotics Smart Robot Servo.
  */
-public class RevSRS extends PWM implements IServo {
-    private double maxAngle;
-    private double minAngle;
-
-    private double maxPeriod = 2500; // in microsecconds
-    private double minPeriod = 500;
-
-    public RevSRS(int channel, double maxAngle, double minAngle) {
-        super(channel);
-        this.maxAngle = maxAngle;
-        this.minAngle = minAngle;
-        setBounds(maxPeriod / 1000.0, 0, 0, 0, minPeriod / 1000.0);
-        setPeriodMultiplier(PeriodMultiplier.k4X);
-
-        // idk if these do anything
-        HAL.report(tResourceType.kResourceType_Servo, getChannel());
-        setName("Servo", getChannel());
-
+public class RevSRS extends PWM implements IAngularServo, IContinuousServo {
+    public enum Mode {
+        Continuous,
+        Angular
     }
 
-    @Override
-    public void setRawPosition(double value) {
-        setPosition(value); // position from 0 to 1 out of full range
-    }
+    private Mode mode;
+    private final double minPeriod = 500; //microseconds
+    private final double maxPeriod = 2500;
+    private final double centerPeriod = (maxPeriod - minPeriod) / 2d;
+    private final double minAngle = -90; //is this 130 for our servo?
+    private final double maxAngle = 90;
 
-    @Override
-    public double getRawPosition() {
-        return getPosition();
+    public RevSRS(IPWMConfig config, Mode mode) {
+        super(config.getChannel());
+        this.mode = mode;
+        setBounds(maxPeriod / 1000d, .01, centerPeriod / 1000d, .01, minPeriod / 1000d);
     }
 
     @Override
     public void setRawAngle(double angle) {
-        if (angle < minAngle) {
-            angle = minAngle;
-        } else if (angle > maxAngle) {
-            angle = maxAngle;
-        }
-
-        double target = (angle - minAngle) / (maxAngle - minAngle);
-
-        setRawPosition(target);
+        if(mode != Mode.Angular) return;
+        //scale angle into 0 to 1 range
+        setPosition((angle - minAngle) / (maxAngle - minAngle));
     }
 
     @Override
     public double getRawAngle() {
-        return getRawPosition() * (maxAngle - minAngle) + minAngle;
+        //scale back into angle
+        return minAngle + getPosition() * (maxAngle - minAngle);
     }
 
-    // TODO: abstract servo things
     @Override
     public void setOutput(double output) {
-        setSpeed(output); // TODO: how the heck does this method work? its definitley not -1 to 1 like the documentation says
+        setSpeed(output);
+        //setPosition(output * .5d + .5d);    
     }
 
     @Override
     public double getOutput() {
         return getSpeed();
+        //return (getPosition - .5d) * 2d;
     }
 }
