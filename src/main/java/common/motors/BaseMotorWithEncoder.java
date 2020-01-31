@@ -54,7 +54,6 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder,
         double target = ResourceFunctions.putAngleInRange(angle);
         double current = getReversedOffsetAngle();
         double delta = target - current;
-        //TODO: need to set a flag to track the current reversal target so we don't continuously flip
         // reverse the motor if turning more than 90 degrees away in either direction
         if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
             //if difference between current and target is > 90

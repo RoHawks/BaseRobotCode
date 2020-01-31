@@ -18,10 +18,10 @@ public class RevSRS extends PWM implements IAngularServo, IContinuousServo {
     private final double minPeriod = .5d; //milliseconds
     private final double maxPeriod = 2.5d;
     private final double centerPeriod = (maxPeriod - minPeriod) / 2d + minPeriod;
-    private final double deadbandMargin = .1d;
+    private final double deadbandMargin = 0.1d;
 
     private final double maxSpeed = 1d;
-    private final double minSpeed = -.998d;
+    private final double minSpeed = -0.998d;
 
     private final double minAngle = -90d; //is this 130 for our servo?
     private final double maxAngle = 90d;

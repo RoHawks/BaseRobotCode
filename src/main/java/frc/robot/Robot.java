@@ -284,7 +284,6 @@ public class Robot extends SampleRobot {
 		SmartDashboard.putNumber("Lift motor current draw", liftMotor.getCurrent());
 	}
 
-	// TODO: make propper servo constants
 	public void runServo() {
 		if (mJoystick.getRawButton(mConfig.SHOOTER.HOOD.CLOCKWISE_BUTTON)) {
 			adjustableHoodServo.setOutput(1);
