@@ -15,16 +15,25 @@ public class RevSRS extends PWM implements IAngularServo, IContinuousServo {
     }
 
     private Mode mode;
-    private final double minPeriod = 500; //microseconds
-    private final double maxPeriod = 2500;
-    private final double centerPeriod = (maxPeriod - minPeriod) / 2d;
-    private final double minAngle = -90; //is this 130 for our servo?
-    private final double maxAngle = 90;
+    private final double minPeriod = .5d; //milliseconds
+    private final double maxPeriod = 2.5d;
+    private final double centerPeriod = (maxPeriod - minPeriod) / 2d + minPeriod;
+    private final double deadbandMargin = .1d;
+
+    private final double maxSpeed = 1d;
+    private final double minSpeed = -.998d;
+
+    private final double minAngle = -90d; //is this 130 for our servo?
+    private final double maxAngle = 90d;
 
     public RevSRS(IPWMConfig config, Mode mode) {
         super(config.getChannel());
         this.mode = mode;
-        setBounds(maxPeriod / 1000d, .01, centerPeriod / 1000d, .01, minPeriod / 1000d);
+        setBounds(maxPeriod, 
+                  centerPeriod + deadbandMargin, 
+                  centerPeriod, 
+                  centerPeriod - deadbandMargin, 
+                  minPeriod);
     }
 
     @Override
@@ -36,19 +45,22 @@ public class RevSRS extends PWM implements IAngularServo, IContinuousServo {
 
     @Override
     public double getRawAngle() {
+        if(mode != Mode.Angular) return 0;
         //scale back into angle
         return minAngle + getPosition() * (maxAngle - minAngle);
     }
 
     @Override
     public void setOutput(double output) {
+        if(mode != Mode.Continuous) return;
+        if(output < minSpeed) output = minSpeed;
+        else if(output > maxSpeed) output = maxSpeed;
         setSpeed(output);
-        //setPosition(output * .5d + .5d);    
     }
 
     @Override
     public double getOutput() {
+        if(mode != Mode.Continuous) return 0;
         return getSpeed();
-        //return (getPosition - .5d) * 2d;
     }
 }
