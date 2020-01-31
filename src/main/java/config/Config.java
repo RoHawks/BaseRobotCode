@@ -93,6 +93,13 @@ public class Config {
                 CLOCKWISE_BUTTON = 6, //Right shoulder button
                 COUNTERCLOCKWISE_BUTTON = 5; //Left shoulder button
         }
+
+        public class Turret {
+            public int
+                CHANNEL,
+                CLOCKWISE_BUTTON,
+                COUNTERCLOCKWISE_BUTTON;
+        }
     }
 
 
