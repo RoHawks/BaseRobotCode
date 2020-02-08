@@ -168,8 +168,4 @@ public class Config {
 			NUDGE_MOVE_SPEED = 0.2,
 			NUDGE_TURN_SPEED = 0.2;
     }
-
-    public class ShooterHoodConstants {    
-
-    }
 }
