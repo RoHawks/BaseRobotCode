@@ -10,7 +10,24 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder,
                                            implements IMotorWithEncoder {
     protected boolean isReversed;
     protected double offset;
-    protected double target;
+    protected double targetPosition;
+    protected double targetVelocity;
+
+    public enum Unit {
+        Ticks,
+        Degrees;
+    }
+
+    public enum Type {
+        Offset,
+        Raw;
+    }
+
+    public enum RotationMode {
+        Absolute,
+        Angular;
+    }
+
 
     protected BaseMotorWithEncoder(IMotorWithEncoderConfig<TMotor, TMotorConfig> config) {
         offset = config.getEncoderConfig().getOffset();
@@ -45,96 +62,23 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder,
         return isReversed;
     }
 
-    public void setTarget(double value) {
-        setTarget(value, false, false);
+    public void setTargetPosition(double value) {
+        setTargetPosition(value, Unit.Degrees, Type.Offset);
     }
 
-    public void setTarget(double value, boolean withTicks, boolean withRaw) {
-        if (!withTicks) {
-            value = degreesToTicks(value);
+    public void setTargetPosition(double target, Unit unit, Type type) {
+        if (unit == Unit.Degrees) {
+            target = degreesToTicks(target);
         }
 
-        if (!withRaw) {
-            value -= offset;
+        if (type == Type.Offset) {
+            target -= offset;
         }
 
         // target is now in raw ticks
-        this.target = ResourceFunctions.putAngleInRange(value); 
+        this.targetPosition = target; 
     }
 
-    public double getTarget() {
-        return getTarget(false, false);
-    }
-
-    public double getTarget(boolean withTicks, boolean withRaw) {
-        double out = target;
-
-        if (!withTicks) {
-            out = ticksToDegrees(out);
-        }
-
-        if (!withRaw) {
-            out += offset;
-        }
-
-        return ResourceFunctions.putAngleInRange(out);
-    }
-
-    public void update(boolean withReversal, boolean withDirectional) {
-        double lTarget = target;
-
-        if (withReversal) {
-            double delta = lTarget - getPosition();
-            if (Math.abs(delta) > 90 && Math.abs(delta) < 270) {
-                //if difference between current and target is > 90
-                isReversed = !isReversed; // TODO: move out of motor?
-                delta += 180;
-            }
-            lTarget += delta;
-        }
-
-        if (withDirectional) {
-            double delta = lTarget - getPosition();
-
-            if (delta > 180) {
-                delta -= 360;
-            } else if (delta < -180) {
-                delta += 360;
-            }
-            lTarget += delta;
-        }
-
-        setPosition(lTarget);
-    }
-
-    public abstract double getPosition();
-
-    public double getPosition(boolean withTicks, boolean withRaw) {
-        double position = getPosition();
-
-        if (!withTicks) {
-            position = ticksToDegrees(position);
-        }
-
-        if (!withRaw) {
-            position += offset;
-        }
-
-        return position;
-    }
-
-
-    /**
-     * returns the current angle of the motor
-     * takes into account motor offset
-     * @return the angle of the motor
-     */
-    @Override
-    public double getOffsetAngle() {
-        double offsetTicks = getOffsetPosition();
-        double offsetAngle = ticksToDegrees(offsetTicks);
-        return ResourceFunctions.putAngleInRange(offsetAngle);
-    }
 
     /**
      * returns the current angle of the motor
