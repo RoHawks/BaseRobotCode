@@ -9,7 +9,7 @@ import common.motors.configs.SparkMaxConfig;
 import common.motors.configs.interfaces.IMotorConfig;
 import common.motors.configs.interfaces.IMotorWithEncoderConfig;
 
-public class SparkMax extends BaseMotorWithEncoder<SparkMax, SparkMaxConfig> {
+public class SparkMax extends BaseTargetedMotorWithEncoder<SparkMax, SparkMaxConfig> {
 
     private CANSparkMax spark;
 

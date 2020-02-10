@@ -6,7 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import common.motors.configs.interfaces.ITalonSRXConfig;
 import common.motors.configs.interfaces.ITalonSRXWithEncoderConfig;
 
-public class TalonSRX extends BaseMotorWithEncoder<TalonSRX, ITalonSRXWithEncoderConfig> {
+public class TalonSRX extends BaseTargetedMotorWithEncoder<TalonSRX, ITalonSRXWithEncoderConfig> {
     protected int sensorPosition;
     protected WPI_TalonSRX talon;
     
