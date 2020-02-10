@@ -36,9 +36,13 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
 
     protected abstract double getTicksPerRotation();
 
-    public abstract void setNativePosition(double target); // native method in raw ticks
+    public abstract void setNativePosition(double position); // native method in raw ticks
 
     public abstract double getNativePosition(); // native method in raw ticks
+
+    public abstract void setNativeVelocity(double velocity); // native method
+
+    public abstract double getNativeVelocity(); // native method
 
     /**
      * reverses the virtual front of the motor
@@ -157,6 +161,18 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         }
 
         return position;
+    }
+
+    public void setTargetVelocity(double target) {
+        this.targetVelocity = target;
+    }
+
+    public double getTargetVelocity() {
+        return this.targetVelocity;
+    }
+
+    public void updateVelocity() {
+        setNativeVelocity(targetVelocity);
     }
 
     protected double ticksToDegrees(double ticks) {
