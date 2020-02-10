@@ -3,9 +3,12 @@ package common.motors;
 import common.motors.configs.interfaces.IMotorConfig;
 import common.motors.configs.interfaces.IMotorWithEncoderConfig;
 import common.motors.interfaces.IMotorWithEncoder;
+import common.motors.interfaces.ITargetedMotorWithEncoder;
 import resource.ResourceFunctions;
 
-public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMotorConfig extends IMotorConfig<TMotor>> implements IMotorWithEncoder {
+public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEncoder, TMotorConfig extends IMotorConfig<TMotor>> implements ITargetedMotorWithEncoder {
+
+    // TODO: document this all will do soon(!)
 
     protected boolean isReversed;
     protected double offset;
@@ -23,14 +26,14 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         Raw;
     }
 
-    protected BaseMotorWithEncoder(IMotorWithEncoderConfig<TMotor, TMotorConfig> config) {
+    protected BaseTargetedMotorWithEncoder(IMotorWithEncoderConfig<TMotor, TMotorConfig> config) {
         offset = config.getEncoderConfig().getOffset();
 
-        double startAngle = getOffsetAngle();
+        double startAngle = getPosition(Mode.Angular, Type.Offset);
         isReversed = startAngle > 90 && startAngle < 270 ? true : false;
     }
 
-    protected BaseMotorWithEncoder(IMotorConfig<TMotor> config) {
+    protected BaseTargetedMotorWithEncoder(IMotorConfig<TMotor> config) {
         //this only exists so that child classes can create non-encoder instances
     }
 
@@ -67,6 +70,7 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
      * Default overload
      * @param target
      */
+    @Override
     public void setTargetPosition(double target) {
         setTargetPosition(target, Mode.Angular, Type.Offset);
     }
@@ -93,6 +97,7 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
     /**
     * Default overload
     */
+    @Override
     public double getTargetPosition() {
         return getTargetPosition(Mode.Angular, Type.Offset);
     }
@@ -114,6 +119,11 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         }
 
         return ResourceFunctions.putAngleInRange(target);
+    }
+
+    @Override
+    public void updatePosition() {
+        updatePosition(Mode.Angular);
     }
 
     /**
@@ -149,6 +159,11 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         setNativePosition(target);
     }
 
+    @Override
+    public double getPosition() {
+        return getPosition(Mode.Angular, Type.Offset);
+    }
+
     public double getPosition(Mode mode, Type type) {
         double position = getNativePosition();
 
@@ -163,14 +178,17 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         return position;
     }
 
+    @Override
     public void setTargetVelocity(double target) {
         this.targetVelocity = target;
     }
 
+    @Override
     public double getTargetVelocity() {
         return this.targetVelocity;
     }
 
+    @Override
     public void updateVelocity() {
         setNativeVelocity(targetVelocity);
     }
