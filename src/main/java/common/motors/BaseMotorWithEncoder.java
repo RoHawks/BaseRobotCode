@@ -12,19 +12,15 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
     protected double targetPosition;
     protected double targetVelocity;
 
-    public enum Unit {
-        Ticks,
-        Degrees;
+    // TODO: consider having Unit and Type be attibutes that are set by user and then referenced on methodcall
+    public enum Mode {
+        Absolute, // ticks
+        Angular, // degrees
     }
 
     public enum Type {
         Offset,
         Raw;
-    }
-
-    public enum RotationMode {
-        Absolute, // ticks
-        Angular, // degrees
     }
 
     protected BaseMotorWithEncoder(IMotorWithEncoderConfig<TMotor, TMotorConfig> config) {
@@ -40,7 +36,9 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
 
     protected abstract double getTicksPerRotation();
 
-    public abstract double getRawPosition();
+    public abstract void setNativePosition(double target); // native method in raw ticks
+
+    public abstract double getNativePosition(); // native method in raw ticks
 
     /**
      * reverses the virtual front of the motor
@@ -61,12 +59,22 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         return isReversed;
     }
 
+    /**
+     * Default overload
+     * @param target
+     */
     public void setTargetPosition(double target) {
-        setTargetPosition(target, Unit.Degrees, Type.Offset);
+        setTargetPosition(target, Mode.Angular, Type.Offset);
     }
 
-    public void setTargetPosition(double target, Unit unit, Type type) {
-        if (unit == Unit.Degrees) {
+    /**
+    * Parametizable overload
+    * @param target
+    * @param mode specifies units
+    * @param type
+    */
+    public void setTargetPosition(double target, Mode mode, Type type) {
+        if (mode == Mode.Angular) {
             target = degreesToTicks(target);
         }
 
@@ -78,26 +86,38 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         this.targetPosition = target;
     }
 
+    /**
+    * Default overload
+    */
     public double getTargetPosition() {
-        return getTargetPosition(Unit.Degrees, Type.Offset);
+        return getTargetPosition(Mode.Angular, Type.Offset);
     }
 
-    public double getTargetPosition(Unit unit, Type type) {
-        double target = targetPosition;
+    /**
+    * Parametizable overload
+    * @param mode specifies units
+    * @param type
+    */
+    public double getTargetPosition(Mode mode, Type type) {
+        double target = this.targetPosition;
 
         if (type == Type.Offset) {
             target += offset;
         }
 
-        if (unit == Unit.Degrees) {
+        if (mode == Mode.Angular) {
             target = ticksToDegrees(target);
         }
 
         return ResourceFunctions.putAngleInRange(target);
     }
 
-    public void updatePosition(RotationMode mode) {
-        double target = targetPosition;
+    /**
+     * 
+    * @param mode specifies rotation type, concerned with angle or abolute position
+     */
+    public void updatePosition(Mode mode) {
+        double target = this.targetPosition;
 
         switch (mode) {
         case Absolute:
@@ -125,14 +145,10 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         setNativePosition(target);
     }
 
-    public abstract void setNativePosition(double target); // native method in raw ticks
-
-    public abstract double getNativePosition(); // native method in raw ticks
-
-    public double getPosition(Unit unit, Type type) {
+    public double getPosition(Mode mode, Type type) {
         double position = getNativePosition();
 
-        if (unit == Unit.Degrees) {
+        if (mode == Mode.Angular) {
             position = ticksToDegrees(position);
         }
 
@@ -141,16 +157,6 @@ public abstract class BaseMotorWithEncoder<TMotor extends IMotorWithEncoder, TMo
         }
 
         return position;
-    }
-
-    /**
-     * returns the current angle of the motor
-     * does not take into account motor offset
-     * @return the absolute rotation of the motor
-     */
-    @Override
-    public double getRawAngle() {
-        return ResourceFunctions.putAngleInRange(ticksToDegrees(getRawPosition()));
     }
 
     protected double ticksToDegrees(double ticks) {
