@@ -1,11 +1,19 @@
 package config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import common.encoders.configs.BaseEncoderConfig;
 import common.motors.configs.SparkMaxConfig;
 import common.motors.configs.TalonSRXConfig;
 import common.motors.configs.TalonSRXWithEncoderConfig;
 import common.pid.configs.PIDConfig;
 import drivetrain.swerve.wheels.configs.WheelConfig;
+import logging.configs.LoggerConfig;
+import logging.destinations.LogDestinations;
+import logging.enums.LogLevel;
+import logging.enums.MsgLifetime;
+import logging.interfaces.ILogDestination;
 
 public class Robot2019Config extends Config {
 
@@ -49,5 +57,14 @@ public class Robot2019Config extends Config {
                                 driveConstants.ROTATIONAL_TOLERANCE    
             );
         }
+        List<ILogDestination> destinations = new ArrayList<ILogDestination>();
+        destinations.add(LogDestinations.SmartDashboard);
+        loggerConfig = new LoggerConfig( 
+            LogLevel.Debug,
+            destinations,
+            (MsgLifetime msgLifetime, LogLevel logLevel) -> destinations.get(0)       
+        ); 
+         //set list here
+        
     }
 }

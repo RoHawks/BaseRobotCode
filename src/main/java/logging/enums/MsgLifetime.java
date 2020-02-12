@@ -3,7 +3,10 @@ package logging.enums;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum LogDestinations {
+public enum MsgLifetime {
     Realtime,
-    Lifetime
+    Saved,
+    Both;
     }
+
+

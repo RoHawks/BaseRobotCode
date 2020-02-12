@@ -5,6 +5,8 @@ import common.motors.configs.interfaces.ITalonSRXConfig;
 import drivetrain.swerve.wheels.configs.WheelConfig;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
+import logging.configs.LoggerConfig;
+
 
 public class Config {
     public RunConstants runConstants = new RunConstants();
@@ -14,6 +16,8 @@ public class Config {
     public WheelConfig[] wheelConfigs = new WheelConfig[4];
     public IntakeConstants intakeConstants = new IntakeConstants(); 
     public LiftConstants liftConstants = new LiftConstants(); 
+    public LoggerConfig loggerConfig = new LoggerConfig();
+
 
     //Constants for the intake test mechanism
     public class IntakeConstants {    

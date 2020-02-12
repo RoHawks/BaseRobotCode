@@ -27,6 +27,10 @@ import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import logging.Logger;
+import logging.SmartDashboardLogMessage;
+import logging.destinations.LogDestinations;
+import logging.enums.LogLevel;
 import robotcode.driving.DriveTrain;
 import robotcode.driving.Wheel;
 import robotcode.systems.CompressorWrapper;
@@ -42,6 +46,7 @@ public class Robot extends SampleRobot {
 
 	//config
 	private Config mConfig;
+	private Logger mLogger;
 
 	// controllers
 	private XboxController mController;
@@ -91,10 +96,12 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-		//mConfig = new Robot2019Config();
+		mConfig = new Robot2019Config();
 		//mConfig = new Robot2018Config();
 		// mConfig = new Robot2017Config();
-		mConfig = new LiftTestConfig();
+		//mConfig = new LiftTestConfig();
+		mLogger = new Logger(mConfig.loggerConfig);
+		mLogger.log(LogLevel.Error, LogDestinations.SmartDashboard, new SmartDashboardLogMessage("Logger status: ", "Logger has started"));
 		mController = new XboxController(mConfig.ports.XBOX);
 		if (mConfig.runConstants.RUNNING_GYRO) {
 			mNavX = new AHRS(mConfig.ports.NAVX); 
