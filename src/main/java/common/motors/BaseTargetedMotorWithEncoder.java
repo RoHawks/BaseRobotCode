@@ -15,13 +15,13 @@ public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEnco
     protected double targetPosition;
     protected double targetVelocity;
 
-    // TODO: consider having Unit and Type be attibutes that are set by user and then referenced on methodcall
-    public enum Mode {
+    // TODO: consider having Unit and UnitType be attibutes that are set by user and then referenced on methodcall
+    public enum TargetingMode {
         Absolute, // ticks
         Angular, // degrees
     }
 
-    public enum Type {
+    public enum UnitType {
         Offset,
         Raw;
     }
@@ -29,7 +29,7 @@ public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEnco
     protected BaseTargetedMotorWithEncoder(IMotorWithEncoderConfig<TMotor, TMotorConfig> config) {
         offset = config.getEncoderConfig().getOffset();
 
-        double startAngle = getPosition(Mode.Angular, Type.Offset);
+        double startAngle = getPosition(TargetingMode.Angular, UnitType.Offset);
         isReversed = startAngle > 90 && startAngle < 270 ? true : false;
     }
 
@@ -72,7 +72,7 @@ public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEnco
      */
     @Override
     public void setTargetPosition(double target) {
-        setTargetPosition(target, Mode.Angular, Type.Offset);
+        setTargetPosition(target, TargetingMode.Angular, UnitType.Offset);
     }
 
     /**
@@ -81,12 +81,12 @@ public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEnco
     * @param mode specifies units
     * @param type
     */
-    public void setTargetPosition(double target, Mode mode, Type type) {
-        if (mode == Mode.Angular) {
+    public void setTargetPosition(double target, TargetingMode mode, UnitType type) {
+        if (mode == TargetingMode.Angular) {
             target = degreesToTicks(target);
         }
 
-        if (type == Type.Offset) {
+        if (type == UnitType.Offset) {
             target -= offset;
         }
 
@@ -99,7 +99,7 @@ public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEnco
     */
     @Override
     public double getTargetPosition() {
-        return getTargetPosition(Mode.Angular, Type.Offset);
+        return getTargetPosition(TargetingMode.Angular, UnitType.Offset);
     }
 
     /**
@@ -107,30 +107,31 @@ public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEnco
     * @param mode specifies units
     * @param type
     */
-    public double getTargetPosition(Mode mode, Type type) {
+    public double getTargetPosition(TargetingMode mode, UnitType type) {
         double target = this.targetPosition;
 
-        if (type == Type.Offset) {
+        if (type == UnitType.Offset) {
             target += offset;
         }
 
-        if (mode == Mode.Angular) {
+        if (mode == TargetingMode.Angular) {
             target = ticksToDegrees(target);
+            target = ResourceFunctions.putAngleInRange(target);
         }
 
-        return ResourceFunctions.putAngleInRange(target);
+        return target;
     }
 
     @Override
     public void updatePosition() {
-        updatePosition(Mode.Angular);
+        updatePosition(TargetingMode.Angular);
     }
 
     /**
      * 
     * @param mode specifies rotation type, concerned with angle or abolute position
      */
-    public void updatePosition(Mode mode) {
+    public void updatePosition(TargetingMode mode) {
         double target = this.targetPosition;
 
         switch (mode) {
@@ -161,17 +162,17 @@ public abstract class BaseTargetedMotorWithEncoder<TMotor extends IMotorWithEnco
 
     @Override
     public double getPosition() {
-        return getPosition(Mode.Angular, Type.Offset);
+        return getPosition(TargetingMode.Angular, UnitType.Offset);
     }
 
-    public double getPosition(Mode mode, Type type) {
+    public double getPosition(TargetingMode mode, UnitType type) {
         double position = getNativePosition();
 
-        if (mode == Mode.Angular) {
+        if (mode == TargetingMode.Angular) {
             position = ticksToDegrees(position);
         }
 
-        if (type == Type.Offset) {
+        if (type == UnitType.Offset) {
             position += offset;
         }
 
