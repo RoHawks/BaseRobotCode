@@ -6,6 +6,13 @@ import drivetrain.swerve.wheels.configs.interfaces.IWheelConfig;
 import resource.ResourceFunctions;
 import resource.Vector;
 
+/**
+ * A class representing a swerve drive module with a turn motor, a drive motor,
+ * and a turn encoder. Currently written purely for CTRE Talons, but can be
+ * modified for Sparks or other motor controllers.
+ * 
+ * @author Tal Zussman
+ */
 public class Wheel {
 	public final IWheelConfig config;
 	public IMotorWithEncoder Turn;
@@ -25,8 +32,7 @@ public class Wheel {
 	/**
 	 * Set wheel angle & speed
 	 * 
-	 * @param pWheelVelocity
-	 *            Vector of wheel velocity
+	 * @param pWheelVelocity Vector of wheel velocity
 	 */
 	public void set(Vector pWheelVelocity) {
 		set(pWheelVelocity.getAngle(), pWheelVelocity.getMagnitude());
@@ -78,20 +84,14 @@ public class Wheel {
 	 * 		mTurn.set(ControlMode.PercentOutput, speed);
 	 * }
 	 * 
-	 * private double proportional (double pTarget) { 
-	 * 		double current = mEncoder.getAngleDegrees();
-	 * 		double error = ResourceFunctions.continuousAngleDif(pTarget, current/*current, 360 - pTarget///);
-	 * 		// 360-pTarget was quick fix, will think more later
-	 * 		if (Math.abs(error) > 90) { 
-	 * 			mEncoder.setAdd180(!mEncoder.getAdd180());
-	 * 			setInverted(!mDrive.getInverted()); 
-	 * 			error = ResourceFunctions.continuousAngleDif(pTarget, mEncoder.getAngleDegrees()); 
-	 * 		} 
-	 * 		if (Math.abs(error) < 5) { return 0; }
-	 * 		SmartDashboard.putNumber("error", error); // Instance variable? double
-	 * 		speed = error * NONTALON_P;// Temporary for onboard PID 
-	 * 		speed = Math.signum(speed) * Math.min(Math.abs(speed), DriveConstants.MAX_TURN_VEL) * (mTurnInverted ? -1 : 1); 
-	 * 		return speed; 
-	 * }
+	 * @param pTarget target angle in degrees
+	 * @return if the wheel is in range
 	 */
+	public boolean isInRange(double pTarget) {
+		double currentPosition = mEncoder.getAngleDegrees();
+		double error = ResourceFunctions.continuousAngleDif(pTarget, currentPosition);
+		return Math.abs(error) < DriveConstants.ActualRobot.ROTATION_TOLERANCE[0];
+		// TODO change tolerance value. Same value is used for ticks and angles for some reason...
+	}
+
 }
