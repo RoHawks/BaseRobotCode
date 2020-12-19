@@ -8,17 +8,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import resource.Vector;
 import robotcode.pid.GenericPIDOutput;
-import robotcode.pid.LocalPIDController;
 import sensors.RobotAngle;
 
 public class DriveTrain {
 
 	// Output
-	private SwerveDrive mSwerveDrive; 
+	private SwerveDrive mSwerveDrive;
 	private Wheel[] mWheels;
 
 	// Input
-	private RobotAngle mRobotAngle; 
+	private RobotAngle mRobotAngle;
 	private XboxController mController;
 	private double mJoystickAngle;
 
@@ -29,10 +28,10 @@ public class DriveTrain {
 	private boolean mIsFieldRelative;
 
 	// PIDs
-	private LocalPIDController mGyroPID;
+	private PIDController mGyroPID;
 	private GenericPIDOutput mGyroOutput;
 
-	private LocalPIDController mDriftCompensationPID;
+	private PIDController mDriftCompensationPID;
 	private GenericPIDOutput mDriftCompensationOutput;
 
 	// Velocity modes
@@ -431,9 +430,9 @@ public class DriveTrain {
 		mDriftCompensationPID.disable();
 	}
 
-	public boolean allWheelsInRange(double pAngle) {
+	public boolean AllWheelsInRange(double pAngle) {
 		for (int i = 0; i < 4; i++) {
-			if (!mWheels[i].isInRange(pAngle)) {
+			if (!mWheels[i].IsInRange(pAngle)) {
 				return false;
 			}
 		}

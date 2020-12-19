@@ -22,6 +22,7 @@ import config.ShooterTestConfig;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SampleRobot;
@@ -37,9 +38,9 @@ import sensors.TalonAbsoluteEncoder;
 @SuppressWarnings("deprecation")
 public class Robot extends SampleRobot {
 
-	//***********//
+	// *************//
 	// VARIABLES //
-	//***********//
+	// *************//
 
 	//config
 	private Config mConfig;
@@ -81,9 +82,9 @@ public class Robot extends SampleRobot {
 	private IMotorWithEncoder shooterMotor;
 	private double shooterRPM;
 
-	//**************//
+	// ****************//
 	// GENERAL CODE //
-	//**************//
+	// ****************//
 	public Robot() {
 	}
 
@@ -92,9 +93,6 @@ public class Robot extends SampleRobot {
 	}
 
 	public void endGame() {
-		if(RunConstants.LOGGING){
-			SmartDashboard.putString("DashboardCommand", "EndRecording");
-		}
 	}
 
 	@Override
@@ -109,7 +107,6 @@ public class Robot extends SampleRobot {
 			mNavX = new AHRS(mConfig.ports.NAVX); 
 		}
 		mPDP = new PowerDistributionPanel();
-		mCompressor = new Compressor(Ports.COMPRESSOR);
 
 		if (mConfig.runConstants.RUNNING_DRIVE && mConfig.runConstants.RUNNING_GYRO) {
 			driveInit();
@@ -285,39 +282,16 @@ public class Robot extends SampleRobot {
 		if (!mInGame) {
 			mGameStartMillis = System.currentTimeMillis();
 
-			// CompressorWrapper.action(mCompressor, mConfig);
-			if(RunConstants.LOGGING){
-				createHeaderString();
-				SmartDashboard.putString("DashboardCommand", "StartRecording");
-			}
-			
-			if (RunConstants.RUNNING_PNEUMATICS) {
-				mCompressor.start();
-			}
-			else {
-				mCompressor.stop();
-			}
-
+			CompressorWrapper.action(mCompressor, mConfig);
 			mInGame = true;
 		}
 	}
 
 	@Override
 	public void disabled() {
-		
-		long timeDisabledStarted = System.currentTimeMillis();
-		boolean ended = false;
+		endGame();
 
 		while (this.isDisabled()) {
-			
-			long timeElapsed = System.currentTimeMillis() - timeDisabledStarted;
-
-			if (timeElapsed > 3000 && !ended) {
-				endGame();
-				ended = true;
-				//SmartDashboard.putString("CURRENT ROBOT MODE: ", "DISABLED");
-			}
-			
 			if (mConfig.runConstants.SECONDARY_JOYSTICK && mJoystick.getTriggerPressed()) {
 				// rotate autonomous routines to select which one to start with:
 				if (mAutonomousRoutine == AutonomousRoutineType.DEFAULT) {
@@ -333,14 +307,12 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private void tankDrive() {
 		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveTank();
 		}
 	}
-	
-	@SuppressWarnings("unused")
+
 	private void crabDrive() {
 		if (mConfig.runConstants.RUNNING_DRIVE) {
 			mDriveTrain.driveCrab();
@@ -374,17 +346,17 @@ public class Robot extends SampleRobot {
 		pLogString.append(pVal);
 		pLogString.append(",");
 	}
-	@SuppressWarnings("unused")
+
 	private void addLogValueLong(StringBuilder pLogString, long pVal) {
 		pLogString.append(pVal);
 		pLogString.append(",");
 	}
-	@SuppressWarnings("unused")
+
 	private void addLogValueBoolean(StringBuilder pLogString, boolean pVal) {
 		pLogString.append(pVal ? "1" : "0");
 		pLogString.append(",");
 	}
-	
+
 	private void addLogValueString(StringBuilder pLogString, String pVal) {
 		pLogString.append(pVal);
 		pLogString.append(",");
@@ -394,17 +366,17 @@ public class Robot extends SampleRobot {
 		pLogString.append(pVal);
 		pLogString.append("\n");
 	}
-	@SuppressWarnings("unused")
+
 	private void addLogValueEndInt(StringBuilder pLogString, int pVal) {
 		pLogString.append(pVal);
 		pLogString.append("\n");
 	}
-	@SuppressWarnings("unused")
+
 	private void addLogValueEndLong(StringBuilder pLogString, long pVal) {
 		pLogString.append(pVal);
 		pLogString.append("\n");
 	}
-	@SuppressWarnings("unused")
+
 	private void addLogValueEndBoolean(StringBuilder pLogString, boolean pVal) {
 		pLogString.append(pVal ? "1" : "0");
 		pLogString.append("\n");
@@ -420,6 +392,7 @@ public class Robot extends SampleRobot {
 		long timeElapsed = time - mGameStartMillis;
 
 		SmartDashboard.putBoolean("Game Has Started:", mInGame);
+		SmartDashboard.putNumber("Time Game Started:", mGameStartMillis);
 		SmartDashboard.putNumber("Time Elapsed:", timeElapsed);
 
 		StringBuilder logString = new StringBuilder();
@@ -460,6 +433,10 @@ public class Robot extends SampleRobot {
 
 				addLogValueDouble(logString, mEncoder[i].getAngleDegrees());
 			}
+
+			addLogValueDouble(logString, mDriveTrain.getDesiredRobotVel().getMagnitude());
+			addLogValueDouble(logString, mDriveTrain.getDesiredRobotVel().getAngle());
+			addLogValueDouble(logString, mDriveTrain.getDesiredAngularVel());
 		}
 
 		if (mConfig.runConstants.RUNNING_PNEUMATICS) {
@@ -471,17 +448,5 @@ public class Robot extends SampleRobot {
 		addLogValueEndDouble(logString, mRobotAngle.getAngleDegrees());
 
 		SmartDashboard.putString("LogString", logString.toString());
-	}
-	
-	public void createHeaderString() {
-		StringBuilder headerString = new StringBuilder();
-		String[] headers = { "Time left", "Robot State", "etc" };
-
-		for(int i = 0; i < headers.length - 1; i++){
-			addLogValueString(headerString, headers[i]);
-		}
-		
-		addLogValueEndString(headerString, headers[headers.length - 1]);
-		SmartDashboard.putString("HeaderString", headerString.toString());
 	}
 }
